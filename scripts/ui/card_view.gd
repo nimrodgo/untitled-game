@@ -34,7 +34,8 @@ static func make(title: String, cost: int, body: String, bg: Color = Palette.CAR
 	v.size = min_size
 	v.mouse_filter = Control.MOUSE_FILTER_STOP
 	var big := min_size.x >= LARGE.x * 0.9
-	var k := 1.7 if big else clampf(min_size.x / SMALL.x, 0.8, 1.1)
+	# Text scale follows the tile size (market tiles vary with the screen).
+	var k := 1.7 if big else clampf(minf(min_size.x / SMALL.x, min_size.y / 150.0), 0.85, 1.25)
 
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", int(4 * k))
