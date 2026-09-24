@@ -24,15 +24,17 @@ var _pressed := false
 var _press_pos := Vector2.ZERO
 
 
+## `body` is the main text (for cards: the on-play effect). `buy_text`, if
+## given, is shown in a separate gold "on buy" strip at the bottom of the card.
 static func make(title: String, cost: int, body: String, bg: Color = Palette.CARD,
-		min_size: Vector2 = SMALL, tag := "", footer := "") -> CardView:
+		min_size: Vector2 = SMALL, tag := "", footer := "", buy_text := "") -> CardView:
 	var v := CardView.new()
 	v._bg = bg
 	v.custom_minimum_size = min_size
 	v.size = min_size
 	v.mouse_filter = Control.MOUSE_FILTER_STOP
 	var big := min_size.x >= LARGE.x * 0.9
-	var k := 1.7 if big else (1.1 if min_size.x >= HAND.x else 1.0)
+	var k := 1.7 if big else clampf(min_size.x / SMALL.x, 0.8, 1.1)
 
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", int(4 * k))
@@ -75,8 +77,36 @@ static func make(title: String, cost: int, body: String, bg: Color = Palette.CAR
 		f.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		vb.add_child(f)
 
+	if buy_text != "":
+		vb.add_child(_buy_strip(buy_text, k))
+
 	v._restyle()
 	return v
+
+
+## Gold strip with a shopping-bag icon: what happens when the card is bought.
+static func _buy_strip(text: String, k: float) -> Control:
+	var strip := PanelContainer.new()
+	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := Palette.box(Palette.GOLD.darkened(0.55), Palette.GOLD.darkened(0.15), int(7 * k), 1, int(5 * k))
+	strip.add_theme_stylebox_override("panel", sb)
+	var hb := HBoxContainer.new()
+	hb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hb.add_theme_constant_override("separation", int(5 * k))
+	strip.add_child(hb)
+	var icon := TextureRect.new()
+	icon.texture = Icons.texture(Icons.BUY)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.custom_minimum_size = Vector2(18, 18) * k
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hb.add_child(icon)
+	var t := Icons.rich_label(text, int(14 * k), Palette.FOAM)
+	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	t.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	hb.add_child(t)
+	return strip
 
 
 static func _label(text: String, font_size: int, color: Color) -> Label:

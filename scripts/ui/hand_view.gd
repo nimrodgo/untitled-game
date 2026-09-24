@@ -73,7 +73,10 @@ func _layout(animate: bool, fresh: Array) -> void:
 	var fresh_i := 0
 	for i in n:
 		var v := _views[i]
-		if not is_instance_valid(v) or v.has_meta("flying") or (v == _drag_view and _dragging):
+		if not is_instance_valid(v):
+			continue
+		v.size = CardView.HAND   # re-apply: autowrapped text may have inflated it
+		if v.has_meta("flying") or (v == _drag_view and _dragging):
 			continue
 		var t := i - mid
 		var target_pos := Vector2(x0 + step * i, 4.0 + t * t * 2.5)

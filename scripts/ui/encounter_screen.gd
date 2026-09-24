@@ -12,12 +12,10 @@ extends Control
 @export var encounter_data: EncounterData
 @export var loadout: LoadoutData
 
-enum ShopTab { CARDS, ITEMS, TRINKETS, UPGRADES }
 
 const LARGE_W := 340.0
 
 var enc: Encounter
-var shop_tab: ShopTab = ShopTab.CARDS
 var pending_enh_slot := -1
 
 var _round_label: Label
@@ -33,9 +31,9 @@ var _intent_bubble: PanelContainer
 var _intent_title: Label
 var _intent_kind: Label
 var _intent_desc: RichTextLabel
-var _tab_buttons: Array[Button] = []
 var _shop_panel: PanelContainer
-var _shop_row: HBoxContainer
+var _shop_row: HBoxContainer        ## all market groups side by side
+var _shop_cards_row: HBoxContainer  ## the card group (for enemy snatch fx)
 var _table: Control            ## middle of the screen, where played cards resolve
 var _table_hint: Label         ## only used for the enhancement picker
 var _trinkets_panel: DropTarget
@@ -94,11 +92,11 @@ func _on_enemy_timer() -> void:
 	# Remember the market so we can show what the enemy takes.
 	var before := enc.shop.cards.duplicate()
 	var rects := []
-	for c in _shop_row.get_children():
-		rects.append((c as Control).get_global_rect())
-	var was_cards_tab := shop_tab == ShopTab.CARDS
+	if _shop_cards_row:
+		for c in _shop_cards_row.get_children():
+			rects.append((c as Control).get_global_rect())
 	enc.enemy_act()
-	if was_cards_tab:
+	if true:
 		for i in mini(before.size(), rects.size()):
 			if before[i] != null and enc.shop.cards[i] != before[i]:
 				var ghost := _card_data_view(before[i], CardView.SMALL)
@@ -202,13 +200,6 @@ func _refresh() -> void:
 			func(): _show_popup(_item_view(item.data, false), "", [], "Enemy item")))
 
 	# Market.
-	var counts := [_count(enc.shop.cards), _count(enc.shop.items), _count(enc.shop.trinkets), _count(enc.shop.enhancements)]
-	var names := ["Cards", "Items", "Trinkets", "Upgrades"]
-	var slots := [enc.shop.cards.size(), enc.shop.items.size(), enc.shop.trinkets.size(), enc.shop.enhancements.size()]
-	for i in _tab_buttons.size():
-		_tab_buttons[i].text = "%s %d" % [names[i], counts[i]]
-		_tab_buttons[i].visible = slots[i] > 0   # hide categories this shop doesn't sell
-		_tab_buttons[i].button_pressed = (i == shop_tab)
 	_fill_shop()
 
 	# Your trinkets / items.
@@ -293,66 +284,102 @@ func _empty_gear_slot() -> Control:
 
 # ================================================================ market
 
+## The whole market on one row: Cards | Items | Trinkets | Upgrades.
+## Tiles shrink to fit when a shop sells a lot.
 func _fill_shop() -> void:
 	_clear(_shop_row)
-	match shop_tab:
-		ShopTab.CARDS:
-			for slot in enc.shop.cards.size():
-				var cd: CardData = enc.shop.cards[slot]
-				if cd == null:
-					_shop_row.add_child(_empty_slot()); continue
-				var s := slot
-				var v := _card_data_view(cd, CardView.SMALL)
-				v.set_enabled(enc.can_buy_card(s))
-				var make := func(): return _card_data_view(cd, CardView.SMALL)
-				_attach_buy_drag(v, func(): return enc.buy_card(s), _pile, make)
-				v.tapped.connect(func(): _show_popup(_card_data_view(cd, CardView.LARGE), cd.flavor_text, [
-					{"label": "Buy (%d)" % cd.cost, "enabled": enc.can_buy_card(s),
-						"cb": func(): _buy_with_fx(func(): return enc.buy_card(s), make.call(), _pile)}]))
-				_shop_row.add_child(v)
-		ShopTab.ITEMS:
-			for slot in enc.shop.items.size():
-				var it: ItemData = enc.shop.items[slot]
-				if it == null:
-					_shop_row.add_child(_empty_slot()); continue
-				var s := slot
-				var v := _item_view(it, true)
-				v.set_enabled(enc.can_buy_item(s))
-				var make := func(): return _item_view(it, true)
-				_attach_buy_drag(v, func(): return enc.buy_item(s), _items_panel, make)
-				v.tapped.connect(func(): _show_popup(_item_view(it, true, CardView.LARGE), "", [
-					{"label": "Buy (%d)" % it.cost, "enabled": enc.can_buy_item(s),
-						"cb": func(): _buy_with_fx(func(): return enc.buy_item(s), make.call(), _items_panel)}]))
-				_shop_row.add_child(v)
-		ShopTab.TRINKETS:
-			for slot in enc.shop.trinkets.size():
-				var td: TrinketData = enc.shop.trinkets[slot]
-				if td == null:
-					_shop_row.add_child(_empty_slot()); continue
-				var s := slot
-				var v := _trinket_data_view(td, CardView.SMALL)
-				v.set_enabled(enc.can_buy_trinket(s))
-				var make := func(): return _trinket_data_view(td, CardView.SMALL)
-				_attach_buy_drag(v, func(): return enc.buy_trinket(s), _trinkets_panel, make)
-				v.tapped.connect(func(): _show_popup(_trinket_data_view(td, CardView.LARGE), "", [
-					{"label": "Buy (%d)" % td.cost, "enabled": enc.can_buy_trinket(s),
-						"cb": func(): _buy_with_fx(func(): return enc.buy_trinket(s), make.call(), _trinkets_panel)}]))
-				_shop_row.add_child(v)
-		ShopTab.UPGRADES:
-			for slot in enc.shop.enhancements.size():
-				var ed: EnhancementData = enc.shop.enhancements[slot]
-				if ed == null:
-					_shop_row.add_child(_empty_slot()); continue
-				var s := slot
-				var v := CardView.make(ed.display_name, ed.cost, ed.get_description(), Palette.CARD_ENH, CardView.SMALL, "UPGRADE")
-				v.set_enabled(enc.can_buy_enhancement(s))
-				v.tapped.connect(func(): _show_popup(
-					CardView.make(ed.display_name, ed.cost, ed.get_description(), Palette.CARD_ENH, CardView.LARGE, "UPGRADE"), ed.description, [
-					{"label": "Choose card (%d)" % ed.cost, "enabled": enc.can_buy_enhancement(s),
-						"cb": func(): pending_enh_slot = s; _refresh()}]))
-				_shop_row.add_child(v)
-	if _shop_row.get_child_count() == 0:
-		_shop_row.add_child(CardView._label("Nothing for sale", 18, Palette.MUTED))
+	_shop_cards_row = null
+	var groups := []
+	if enc.shop.cards.size() > 0: groups.append("cards")
+	if enc.shop.items.size() > 0: groups.append("items")
+	if enc.shop.trinkets.size() > 0: groups.append("trinkets")
+	if enc.shop.enhancements.size() > 0: groups.append("upgrades")
+	var n := enc.shop.cards.size() + enc.shop.items.size() + enc.shop.trinkets.size() + enc.shop.enhancements.size()
+	var avail := get_viewport_rect().size.x - 290.0 - 12.0 * 3 - 24.0 - GROUP_GAP * maxf(0, groups.size() - 1)
+	var w := clampf((avail - 8.0 * n) / maxf(1, n), 96.0, CardView.SMALL.x)
+	var tile := Vector2(w, w * CardView.SMALL.y / CardView.SMALL.x)
+	for g in groups:
+		if _shop_row.get_child_count() > 0:
+			var sep := VSeparator.new()
+			sep.add_theme_constant_override("separation", GROUP_GAP)
+			_shop_row.add_child(sep)
+		match g:
+			"cards":
+				var row := _market_group("CARDS", Palette.TEAL)
+				_shop_cards_row = row
+				for slot in enc.shop.cards.size():
+					var cd: CardData = enc.shop.cards[slot]
+					if cd == null:
+						row.add_child(_empty_slot(tile)); continue
+					var s := slot
+					var v := _card_data_view(cd, tile)
+					v.set_enabled(enc.can_buy_card(s))
+					var make := func(): return _card_data_view(cd, tile)
+					_attach_buy_drag(v, func(): return enc.buy_card(s), _pile, make)
+					v.tapped.connect(func(): _show_popup(_card_data_view(cd, CardView.LARGE), cd.flavor_text, [
+						{"label": "Buy (%d)" % cd.cost, "enabled": enc.can_buy_card(s),
+							"cb": func(): _buy_with_fx(func(): return enc.buy_card(s), make.call(), _pile)}]))
+					row.add_child(v)
+			"items":
+				var row := _market_group("ITEMS", Palette.KELP)
+				for slot in enc.shop.items.size():
+					var it: ItemData = enc.shop.items[slot]
+					if it == null:
+						row.add_child(_empty_slot(tile)); continue
+					var s := slot
+					var v := _item_view(it, true, tile)
+					v.set_enabled(enc.can_buy_item(s))
+					var make := func(): return _item_view(it, true, tile)
+					_attach_buy_drag(v, func(): return enc.buy_item(s), _items_panel, make)
+					v.tapped.connect(func(): _show_popup(_item_view(it, true, CardView.LARGE), "", [
+						{"label": "Buy (%d)" % it.cost, "enabled": enc.can_buy_item(s),
+							"cb": func(): _buy_with_fx(func(): return enc.buy_item(s), make.call(), _items_panel)}]))
+					row.add_child(v)
+			"trinkets":
+				var row := _market_group("TRINKETS", Palette.GOLD)
+				for slot in enc.shop.trinkets.size():
+					var td: TrinketData = enc.shop.trinkets[slot]
+					if td == null:
+						row.add_child(_empty_slot(tile)); continue
+					var s := slot
+					var v := _trinket_data_view(td, tile)
+					v.set_enabled(enc.can_buy_trinket(s))
+					var make := func(): return _trinket_data_view(td, tile)
+					_attach_buy_drag(v, func(): return enc.buy_trinket(s), _trinkets_panel, make)
+					v.tapped.connect(func(): _show_popup(_trinket_data_view(td, CardView.LARGE), "", [
+						{"label": "Buy (%d)" % td.cost, "enabled": enc.can_buy_trinket(s),
+							"cb": func(): _buy_with_fx(func(): return enc.buy_trinket(s), make.call(), _trinkets_panel)}]))
+					row.add_child(v)
+			"upgrades":
+				var row := _market_group("UPGRADES", Palette.CARD_ENH.lightened(0.4))
+				for slot in enc.shop.enhancements.size():
+					var ed: EnhancementData = enc.shop.enhancements[slot]
+					if ed == null:
+						row.add_child(_empty_slot(tile)); continue
+					var s := slot
+					var v := CardView.make(ed.display_name, ed.cost, ed.get_description(), Palette.CARD_ENH, tile)
+					v.set_enabled(enc.can_buy_enhancement(s))
+					v.tapped.connect(func(): _show_popup(
+						CardView.make(ed.display_name, ed.cost, ed.get_description(), Palette.CARD_ENH, CardView.LARGE, "UPGRADE"), ed.description, [
+						{"label": "Choose card (%d)" % ed.cost, "enabled": enc.can_buy_enhancement(s),
+							"cb": func(): pending_enh_slot = s; _refresh()}]))
+					row.add_child(v)
+
+
+const GROUP_GAP := 14
+
+
+## A labelled group in the market; returns the row to put tiles in.
+func _market_group(title: String, color: Color) -> HBoxContainer:
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 4)
+	var l := CardView._label(title, 12, color)
+	vb.add_child(l)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	vb.add_child(row)
+	_shop_row.add_child(vb)
+	return row
 
 
 func _count(arr: Array) -> int:
@@ -479,27 +506,17 @@ func _show_deck_viewer() -> void:
 
 # ================================================================= views
 
-func _card_body(play: String, buy: String) -> String:
-	var s := ""
-	if play != "":
-		s += "[color=#7fe3d0]Play:[/color] " + play
-	if buy != "":
-		s += ("\n" if s != "" else "") + "[color=#ffd166]On buy:[/color] " + buy
-	return s
-
-
 func _card_data_view(cd: CardData, sz: Vector2) -> CardView:
-	return CardView.make(cd.display_name, cd.cost,
-		_card_body(cd.get_play_text(_vars()), cd.get_buy_text(_vars())),
-		Palette.CARD, sz, "INSTANT" if cd.instant and not cd.has_custom_text() else "")
+	return CardView.make(cd.display_name, cd.cost, cd.get_play_text(_vars()), Palette.CARD, sz,
+		"INSTANT" if cd.instant and not cd.has_custom_text() else "", "", cd.get_buy_text(_vars()))
 
 
 func _card_instance_view(c: CardInstance, sz: Vector2) -> CardView:
 	var footer := ""
 	for e in c.enhancements:
 		footer += "+ " + e.display_name + "  "
-	return CardView.make(c.get_name(), c.get_cost(), _card_body(c.play_text(_vars()), c.buy_text(_vars())),
-		Palette.CARD, sz, "INSTANT" if c.is_instant() and not c.data.has_custom_text() else "", footer.strip_edges())
+	return CardView.make(c.get_name(), c.get_cost(), c.play_text(_vars()), Palette.CARD, sz,
+		"INSTANT" if c.is_instant() and not c.data.has_custom_text() else "", footer.strip_edges(), c.buy_text(_vars()))
 
 
 func _vars() -> Dictionary:
@@ -507,14 +524,17 @@ func _vars() -> Dictionary:
 
 
 func _item_view(it: ItemData, show_cost: bool, sz: Vector2 = CardView.SMALL) -> CardView:
-	return CardView.make(it.display_name, it.cost if show_cost else -1, it.get_description(), Palette.CARD_ITEM, sz, "ITEM")
+	return CardView.make(it.display_name, it.cost if show_cost else -1, it.get_description(), Palette.CARD_ITEM, sz,
+		"ITEM" if sz == CardView.LARGE else "")
 
 
 func _trinket_data_view(td: TrinketData, sz: Vector2) -> CardView:
+	# (sz may be a shrunken market tile)
 	var desc := td.levels[0].get_text() if not td.levels.is_empty() else ""
 	if td.description != "":
 		desc = td.description + "\n" + desc
-	return CardView.make(td.display_name, td.cost, "Once per round (free): " + desc, Palette.CARD_TRINKET, sz, "TRINKET")
+	return CardView.make(td.display_name, td.cost, "Once per round (free): " + desc, Palette.CARD_TRINKET, sz,
+		"TRINKET" if sz == CardView.LARGE else "")
 
 
 func _show_trinket_popup(idx: int) -> void:
@@ -561,8 +581,8 @@ func _chip(text: String, color: Color, glow: bool, cb: Callable) -> Button:
 	return b
 
 
-func _empty_slot() -> Control:
-	var v := CardView.make("—", -1, "Sold out", Palette.DEEP, CardView.SMALL)
+func _empty_slot(sz: Vector2 = CardView.SMALL) -> Control:
+	var v := CardView.make("", -1, "", Palette.DEEP, sz)
 	v.set_enabled(false)
 	return v
 
@@ -816,34 +836,10 @@ func _build_ui() -> void:
 	var sh := HBoxContainer.new()
 	sh.add_theme_constant_override("separation", 12)
 	_shop_panel.add_child(sh)
-	var tabs := VBoxContainer.new()
-	tabs.add_theme_constant_override("separation", 6)
-	tabs.custom_minimum_size.x = 150
-	sh.add_child(tabs)
-	tabs.add_child(CardView._label("MARKET", 15, Palette.KELP))
-	var group := ButtonGroup.new()
-	for i in 4:
-		var t := Button.new()
-		t.toggle_mode = true
-		t.button_group = group
-		t.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		t.custom_minimum_size.y = 36
-		t.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		t.add_theme_font_size_override("font_size", 18)
-		t.add_theme_stylebox_override("normal", Palette.box(Palette.PANEL.darkened(0.2), Color.TRANSPARENT, 10, 0, 8))
-		t.add_theme_stylebox_override("hover", Palette.box(Palette.PANEL, Color.TRANSPARENT, 10, 0, 8))
-		t.add_theme_stylebox_override("pressed", Palette.box(Palette.TEAL.darkened(0.45), Palette.TEAL, 10, 2, 8))
-		t.add_theme_color_override("font_color", Palette.MUTED)
-		t.add_theme_color_override("font_pressed_color", Palette.FOAM)
-		var idx := i
-		t.pressed.connect(func(): shop_tab = idx as ShopTab; _refresh())
-		tabs.add_child(t)
-		_tab_buttons.append(t)
 	_shop_row = HBoxContainer.new()
 	_shop_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_shop_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_shop_row.add_theme_constant_override("separation", 8)
-	_shop_row.custom_minimum_size.y = CardView.SMALL.y
+	_shop_row.add_theme_constant_override("separation", GROUP_GAP)
 	sh.add_child(_shop_row)
 
 	# The table: empty space where played cards resolve.
@@ -928,6 +924,8 @@ func _gear_panel(title: String, accent: Color) -> DropTarget:
 func _check_orientation() -> void:
 	var s := get_viewport_rect().size
 	_rotate_overlay.visible = s.y > s.x
+	if enc:
+		_refresh.call_deferred()   # market tiles are sized to the screen width
 
 
 func _toggle_fullscreen() -> void:

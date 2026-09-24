@@ -8,6 +8,7 @@ extends RefCounted
 const COIN := "🪙"
 const CARD := "🂠"
 const BOLT := "⚡"
+const BUY := "🛍"   ## marks "when bought" effects
 ## Alternative spellings that draw the same icon.
 const ALIASES := {"🗲": "⚡"}
 
@@ -21,6 +22,10 @@ const SVG := {
 	"⚡": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
 		<path d="M19 2 L6 18 H14.5 L12 30 L26 12.5 H17.5 Z" fill="#ffe066" stroke="#a87412"
 		stroke-width="2" stroke-linejoin="round"/></svg>""",
+	"🛍": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+		<path d="M11 11 V8.5 a5 5 0 0 1 10 0 V11" fill="none" stroke="#a87412" stroke-width="2.5" stroke-linecap="round"/>
+		<path d="M6 11 H26 L24.5 28 H7.5 Z" fill="#ffd166" stroke="#a87412" stroke-width="2.2" stroke-linejoin="round"/>
+		<circle cx="12" cy="15" r="1.4" fill="#a87412"/><circle cx="20" cy="15" r="1.4" fill="#a87412"/></svg>""",
 }
 
 static var _cache := {}
