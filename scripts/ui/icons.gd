@@ -7,7 +7,7 @@ extends RefCounted
 
 const COIN := "🪙"
 const CARD := "🂠"
-const BOLT := "🗲"
+const BOLT := "⚡"
 
 const SVG := {
 	"🪙": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
@@ -16,7 +16,7 @@ const SVG := {
 	"🂠": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
 		<rect x="7" y="3" width="18" height="26" rx="3.5" fill="#9ad7ff" stroke="#123e5a" stroke-width="2.5"/>
 		<rect x="11.5" y="8" width="9" height="16" rx="1.5" fill="none" stroke="#123e5a" stroke-width="1.8"/></svg>""",
-	"🗲": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+	"⚡": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
 		<path d="M19 2 L6 18 H14.5 L12 30 L26 12.5 H17.5 Z" fill="#ffe066" stroke="#a87412"
 		stroke-width="2" stroke-linejoin="round"/></svg>""",
 }

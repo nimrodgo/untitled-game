@@ -27,6 +27,8 @@ var active: PlayerState
 var is_over := false
 var won := false
 var _actions_since_enemy := 0
+## Where the most recently bought card went (the UI animates it there).
+var last_bought_zone: GameRules.Zone = GameRules.DEFAULT_BUY_DESTINATION
 
 
 func _init(encounter_data: EncounterData, loadout: LoadoutData) -> void:
@@ -176,6 +178,8 @@ func buy_card(slot: int) -> bool:
 	ctx.source_name = cd.display_name
 	_run(cd.on_buy, ctx)
 	_place_card(p, card, ctx.buy_destination)
+	log_line("  %s %s." % [_card_name(card), _zone_phrase(ctx.buy_destination)])
+	last_bought_zone = ctx.buy_destination
 	_fire(GameRules.Trigger.CARD_BOUGHT, p, ctx)
 	_fire(GameRules.Trigger.OPPONENT_CARD_BOUGHT, enemy, _ctx(enemy, card))
 	_after_purchase(GameRules.CARD_BUY_IS_ACTION, ctx.grant_extra_action)
@@ -436,6 +440,14 @@ func _place_card(p: PlayerState, card: CardInstance, zone: GameRules.Zone) -> vo
 			p.discard.append(card)
 		_:
 			p.draw_pile.insert(rng.randi_range(0, p.draw_pile.size()), card)
+
+
+func _zone_phrase(zone: GameRules.Zone) -> String:
+	match zone:
+		GameRules.Zone.HAND: return "goes to your hand"
+		GameRules.Zone.DRAW_TOP: return "goes on top of your deck"
+		GameRules.Zone.DISCARD: return "goes to your discard pile"
+	return "is shuffled into your deck"
 
 
 func _ctx(owner: PlayerState, card: CardInstance = null) -> EffectContext:

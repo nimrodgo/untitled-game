@@ -20,9 +20,12 @@ one encounter, full rules engine, landscape (phone-friendly) placeholder UI, TES
 Tunables live in `scripts/core/game_rules.gd` (which buys cost your action, how often the enemy acts, …).
 
 ## Controls
-- Drag a card from your hand into the middle area to play it.
-- Tap anything (cards, shop tiles, items, trinkets, the enemy's intent) to inspect it and see its actions.
-- Shop is split into tabs: Cards / Items / Trinkets / Upgrades.
+- **Play:** drag a card out of your hand and let go — it glows gold once releasing would play it.
+- **Buy a card:** drag it from the market onto your deck (bottom right).
+- **Buy an item / trinket:** drag it onto your Items / Trinkets slots (left). Valid targets pulse while you drag.
+- **Inspect:** tap anything (cards, market tiles, gear, the enemy's intent, your deck) for details and buttons.
+- **Your cards:** tap the deck to see your deck, hand, played cards and discard.
+- Coin changes pop up next to the coin counters; the enemy's intent pulses when it acts.
 - Landscape only; on a phone held upright the game asks you to rotate.
 
 ## Playtest from anywhere (GitHub Pages)

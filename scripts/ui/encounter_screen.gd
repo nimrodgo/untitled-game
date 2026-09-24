@@ -2,13 +2,19 @@ extends Control
 ## Landscape (mobile-friendly) encounter screen, built in code so it's easy to
 ## swap for real scenes/art later. Talks only to Encounter.
 ##
-## Interaction model: tap anything to inspect it (popup with its actions);
-## drag cards from your hand into the play zone to play them.
+## Interaction model (communicated with motion/highlights, not text):
+## - Drag a card out of your hand to play it (it glows gold once releasing
+##   would play it, then pops in the middle of the table).
+## - Drag a market card onto your deck to buy it; drag items / trinkets onto
+##   your Items / Trinkets slots. Valid targets pulse; the hovered one glows.
+## - Tap anything to inspect it (popup with the same actions as buttons).
 
 @export var encounter_data: EncounterData
 @export var loadout: LoadoutData
 
 enum ShopTab { CARDS, ITEMS, TRINKETS, UPGRADES }
+
+const LARGE_W := 340.0
 
 var enc: Encounter
 var shop_tab: ShopTab = ShopTab.CARDS
@@ -27,19 +33,26 @@ var _intent_title: Label
 var _intent_kind: Label
 var _intent_desc: RichTextLabel
 var _tab_buttons: Array[Button] = []
+var _shop_panel: PanelContainer
 var _shop_row: HBoxContainer
-var _play_zone: PanelContainer
-var _play_hint: Label
-var _ticker: RichTextLabel
-var _gear_row: VBoxContainer
+var _table: Control            ## middle of the screen, where played cards resolve
+var _table_hint: Label         ## only used for the enhancement picker
+var _trinkets_panel: DropTarget
+var _trinkets_box: VBoxContainer
+var _items_panel: DropTarget
+var _items_box: VBoxContainer
 var _rotate_overlay: Control
 var _hand: HandView
-var _pile_label: Label
+var _pile: PileView
 var _pass_btn: Button
+var _fx_layer: Control
 var _popup_layer: Control
 var _log_text := ""
-var _recent: PackedStringArray = []
 var _enemy_timer: Timer
+var _shop_drag := {}
+var _last_coins := -1
+var _last_enemy_coins := -1
+var _last_round := 0
 
 
 func _ready() -> void:
@@ -47,17 +60,20 @@ func _ready() -> void:
 	_enemy_timer = Timer.new()
 	_enemy_timer.one_shot = true
 	_enemy_timer.wait_time = GameRules.ENEMY_STEP_DELAY
-	_enemy_timer.timeout.connect(func(): if enc: enc.enemy_act())
+	_enemy_timer.timeout.connect(_on_enemy_timer)
 	add_child(_enemy_timer)
 
 	if encounter_data == null or loadout == null:
-		_play_hint.text = "Assign encounter_data and loadout on the Main node."
+		_table_hint.text = "Assign encounter_data and loadout on the Main node."
 		return
 	enc = Encounter.new(encounter_data, loadout)
-	enc.logged.connect(_on_log)
+	enc.logged.connect(func(t: String): _log_text += t + "\n")
 	enc.changed.connect(_refresh)
 	enc.enemy_turn_pending.connect(_on_enemy_pending)
 	enc.ended.connect(_show_end_overlay)
+	# Let the layout settle so cards can deal in from the deck.
+	await get_tree().process_frame
+	_hand.spawn_point = _pile.target_center()
 	enc.start()
 
 
@@ -71,20 +87,39 @@ func _on_enemy_pending() -> void:
 	_enemy_timer.start()
 
 
-func _on_log(text: String) -> void:
-	_log_text += text + "\n"
-	var t := text.strip_edges()
-	if t != "":
-		_recent.append(t)
-		if _recent.size() > 3:
-			_recent = _recent.slice(_recent.size() - 3)
-	if _ticker:
-		_ticker.text = "\n".join(_recent)
+func _on_enemy_timer() -> void:
+	if enc == null:
+		return
+	# Remember the market so we can show what the enemy takes.
+	var before := enc.shop.cards.duplicate()
+	var rects := []
+	for c in _shop_row.get_children():
+		rects.append((c as Control).get_global_rect())
+	var was_cards_tab := shop_tab == ShopTab.CARDS
+	enc.enemy_act()
+	if was_cards_tab:
+		for i in mini(before.size(), rects.size()):
+			if before[i] != null and enc.shop.cards[i] != before[i]:
+				var ghost := _card_data_view(before[i], CardView.SMALL)
+				_add_fx(ghost, rects[i].get_center())
+				Fx.fly_into(ghost, _enemy_portrait.get_global_rect().get_center(), Callable(), 0.55)
 
 
-func _on_card_dropped(card: Variant) -> void:
-	if pending_enh_slot >= 0 or not enc.play_card(card):
-		_hand._layout(true)   # snap back
+func _on_card_dropped(card: Variant, at_global: Vector2) -> void:
+	if pending_enh_slot >= 0:
+		_hand._layout(true, [])
+		return
+	_play_with_fx(card, at_global)
+
+
+func _play_with_fx(card: CardInstance, from_global: Vector2) -> void:
+	var ghost := _card_instance_view(card, CardView.HAND)
+	if not enc.play_card(card):
+		ghost.free()
+		_hand._layout(true, [])
+		return
+	_add_fx(ghost, from_global)
+	Fx.resolve(ghost, _table.get_global_rect().get_center())
 
 
 func _on_hand_tapped(card: Variant) -> void:
@@ -96,8 +131,17 @@ func _on_hand_tapped(card: Variant) -> void:
 			_refresh()
 		return
 	_show_popup(_card_instance_view(c, CardView.LARGE), c.data.flavor_text, [
-		{"label": "Play" + (" (free)" if c.is_instant() else ""), "enabled": enc.can_play(c), "cb": func(): enc.play_card(c)},
-	], "Tip: drag cards up to play them.")
+		{"label": "Play" + (" (free)" if c.is_instant() else ""), "enabled": enc.can_play(c),
+			"cb": func(): _play_with_fx(c, _hand.card_center(c))},
+	])
+
+
+## Adds `view` to the effects layer centred on `center_global`.
+func _add_fx(view: Control, center_global: Vector2) -> void:
+	view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fx_layer.add_child(view)
+	view.size = view.custom_minimum_size
+	view.global_position = center_global - view.size * 0.5
 
 
 # =============================================================== refresh
@@ -108,11 +152,18 @@ func _refresh() -> void:
 	var me := enc.player
 	var my_turn := enc.is_player_turn()
 
-	# Top bar.
+	# Top bar + coin change pop-ups.
 	_round_label.text = "Round %d/%d" % [enc.round_num, enc.data.rounds]
 	_coins_label.text = "%d / %d" % [me.coins, enc.data.coin_target]
 	_coins_bar.max_value = enc.data.coin_target
 	_coins_bar.value = mini(me.coins, enc.data.coin_target)
+	_coin_pop(_coins_label, _last_coins, me.coins)
+	_coin_pop(_enemy_sub, _last_enemy_coins, enc.enemy.coins)
+	_last_coins = me.coins
+	_last_enemy_coins = enc.enemy.coins
+	if enc.round_num != _last_round:
+		_last_round = enc.round_num
+		_round_banner("Round %d" % enc.round_num)
 
 	# Enemy.
 	_enemy_name.text = enc.enemy.display_name
@@ -121,22 +172,20 @@ func _refresh() -> void:
 	var ecol: Color = enc.data.enemy.color if enc.data.enemy else Palette.CORAL
 	_enemy_portrait.add_theme_stylebox_override("panel", Palette.box(ecol.darkened(0.5), ecol, 48, 3, 0))
 	var intent := enc.current_intent()
+	_intent_desc.clear()
 	if intent:
 		_intent_title.text = intent.display_name
-		_intent_kind.text = "NEXT ACTION · " + EnemyIntent.kind_label(intent.kind)
-		_intent_desc.clear()
+		_intent_kind.text = "NEXT · " + EnemyIntent.kind_label(intent.kind)
 		Icons.append(_intent_desc, intent.get_description(), 19)
 	else:
 		_intent_title.text = "—"
-		_intent_desc.clear()
-		_intent_desc.append_text("No intents")
 	_clear(_enemy_chips)
 	for it in enc.enemy.items:
 		var item: ItemInstance = it
 		_enemy_chips.add_child(_chip(item.data.display_name, Palette.CARD_ITEM, false,
 			func(): _show_popup(_item_view(item.data, false), "", [], "Enemy item")))
 
-	# Shop tabs.
+	# Market.
 	var counts := [_count(enc.shop.cards), _count(enc.shop.items), _count(enc.shop.trinkets), _count(enc.shop.enhancements)]
 	var names := ["Cards", "Items", "Trinkets", "Upgrades"]
 	var slots := [enc.shop.cards.size(), enc.shop.items.size(), enc.shop.trinkets.size(), enc.shop.enhancements.size()]
@@ -146,34 +195,26 @@ func _refresh() -> void:
 		_tab_buttons[i].button_pressed = (i == shop_tab)
 	_fill_shop()
 
-	# Play zone.
-	_play_zone.add_theme_stylebox_override("panel", Palette.box(Palette.DEEP.lerp(Palette.ABYSS, 0.5), Palette.TEAL.darkened(0.5), 16, 2, 14))
-	if enc.is_over:
-		_play_hint.text = "Encounter over"
-	elif pending_enh_slot >= 0:
-		_play_hint.text = "Tap a card in your hand to enhance it\n(tap here to cancel)"
-	elif my_turn:
-		_play_hint.text = "Drag a card here to play it"
-	else:
-		_play_hint.text = "%s is acting…" % enc.enemy.display_name
-
-	# Gear.
-	_clear(_gear_row)
+	# Your trinkets / items.
+	_clear(_trinkets_box)
 	for i in me.trinkets.size():
 		var t := me.trinkets[i]
 		var idx := i
 		var usable := enc.can_use_trinket(idx)
-		_gear_row.add_child(_chip(t.get_name() + (" · USE" if usable else ""), Palette.CARD_TRINKET, usable,
-			func(): _show_trinket_popup(idx)))
+		var chip := _chip(t.get_name(), Palette.CARD_TRINKET, usable, func(): _show_trinket_popup(idx))
+		chip.modulate = Color.WHITE if usable else Color(0.7, 0.7, 0.7)
+		_trinkets_box.add_child(chip)
+	if me.trinkets.is_empty():
+		_trinkets_box.add_child(_empty_gear_slot())
+	_clear(_items_box)
 	for it in me.items:
 		var item: ItemInstance = it
-		_gear_row.add_child(_chip(item.data.display_name, Palette.CARD_ITEM, false,
+		_items_box.add_child(_chip(item.data.display_name, Palette.CARD_ITEM, false,
 			func(): _show_popup(_item_view(item.data, false), "", [], "Passive — always on")))
-	if me.trinkets.is_empty() and me.items.is_empty():
-		var l := CardView._label("No items or trinkets yet.\nBuy them in the market.", 16, Palette.MUTED)
-		_gear_row.add_child(l)
+	if me.items.is_empty():
+		_items_box.add_child(_empty_gear_slot())
 
-	# Hand.
+	# Hand (dimmed while the enemy acts).
 	var views: Array[CardView] = []
 	for c in me.hand:
 		var v := _card_instance_view(c, CardView.HAND)
@@ -183,14 +224,58 @@ func _refresh() -> void:
 			v.set_highlighted(true)
 		else:
 			v.set_enabled(enc.can_play(c))
+			v.dim_when_disabled = false
 		views.append(v)
 	_hand.set_views(views)
+	_hand.modulate = Color.WHITE if my_turn or enc.is_over else Color(0.6, 0.62, 0.7)
 
-	# Bottom bar.
-	_pile_label.text = "Deck %d   Discard %d" % [me.draw_pile.size(), me.discard.size() + me.in_play.size()]
+	_pile.set_counts(me.draw_pile.size(), me.discard.size() + me.in_play.size())
 	_pass_btn.disabled = not my_turn or pending_enh_slot >= 0
 	_pass_btn.text = "Pass" if enc.round_num < enc.data.rounds else "Finish"
+	_table_hint.text = "Tap a card in your hand to enhance it" if pending_enh_slot >= 0 else ""
 
+
+func _coin_pop(anchor: Control, before: int, now: int) -> void:
+	if before < 0 or before == now or not anchor.is_inside_tree():
+		return
+	var d := now - before
+	var col := "#ffd166" if d > 0 else "#ff7f6a"
+	Fx.float_text(_fx_layer, anchor.get_global_rect().get_center() + Vector2(0, -6),
+		"[color=%s]%+d[/color] 🪙" % [col, d], 30)
+
+
+func _round_banner(text: String) -> void:
+	var l := CardView._label(text, 64, Palette.TEAL)
+	l.add_theme_color_override("font_outline_color", Palette.ABYSS)
+	l.add_theme_constant_override("outline_size", 12)
+	_fx_layer.add_child(l)
+	l.reset_size()
+	l.pivot_offset = l.size * 0.5
+	l.global_position = _table.get_global_rect().get_center() - l.size * 0.5
+	l.modulate.a = 0.0
+	l.scale = Vector2(0.7, 0.7)
+	var tw := l.create_tween()
+	tw.set_parallel().tween_property(l, "modulate:a", 1.0, 0.25)
+	tw.tween_property(l, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.chain().tween_interval(0.6)
+	tw.chain().tween_property(l, "modulate:a", 0.0, 0.4)
+	tw.chain().tween_callback(l.queue_free)
+
+
+func _empty_gear_slot() -> Control:
+	var p := Panel.new()
+	p.custom_minimum_size = Vector2(0, 44)
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.add_theme_stylebox_override("panel", Palette.box(Color.TRANSPARENT, Palette.MUTED.darkened(0.45), 22, 2, 0))
+	var l := CardView._label("+", 26, Palette.MUTED.darkened(0.3))
+	l.set_anchors_preset(Control.PRESET_FULL_RECT)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	p.add_child(l)
+	return p
+
+
+# ================================================================ market
 
 func _fill_shop() -> void:
 	_clear(_shop_row)
@@ -203,9 +288,11 @@ func _fill_shop() -> void:
 				var s := slot
 				var v := _card_data_view(cd, CardView.SMALL)
 				v.set_enabled(enc.can_buy_card(s))
+				var make := func(): return _card_data_view(cd, CardView.SMALL)
+				_attach_buy_drag(v, func(): return enc.buy_card(s), _pile, make)
 				v.tapped.connect(func(): _show_popup(_card_data_view(cd, CardView.LARGE), cd.flavor_text, [
-					{"label": "Buy (%d)" % cd.cost, "enabled": enc.can_buy_card(s), "cb": func(): enc.buy_card(s)}],
-					_action_note(GameRules.CARD_BUY_IS_ACTION)))
+					{"label": "Buy (%d)" % cd.cost, "enabled": enc.can_buy_card(s),
+						"cb": func(): _buy_with_fx(func(): return enc.buy_card(s), make.call(), _pile)}]))
 				_shop_row.add_child(v)
 		ShopTab.ITEMS:
 			for slot in enc.shop.items.size():
@@ -215,9 +302,11 @@ func _fill_shop() -> void:
 				var s := slot
 				var v := _item_view(it, true)
 				v.set_enabled(enc.can_buy_item(s))
+				var make := func(): return _item_view(it, true)
+				_attach_buy_drag(v, func(): return enc.buy_item(s), _items_panel, make)
 				v.tapped.connect(func(): _show_popup(_item_view(it, true, CardView.LARGE), "", [
-					{"label": "Buy (%d)" % it.cost, "enabled": enc.can_buy_item(s), "cb": func(): enc.buy_item(s)}],
-					_action_note(GameRules.ITEM_BUY_IS_ACTION)))
+					{"label": "Buy (%d)" % it.cost, "enabled": enc.can_buy_item(s),
+						"cb": func(): _buy_with_fx(func(): return enc.buy_item(s), make.call(), _items_panel)}]))
 				_shop_row.add_child(v)
 		ShopTab.TRINKETS:
 			for slot in enc.shop.trinkets.size():
@@ -227,9 +316,11 @@ func _fill_shop() -> void:
 				var s := slot
 				var v := _trinket_data_view(td, CardView.SMALL)
 				v.set_enabled(enc.can_buy_trinket(s))
+				var make := func(): return _trinket_data_view(td, CardView.SMALL)
+				_attach_buy_drag(v, func(): return enc.buy_trinket(s), _trinkets_panel, make)
 				v.tapped.connect(func(): _show_popup(_trinket_data_view(td, CardView.LARGE), "", [
-					{"label": "Buy (%d)" % td.cost, "enabled": enc.can_buy_trinket(s), "cb": func(): enc.buy_trinket(s)}],
-					_action_note(GameRules.TRINKET_BUY_IS_ACTION)))
+					{"label": "Buy (%d)" % td.cost, "enabled": enc.can_buy_trinket(s),
+						"cb": func(): _buy_with_fx(func(): return enc.buy_trinket(s), make.call(), _trinkets_panel)}]))
 				_shop_row.add_child(v)
 		ShopTab.UPGRADES:
 			for slot in enc.shop.enhancements.size():
@@ -242,15 +333,10 @@ func _fill_shop() -> void:
 				v.tapped.connect(func(): _show_popup(
 					CardView.make(ed.display_name, ed.cost, ed.get_description(), Palette.CARD_ENH, CardView.LARGE, "UPGRADE"), ed.description, [
 					{"label": "Choose card (%d)" % ed.cost, "enabled": enc.can_buy_enhancement(s),
-						"cb": func(): pending_enh_slot = s; _refresh()}],
-					"Applies to a card in your hand. " + _action_note(GameRules.ENHANCEMENT_BUY_IS_ACTION)))
+						"cb": func(): pending_enh_slot = s; _refresh()}]))
 				_shop_row.add_child(v)
 	if _shop_row.get_child_count() == 0:
 		_shop_row.add_child(CardView._label("Nothing for sale", 18, Palette.MUTED))
-
-
-func _action_note(is_action: bool) -> String:
-	return "Uses your action for this turn." if is_action else "Free action."
 
 
 func _count(arr: Array) -> int:
@@ -259,6 +345,120 @@ func _count(arr: Array) -> int:
 		if x != null:
 			n += 1
 	return n
+
+
+## Buy from a popup button: the bought thing flies from the centre to `target`.
+func _buy_with_fx(buy: Callable, ghost: CardView, target: DropTarget) -> void:
+	if not buy.call():
+		ghost.free()
+		return
+	_add_fx(ghost, get_viewport_rect().size * 0.5)
+	_fly_to_target(ghost, target)
+
+
+func _fly_to_target(ghost: Control, target: DropTarget) -> void:
+	var to := _pile.target_center() if target == _pile else target.get_global_rect().get_center()
+	Fx.fly_into(ghost, to, func():
+		if target == _pile:
+			_pile.pulse()
+		else:
+			var tw := target.create_tween()
+			tw.tween_property(target, "self_modulate", Color(1.6, 1.5, 1.1), 0.1)
+			tw.tween_property(target, "self_modulate", Color.WHITE, 0.25))
+
+
+## Market tiles: drag onto `target` (deck / items / trinkets) and release to buy.
+func _attach_buy_drag(v: CardView, buy: Callable, target: DropTarget, make_ghost: Callable) -> void:
+	v.gui_input.connect(func(e: InputEvent): _on_shop_tile_input(e, v, buy, target, make_ghost))
+
+
+func _on_shop_tile_input(e: InputEvent, v: CardView, buy: Callable, target: DropTarget, make_ghost: Callable) -> void:
+	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
+		if e.pressed:
+			_shop_drag = {"view": v, "press": e.global_position, "ghost": null, "offset": Vector2.ZERO, "hover": false}
+		elif _shop_drag.get("view") == v:
+			var ghost: CardView = _shop_drag["ghost"]
+			var hover: bool = _shop_drag["hover"]
+			var home: Vector2 = v.get_global_rect().get_center()
+			_shop_drag = {}
+			if ghost == null:
+				return
+			target.set_state(DropTarget.State.IDLE)
+			v.modulate.a = 1.0
+			if not hover:
+				_return_ghost(ghost, home)
+				return
+			# Buying rebuilds the market (freeing `v`), so defer it.
+			(func():
+				if buy.call():
+					_fly_to_target(ghost, target)
+				else:
+					_return_ghost(ghost, home)).call_deferred()
+	elif e is InputEventMouseMotion and _shop_drag.get("view") == v:
+		if _shop_drag["ghost"] == null and v.enabled and e.global_position.distance_to(_shop_drag["press"]) > HandView.DRAG_START:
+			v._pressed = false   # cancel the tap
+			var ghost: CardView = make_ghost.call()
+			ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			_fx_layer.add_child(ghost)
+			ghost.size = v.size
+			ghost.pivot_offset = ghost.size * 0.5
+			ghost.scale = Vector2(1.08, 1.08)
+			_shop_drag["ghost"] = ghost
+			_shop_drag["offset"] = v.global_position - e.global_position
+			v.modulate.a = 0.3
+			target.set_state(DropTarget.State.ACTIVE)
+		var g: CardView = _shop_drag["ghost"]
+		if g:
+			g.global_position = e.global_position + _shop_drag["offset"]
+			var hover := target.contains_global(e.global_position)
+			if hover != _shop_drag["hover"]:
+				_shop_drag["hover"] = hover
+				target.set_state(DropTarget.State.HOVER if hover else DropTarget.State.ACTIVE)
+				g.set_highlighted(hover)
+
+
+func _return_ghost(ghost: Control, home_global: Vector2) -> void:
+	var tw := ghost.create_tween().set_parallel().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(ghost, "global_position", home_global - ghost.size * 0.5, 0.2)
+	tw.tween_property(ghost, "scale", Vector2.ONE, 0.2)
+	tw.tween_property(ghost, "modulate:a", 0.0, 0.2)
+	tw.chain().tween_callback(ghost.queue_free)
+
+
+# ============================================================ deck viewer
+
+func _show_deck_viewer() -> void:
+	if enc == null:
+		return
+	var me := enc.player
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(700, 600)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 10)
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(vb)
+	# The draw pile is shown sorted so it doesn't reveal the draw order.
+	var draw_sorted := me.draw_pile.duplicate()
+	draw_sorted.sort_custom(func(a, b): return a.get_name() < b.get_name())
+	for section in [["Deck", draw_sorted, "(not in draw order)"], ["Hand", me.hand, ""],
+			["Played this round", me.in_play, ""], ["Discard", me.discard, ""]]:
+		var cards: Array = section[1]
+		vb.add_child(CardView._label("%s  (%d)  %s" % [section[0], cards.size(), section[2]], 20, Palette.KELP))
+		if cards.is_empty():
+			vb.add_child(CardView._label("—", 16, Palette.MUTED))
+			continue
+		var grid := GridContainer.new()
+		grid.columns = 5
+		grid.add_theme_constant_override("h_separation", 8)
+		grid.add_theme_constant_override("v_separation", 8)
+		vb.add_child(grid)
+		for c in cards:
+			var v := _card_instance_view(c, CardView.SMALL)
+			v.dim_when_disabled = false
+			v.set_enabled(false)
+			grid.add_child(v)
+	_show_popup(scroll, "", [], "All %d of your cards" % me.all_cards().size())
 
 
 # ================================================================= views
@@ -326,7 +526,6 @@ func _show_intents_popup() -> void:
 	_show_popup(vb, "", [], "%s acts after each of your actions, in this order." % enc.enemy.display_name)
 
 
-const LARGE_W := 340.0
 
 
 func _chip(text: String, color: Color, glow: bool, cb: Callable) -> Button:
@@ -449,7 +648,6 @@ func _show_end_overlay(won: bool) -> void:
 	_show_popup(box, "", [{"label": "Play again", "enabled": true, "cb": func(): get_tree().reload_current_scene()}])
 
 
-# ================================================================= build
 
 func _big_button(text: String, color: Color) -> Button:
 	var b := Button.new()
@@ -463,6 +661,8 @@ func _big_button(text: String, color: Color) -> Button:
 	b.add_theme_color_override("font_disabled_color", Palette.MUTED.darkened(0.3))
 	return b
 
+
+# ================================================================= build
 
 func _build_ui() -> void:
 	var th := Theme.new()
@@ -488,7 +688,7 @@ func _build_ui() -> void:
 	main.add_theme_constant_override("separation", 12)
 	margin.add_child(main)
 
-	# ================= LEFT COLUMN: status, enemy, your gear
+	# ================= LEFT COLUMN: status, enemy, your trinkets & items
 	var left := VBoxContainer.new()
 	left.custom_minimum_size.x = 290
 	left.add_theme_constant_override("separation", 10)
@@ -525,9 +725,9 @@ func _build_ui() -> void:
 	eh.add_theme_constant_override("separation", 12)
 	ev.add_child(eh)
 	_enemy_portrait = PanelContainer.new()
-	_enemy_portrait.custom_minimum_size = Vector2(76, 76)
+	_enemy_portrait.custom_minimum_size = Vector2(70, 70)
 	eh.add_child(_enemy_portrait)
-	_enemy_portrait_label = CardView._label("?", 36, Palette.FOAM)
+	_enemy_portrait_label = CardView._label("?", 34, Palette.FOAM)
 	_enemy_portrait_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_enemy_portrait_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_enemy_portrait.add_child(_enemy_portrait_label)
@@ -541,17 +741,18 @@ func _build_ui() -> void:
 	_enemy_sub = CardView._label("", 16, Palette.MUTED)
 	einfo.add_child(_enemy_sub)
 	_intent_bubble = PanelContainer.new()
-	_intent_bubble.add_theme_stylebox_override("panel", Palette.box(Palette.CORAL.darkened(0.55), Palette.CORAL, 14, 3, 12))
+	_intent_bubble.add_theme_stylebox_override("panel", Palette.box(Palette.CORAL.darkened(0.55), Palette.CORAL, 14, 3, 10))
 	_intent_bubble.mouse_filter = Control.MOUSE_FILTER_STOP
 	_intent_bubble.gui_input.connect(func(e: InputEvent):
 		if e is InputEventMouseButton and not e.pressed and e.button_index == MOUSE_BUTTON_LEFT and enc: _show_intents_popup())
 	ev.add_child(_intent_bubble)
 	var ib := VBoxContainer.new()
 	ib.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ib.add_theme_constant_override("separation", 0)
 	_intent_bubble.add_child(ib)
-	_intent_kind = CardView._label("NEXT ACTION", 14, Palette.CORAL)
+	_intent_kind = CardView._label("NEXT", 13, Palette.CORAL)
 	ib.add_child(_intent_kind)
-	_intent_title = CardView._label("", 26, Palette.FOAM)
+	_intent_title = CardView._label("", 24, Palette.FOAM)
 	ib.add_child(_intent_title)
 	_intent_desc = Icons.rich_label("", 17, Palette.FOAM.darkened(0.1))
 	ib.add_child(_intent_desc)
@@ -559,46 +760,41 @@ func _build_ui() -> void:
 	_enemy_chips.add_theme_constant_override("separation", 6)
 	ev.add_child(_enemy_chips)
 
-	# Your gear (trinkets + items), scrollable.
-	left.add_child(CardView._label("YOUR GEAR", 14, Palette.KELP))
-	var gear_scroll := ScrollContainer.new()
-	gear_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	gear_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	left.add_child(gear_scroll)
-	_gear_row = VBoxContainer.new()
-	_gear_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_gear_row.add_theme_constant_override("separation", 6)
-	gear_scroll.add_child(_gear_row)
+	# Your trinkets and items: also the drop targets for buying them.
+	var gear := HBoxContainer.new()
+	gear.add_theme_constant_override("separation", 8)
+	gear.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	left.add_child(gear)
+	_trinkets_panel = _gear_panel("TRINKETS", Palette.GOLD)
+	_trinkets_box = _trinkets_panel.get_meta("box")
+	gear.add_child(_trinkets_panel)
+	_items_panel = _gear_panel("ITEMS", Palette.KELP)
+	_items_box = _items_panel.get_meta("box")
+	gear.add_child(_items_panel)
 
 	var left_bottom := HBoxContainer.new()
 	left_bottom.add_theme_constant_override("separation", 8)
 	left.add_child(left_bottom)
-	var log_btn := _big_button("Log", Palette.PANEL)
-	log_btn.custom_minimum_size = Vector2(0, 56)
-	log_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	log_btn.add_theme_font_size_override("font_size", 19)
-	log_btn.pressed.connect(_show_log)
-	left_bottom.add_child(log_btn)
-	var fs_btn := _big_button("Fullscreen", Palette.PANEL)
-	fs_btn.custom_minimum_size = Vector2(0, 56)
-	fs_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	fs_btn.add_theme_font_size_override("font_size", 19)
-	fs_btn.pressed.connect(_toggle_fullscreen)
-	left_bottom.add_child(fs_btn)
+	for pair in [["Log", _show_log], ["Fullscreen", _toggle_fullscreen]]:
+		var b := _big_button(pair[0], Palette.PANEL)
+		b.custom_minimum_size = Vector2(0, 52)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.add_theme_font_size_override("font_size", 18)
+		b.pressed.connect(pair[1])
+		left_bottom.add_child(b)
 
-	# ================= RIGHT: shop, play zone, hand
+	# ================= RIGHT: market, table, hand
 	var right := VBoxContainer.new()
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	right.add_theme_constant_override("separation", 10)
 	main.add_child(right)
 
-	var shop_panel := PanelContainer.new()
-	shop_panel.add_theme_stylebox_override("panel", Palette.box(Palette.DEEP, Palette.TEAL.darkened(0.55), 16, 2, 10))
-	right.add_child(shop_panel)
+	_shop_panel = PanelContainer.new()
+	_shop_panel.add_theme_stylebox_override("panel", Palette.box(Palette.DEEP, Palette.TEAL.darkened(0.55), 16, 2, 10))
+	right.add_child(_shop_panel)
 	var sh := HBoxContainer.new()
 	sh.add_theme_constant_override("separation", 12)
-	shop_panel.add_child(sh)
-	# Vertical tabs on the left of the shop row.
+	_shop_panel.add_child(sh)
 	var tabs := VBoxContainer.new()
 	tabs.add_theme_constant_override("separation", 6)
 	tabs.custom_minimum_size.x = 150
@@ -629,67 +825,49 @@ func _build_ui() -> void:
 	_shop_row.custom_minimum_size.y = CardView.SMALL.y
 	sh.add_child(_shop_row)
 
-	_play_zone = PanelContainer.new()
-	_play_zone.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_play_zone.gui_input.connect(func(e: InputEvent):
+	# The table: empty space where played cards resolve.
+	_table = Control.new()
+	_table.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_table.gui_input.connect(func(e: InputEvent):
 		if e is InputEventMouseButton and e.pressed and pending_enh_slot >= 0:
 			pending_enh_slot = -1
 			_refresh())
-	right.add_child(_play_zone)
-	var pz := HBoxContainer.new()
-	pz.add_theme_constant_override("separation", 20)
-	pz.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_play_zone.add_child(pz)
-	_play_hint = CardView._label("", 22, Palette.MUTED)
-	_play_hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_play_hint.size_flags_stretch_ratio = 0.8
-	_play_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_play_hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_play_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_play_hint.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	pz.add_child(_play_hint)
-	_ticker = RichTextLabel.new()
-	_ticker.bbcode_enabled = true
-	_ticker.scroll_active = false
-	_ticker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_ticker.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_ticker.fit_content = true
-	_ticker.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_ticker.add_theme_font_size_override("normal_font_size", 17)
-	_ticker.add_theme_font_size_override("bold_font_size", 17)
-	_ticker.add_theme_color_override("default_color", Palette.MUTED)
-	pz.add_child(_ticker)
+	right.add_child(_table)
+	_table_hint = CardView._label("", 22, Palette.MUTED)
+	_table_hint.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_table_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_table_hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_table.add_child(_table_hint)
 
 	var bottom := HBoxContainer.new()
-	bottom.add_theme_constant_override("separation", 12)
+	bottom.add_theme_constant_override("separation", 10)
 	right.add_child(bottom)
 	_hand = HandView.new()
 	_hand.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_hand.custom_minimum_size.y = CardView.HAND.y + 24
-	_hand.drop_zone = _play_zone
+	_hand.custom_minimum_size.y = CardView.HAND.y + 36
 	_hand.card_dropped.connect(_on_card_dropped)
 	_hand.card_tapped.connect(_on_hand_tapped)
-	_hand.dragging_changed.connect(func(d: bool):
-		_play_zone.add_theme_stylebox_override("panel", Palette.box(
-			Palette.TEAL.darkened(0.7) if d else Palette.DEEP.lerp(Palette.ABYSS, 0.5),
-			Palette.GOLD if d else Palette.TEAL.darkened(0.5), 16, 3 if d else 2, 14)))
 	bottom.add_child(_hand)
-	var pass_col := VBoxContainer.new()
-	pass_col.alignment = BoxContainer.ALIGNMENT_END
-	pass_col.add_theme_constant_override("separation", 8)
-	bottom.add_child(pass_col)
-	_pile_label = CardView._label("", 17, Palette.MUTED)
-	_pile_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	pass_col.add_child(_pile_label)
+	_pile = PileView.new()
+	_pile.size_flags_vertical = Control.SIZE_SHRINK_END
+	_pile.tapped.connect(_show_deck_viewer)
+	bottom.add_child(_pile)
 	_pass_btn = _big_button("Pass", Palette.CORAL)
-	_pass_btn.custom_minimum_size = Vector2(150, 90)
+	_pass_btn.custom_minimum_size = Vector2(130, 90)
+	_pass_btn.size_flags_vertical = Control.SIZE_SHRINK_END
 	_pass_btn.pressed.connect(func(): enc.pass_turn())
-	pass_col.add_child(_pass_btn)
+	bottom.add_child(_pass_btn)
+
+	_fx_layer = Control.new()
+	_fx_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_fx_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fx_layer.z_index = 400   # above the fanned hand
+	add_child(_fx_layer)
 
 	_popup_layer = Control.new()
 	_popup_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_popup_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_popup_layer.z_index = 500   # above the fanned hand cards
+	_popup_layer.z_index = 500
 	add_child(_popup_layer)
 
 	# Shown when a phone is held upright.
@@ -709,6 +887,23 @@ func _build_ui() -> void:
 	_check_orientation()
 
 
+func _gear_panel(title: String, accent: Color) -> DropTarget:
+	var p := DropTarget.new()
+	p.bg_color = Palette.DEEP
+	p.accent = accent
+	p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	p.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 6)
+	p.add_child(vb)
+	vb.add_child(CardView._label(title, 13, accent))
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	vb.add_child(box)
+	p.set_meta("box", box)
+	return p
+
+
 func _check_orientation() -> void:
 	var s := get_viewport_rect().size
 	_rotate_overlay.visible = s.y > s.x
@@ -722,3 +917,5 @@ func _toggle_fullscreen() -> void:
 		if OS.has_feature("web"):
 			# Lock to landscape on phones that support it (needs fullscreen).
 			JavaScriptBridge.eval("try { screen.orientation.lock('landscape').catch(function(){}); } catch (e) {}")
+
+
