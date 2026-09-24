@@ -31,6 +31,22 @@ func setup(data: EncounterData, rng: RandomNumberGenerator) -> void:
 		enhancements.append(_enh_bag.pop_back() if not _enh_bag.is_empty() else null)
 
 
+## New round: fresh cards in every card slot; sold-out item / trinket /
+## upgrade slots are refilled from what's left in their pools.
+func restock() -> void:
+	for i in cards.size():
+		cards[i] = _random_card()
+	for i in items.size():
+		if items[i] == null and not _item_bag.is_empty():
+			items[i] = _item_bag.pop_back()
+	for i in trinkets.size():
+		if trinkets[i] == null and not _trinket_bag.is_empty():
+			trinkets[i] = _trinket_bag.pop_back()
+	for i in enhancements.size():
+		if enhancements[i] == null and not _enh_bag.is_empty():
+			enhancements[i] = _enh_bag.pop_back()
+
+
 func take_card(slot: int) -> CardData:
 	var c: CardData = cards[slot]
 	cards[slot] = _random_card() if _data.refill_card_slots else null

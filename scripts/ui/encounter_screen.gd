@@ -28,6 +28,7 @@ var _enemy_sub: Label
 var _enemy_portrait_label: Label
 var _enemy_portrait: PanelContainer
 var _enemy_chips: HBoxContainer
+var _enemy_pips: HBoxContainer
 var _intent_bubble: PanelContainer
 var _intent_title: Label
 var _intent_kind: Label
@@ -164,6 +165,9 @@ func _refresh() -> void:
 	if enc.round_num != _last_round:
 		_last_round = enc.round_num
 		_round_banner("Round %d" % enc.round_num)
+		# Market restocked: fade the new stock in.
+		_shop_row.modulate.a = 0.0
+		_shop_row.create_tween().tween_property(_shop_row, "modulate:a", 1.0, 0.5).set_delay(0.3)
 
 	# Enemy.
 	_enemy_name.text = enc.enemy.display_name
@@ -179,6 +183,18 @@ func _refresh() -> void:
 		Icons.append(_intent_desc, intent.get_description(), 19)
 	else:
 		_intent_title.text = "—"
+	# Actions left this round: filled pips; the intent fades once it's spent.
+	var total_actions: int = enc.data.enemy.actions_per_round if enc.data.enemy else 0
+	_clear(_enemy_pips)
+	for i in total_actions:
+		var pip := Panel.new()
+		pip.custom_minimum_size = Vector2(16, 16)
+		pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var left := i < enc.enemy_actions_left
+		pip.add_theme_stylebox_override("panel", Palette.box(Palette.CORAL if left else Color.TRANSPARENT,
+			Palette.CORAL.darkened(0.2), 8, 2, 0))
+		_enemy_pips.add_child(pip)
+	_intent_bubble.modulate = Color.WHITE if enc.enemy_actions_left > 0 else Color(1, 1, 1, 0.4)
 	_clear(_enemy_chips)
 	for it in enc.enemy.items:
 		var item: ItemInstance = it
@@ -498,7 +514,7 @@ func _trinket_data_view(td: TrinketData, sz: Vector2) -> CardView:
 	var desc := td.levels[0].get_text() if not td.levels.is_empty() else ""
 	if td.description != "":
 		desc = td.description + "\n" + desc
-	return CardView.make(td.display_name, td.cost, "Once per turn (free): " + desc, Palette.CARD_TRINKET, sz, "TRINKET")
+	return CardView.make(td.display_name, td.cost, "Once per round (free): " + desc, Palette.CARD_TRINKET, sz, "TRINKET")
 
 
 func _show_trinket_popup(idx: int) -> void:
@@ -508,7 +524,7 @@ func _show_trinket_popup(idx: int) -> void:
 		actions.append({"label": "Upgrade (%d)" % t.upgrade_cost(), "enabled": enc.can_upgrade_trinket(idx),
 			"cb": func(): enc.upgrade_trinket(idx)})
 	_show_popup(CardView.make(t.get_name(), -1, t.get_description(), Palette.CARD_TRINKET, CardView.LARGE,
-		"TRINKET" + (" · used this turn" if t.used else "")), "", actions,
+		"TRINKET" + (" · used this round" if t.used else "")), "", actions,
 		"Using is free. " + ("Upgrading uses your action." if GameRules.TRINKET_UPGRADE_IS_ACTION else ""))
 
 
@@ -523,7 +539,8 @@ func _show_intents_popup() -> void:
 		v.dim_when_disabled = false
 		v.set_enabled(i == 0)
 		vb.add_child(v)
-	_show_popup(vb, "", [], "%s acts after each of your actions, in this order." % enc.enemy.display_name)
+	_show_popup(vb, "", [], "%s answers your actions in this order, %d times per round (%d left)." % [
+		enc.enemy.display_name, enc.data.enemy.actions_per_round, enc.enemy_actions_left])
 
 
 
@@ -740,6 +757,10 @@ func _build_ui() -> void:
 	einfo.add_child(_enemy_name)
 	_enemy_sub = CardView._label("", 16, Palette.MUTED)
 	einfo.add_child(_enemy_sub)
+	_enemy_pips = HBoxContainer.new()
+	_enemy_pips.add_theme_constant_override("separation", 5)
+	_enemy_pips.tooltip_text = "Enemy actions left this round"
+	einfo.add_child(_enemy_pips)
 	_intent_bubble = PanelContainer.new()
 	_intent_bubble.add_theme_stylebox_override("panel", Palette.box(Palette.CORAL.darkened(0.55), Palette.CORAL, 14, 3, 10))
 	_intent_bubble.mouse_filter = Control.MOUSE_FILTER_STOP

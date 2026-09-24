@@ -18,10 +18,9 @@ var intent_index := 0   ## Enemy only.
 var can_shop_items := true   ## Enemies can never buy items/trinkets.
 var cards_bought := 0
 ## Stats usable by effects (GainCoinsPerStatEffect) and card text ({name}).
+## "Turn" = your whole round; the opening hand doesn't count as drawn.
 var cards_drawn_this_turn := 0
-var cards_drawn_this_round := 0
 var cards_played_this_turn := 0
-var cards_played_this_round := 0
 var buys_this_round := 0
 
 

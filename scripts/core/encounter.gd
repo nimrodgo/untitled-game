@@ -3,12 +3,13 @@ extends RefCounted
 ## The rules engine for a single encounter. UI-agnostic: the screen and the
 ## headless simulator both drive it through the public methods.
 ##
-## Structure: `rounds` rounds. At round start you draw a hand. Each of your
-## turns = any number of FREE actions (instant cards, using a trinket) followed
-## by exactly ONE action (play a card, or buy a card/item/trinket/enhancement,
-## or upgrade a trinket) — or PASS, which ends the round for you.
-## The enemy doesn't play cards: after every action you take it resolves its
-## next scripted intent (always visible in advance).
+## Structure: `rounds` rounds; each round is one TURN for you. You draw a hand,
+## then take ACTIONS one at a time: any number of FREE ones (instant cards,
+## using a trinket) and normal ones (play a card, buy a card/item/trinket/
+## upgrade, upgrade a trinket). PASS ends your turn and the round.
+## The enemy doesn't play cards: it answers each of your normal actions with
+## its next scripted intent (always visible), up to actions_per_round times.
+## The market restocks at the start of each round.
 ## After the last round you win if coins >= coin_target.
 
 signal changed
@@ -26,7 +27,8 @@ var round_num := 0
 var active: PlayerState
 var is_over := false
 var won := false
-var _actions_since_enemy := 0
+## Enemy intents still available this round.
+var enemy_actions_left := 0
 ## Where the most recently bought card went (the UI animates it there).
 var last_bought_zone: GameRules.Zone = GameRules.DEFAULT_BUY_DESTINATION
 
@@ -151,7 +153,6 @@ func play_card(card: CardInstance) -> bool:
 	log_line("You play %s%s." % [_card_name(card), " (instant)" if instant else ""])
 	var ctx := _ctx(p, card)
 	p.cards_played_this_turn += 1
-	p.cards_played_this_round += 1
 	_run(card.get_on_play(), ctx)
 	p.in_play.append(card)
 	_fire(GameRules.Trigger.CARD_PLAYED, p, ctx)
@@ -270,9 +271,10 @@ func enemy_act() -> void:
 		ctx.source_name = intent.display_name
 		_run(intent.effects, ctx)
 		enemy.intent_index += 1
+		enemy_actions_left -= 1
 	_fire(GameRules.Trigger.ENEMY_ACTED, enemy, _ctx(enemy))
 	_fire(GameRules.Trigger.ENEMY_ACTED, player, _ctx(player))
-	_begin_player_turn()
+	_await_player_action()
 
 
 # ------------------------------------------------ helpers used by effects
@@ -299,7 +301,6 @@ func draw_cards(p: PlayerState, n: int) -> void:
 		p.hand.append(p.draw_pile.pop_back())
 		drawn += 1
 	p.cards_drawn_this_turn += drawn
-	p.cards_drawn_this_round += drawn
 	if drawn > 0 and round_num > 0 and not p.is_enemy:
 		log_line("  %s draw %d." % [p.display_name, drawn])
 
@@ -325,9 +326,9 @@ func text_vars(p: PlayerState = null) -> Dictionary:
 		p = player
 	return {
 		"cards_drawn_this_turn": p.cards_drawn_this_turn,
-		"cards_drawn_this_round": p.cards_drawn_this_round,
+		"cards_drawn_this_round": p.cards_drawn_this_turn,
 		"cards_played_this_turn": p.cards_played_this_turn,
-		"cards_played_this_round": p.cards_played_this_round,
+		"cards_played_this_round": p.cards_played_this_turn,
 		"coins": p.coins,
 		"round": round_num,
 	}
@@ -344,18 +345,23 @@ func _start_round() -> void:
 	log_line("\n[b]— Round %d / %d —[/b]" % [round_num, data.rounds])
 	player.passed = false
 	player.buys_this_round = 0
-	player.cards_played_this_round = 0
+	if round_num > 1:
+		shop.restock()
+		log_line("  The market restocks.")
 	for p in [player, enemy]:
 		for it in p.items:
 			it.uses_this_round = 0
 	for t in player.trinkets:
 		t.used = false
 	draw_cards(player, GameRules.HAND_SIZE - player.hand.size())
-	player.cards_drawn_this_round = 0   # the opening hand doesn't count
+	# New turn: the opening hand doesn't count as "drawn this turn".
+	player.cards_drawn_this_turn = 0
+	player.cards_played_this_turn = 0
+	enemy_actions_left = data.enemy.actions_per_round if data.enemy else 0
 	_fire(GameRules.Trigger.ROUND_START, player, _ctx(player))
 	_fire(GameRules.Trigger.ROUND_START, enemy, _ctx(enemy))
-	_actions_since_enemy = 0
-	_begin_player_turn()
+	_fire(GameRules.Trigger.TURN_START, player, _ctx(player))
+	_await_player_action()
 
 
 func _end_round() -> void:
@@ -381,14 +387,11 @@ func _finish_encounter() -> void:
 	ended.emit(won)
 
 
-func _begin_player_turn() -> void:
+func _await_player_action() -> void:
 	active = player
-	player.cards_drawn_this_turn = 0
-	player.cards_played_this_turn = 0
-	if GameRules.TRINKET_LIMIT == GameRules.TrinketLimit.PER_TURN:
+	if GameRules.TRINKET_LIMIT == GameRules.TrinketLimit.PER_ACTION:
 		for t in player.trinkets:
 			t.used = false
-	_fire(GameRules.Trigger.TURN_START, player, _ctx(player))
 	changed.emit()
 
 
@@ -406,14 +409,12 @@ func _finish_action(extra: bool) -> void:
 		log_line("  You take another action.")
 		changed.emit()
 		return
-	_actions_since_enemy += 1
-	if _actions_since_enemy >= GameRules.ENEMY_ACTS_EVERY and current_intent() != null:
-		_actions_since_enemy = 0
+	if enemy_actions_left > 0 and current_intent() != null:
 		active = enemy
 		changed.emit()
 		enemy_turn_pending.emit()
 	else:
-		_begin_player_turn()
+		_await_player_action()
 
 
 func _fire(trigger: GameRules.Trigger, p: PlayerState, ctx: EffectContext) -> void:

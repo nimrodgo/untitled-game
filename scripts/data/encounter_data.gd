@@ -10,7 +10,8 @@ extends Resource
 @export var enemy: EnemyData
 
 @export_group("Shop")
-## Card pool; duplicates make a card more likely. Card slots refill from it.
+## Card pool; duplicates make a card more likely. The market restocks from it
+## at the start of every round (bought slots stay empty until then).
 @export var card_pool: Array[CardData] = []
 @export var item_pool: Array[ItemData] = []
 @export var trinket_pool: Array[TrinketData] = []
@@ -19,7 +20,8 @@ extends Resource
 @export var item_slots: int = 2
 @export var trinket_slots: int = 1
 @export var enhancement_slots: int = 1
-@export var refill_card_slots: bool = true
+## Legacy: refill a card slot immediately when it's bought (off = restock per round).
+@export var refill_card_slots: bool = false
 
 @export_group("Debug")
 ## 0 = random each time.

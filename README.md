@@ -5,19 +5,19 @@ one encounter, full rules engine, landscape (phone-friendly) placeholder UI, TES
 
 ## Encounter rules (as implemented)
 - An encounter lasts `rounds` rounds (default 3). Win = at least `coin_target` coins after the last round.
-- Round start: you draw up to 5.
-- Your **turn** = any number of FREE actions, then exactly ONE action (or Pass).
-  - Free: play Instant cards, use a trinket (once per turn).
-  - Action: play a non-instant card, buy a card / item / trinket / upgrade, or upgrade a trinket.
-  - Pass: ends the round.
-- The **enemy** doesn't play cards. It follows a scripted intent cycle (like Slay the Spire): after
-  each of your actions it resolves its NEXT intent, which is always shown in advance. Intents are
-  just effect lists (steal, make you lose coins, snatch a market card, shuffle junk into your deck…).
-  The enemy can have passive items; it never buys items or trinkets.
-- Bought cards resolve their **on-buy** effects, then get shuffled into your draw pile.
-- Played cards stay "in play" until the round ends, then go to discard (prevents infinite draw loops).
+- Each round is **your turn**: draw up to 5, then take actions one at a time until you **Pass**.
+  - Free: play Instant (⚡) cards, use each trinket (once per round).
+  - Actions: play a non-instant card, buy a card / item / trinket / upgrade, upgrade a trinket.
+- The **enemy** doesn't play cards. It follows a scripted intent cycle (like Slay the Spire) and answers
+  your actions with its next intent — at most `actions_per_round` times per round (pips on its panel).
+  After that you act freely. It can have passive items; it never buys items or trinkets.
+- The **market** doesn't refill when you buy; it restocks at the start of each round
+  (new cards; sold-out item/trinket slots refill from their pools).
+- Bought cards resolve their **on-buy** effects, then get shuffled into your deck.
+- Played cards stay "in play" until the round ends, then go to discard.
+- "This turn" in card text = this round (the opening hand doesn't count as drawn).
 
-Tunables live in `scripts/core/game_rules.gd` (which buys cost your action, how often the enemy acts, …).
+Tunables live in `scripts/core/game_rules.gd`; per-enemy action count in its EnemyData.
 
 ## Controls
 - **Play:** drag a card out of your hand and let go — it glows gold once releasing would play it.

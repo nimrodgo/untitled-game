@@ -12,7 +12,7 @@ enum Zone { HAND, DRAW_TOP, DRAW_SHUFFLE, DISCARD }
 enum Trigger {
 	ENCOUNTER_START,
 	ROUND_START,
-	TURN_START,
+	TURN_START,            ## Start of your turn (= start of the round, after drawing).
 	BEFORE_CARD_BUY,       ## Fires before a card is placed; can change its destination.
 	CARD_BOUGHT,
 	CARD_PLAYED,
@@ -24,12 +24,15 @@ enum Trigger {
 	ENEMY_ACTED,           ## After the enemy resolves an intent (fires for both sides).
 }
 
-enum TrinketLimit { PER_TURN, PER_ROUND }
+## Terminology: a TURN is your whole round (draw a hand, act until you pass).
+## Within it you take ACTIONS one at a time; the enemy may answer an action.
+enum TrinketLimit { PER_TURN, PER_ACTION }
 
 const HAND_SIZE := 5
 ## Concept: bought cards are shuffled into your deck.
 const DEFAULT_BUY_DESTINATION := Zone.DRAW_SHUFFLE
 const DISCARD_HAND_AT_ROUND_END := true
+## Trinkets: usable once per turn (= once per round).
 const TRINKET_LIMIT := TrinketLimit.PER_TURN
 
 ## Which purchases use up your one action for the turn.
@@ -39,8 +42,8 @@ const TRINKET_BUY_IS_ACTION := true
 const TRINKET_UPGRADE_IS_ACTION := true
 const ENHANCEMENT_BUY_IS_ACTION := true
 
-## The enemy resolves its next intent after every N player actions.
-const ENEMY_ACTS_EVERY := 1
+## The enemy answers each of your actions with its next intent, until it has
+## used EnemyData.actions_per_round for this round.
 
 ## Seconds before the enemy's intent resolves, so the player can follow along.
 const ENEMY_STEP_DELAY := 0.6
