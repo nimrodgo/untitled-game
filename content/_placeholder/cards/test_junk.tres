@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_pgikc"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="2_0t2f1"]
+
+[resource]
+script = ExtResource("2_0t2f1")
+id = &"test_junk"
+display_name = "TEST Junk"
+cost = 0
+flavor_text = "Placeholder card for testing."
+tags = PackedStringArray()

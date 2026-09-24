@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="1_j4ji8"]
+[ext_resource type="Resource" path="res://content/_placeholder/cards/test_draw.tres" id="2_cb7ni"]
+[ext_resource type="Resource" path="res://content/_placeholder/cards/test_steal.tres" id="3_guloh"]
+[ext_resource type="Resource" path="res://content/_placeholder/cards/test_instant.tres" id="4_uh3ma"]
+[ext_resource type="Resource" path="res://content/_placeholder/cards/test_on_buy.tres" id="5_x1o5y"]
+[ext_resource type="Resource" path="res://content/_placeholder/cards/test_drain.tres" id="6_pe0al"]
+[ext_resource type="Resource" path="res://content/_placeholder/cards/test_discard.tres" id="7_7gm5m"]
+[ext_resource type="Resource" path="res://content/_placeholder/cards/test_extra.tres" id="8_3i4jq"]
+[ext_resource type="Resource" path="res://content/_placeholder/enemies/test_enemy.tres" id="9_glpij"]
+[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="10_foyie"]
+[ext_resource type="Resource" path="res://content/_placeholder/enhancements/test_enh_instant.tres" id="11_i5y2v"]
+[ext_resource type="Resource" path="res://content/_placeholder/enhancements/test_enh_coin.tres" id="12_qr3w5"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="13_juu0e"]
+[ext_resource type="Resource" path="res://content/_placeholder/items/test_item_rebate.tres" id="14_ylgv6"]
+[ext_resource type="Resource" path="res://content/_placeholder/items/test_item_express.tres" id="15_tvf6i"]
+[ext_resource type="Script" path="res://scripts/data/encounter_data.gd" id="16_27vkw"]
+[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="17_2eyxm"]
+[ext_resource type="Resource" path="res://content/_placeholder/trinkets/test_trinket.tres" id="18_kva8r"]
+
+[resource]
+script = ExtResource("16_27vkw")
+display_name = "TEST Encounter"
+coin_target = 6
+enemy = ExtResource("9_glpij")
+card_pool = Array[ExtResource("1_j4ji8")]([ExtResource("2_cb7ni"), ExtResource("3_guloh"), ExtResource("4_uh3ma"), ExtResource("5_x1o5y"), ExtResource("6_pe0al"), ExtResource("7_7gm5m"), ExtResource("8_3i4jq")])
+item_pool = Array[ExtResource("13_juu0e")]([ExtResource("14_ylgv6"), ExtResource("15_tvf6i")])
+trinket_pool = Array[ExtResource("17_2eyxm")]([ExtResource("18_kva8r")])
+enhancement_pool = Array[ExtResource("10_foyie")]([ExtResource("11_i5y2v"), ExtResource("12_qr3w5")])

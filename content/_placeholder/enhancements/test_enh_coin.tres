@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnhancementData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_c7mo8"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_50lul"]
+[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="3_vl38t"]
+
+[sub_resource type="Resource" id="Resource_qc2sq"]
+script = ExtResource("2_50lul")
+
+[resource]
+script = ExtResource("3_vl38t")
+id = &"test_enh_coin"
+display_name = "TEST +1 Coin"
+extra_on_play = Array[ExtResource("1_c7mo8")]([SubResource("Resource_qc2sq")])

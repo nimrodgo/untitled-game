@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_q0hfj"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_xwbmf"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_v75t5"]
+
+[sub_resource type="Resource" id="Resource_llftw"]
+script = ExtResource("2_xwbmf")
+amount = 2
+
+[resource]
+script = ExtResource("3_v75t5")
+id = &"test_draw"
+display_name = "TEST Draw"
+cost = 2
+on_play = Array[ExtResource("1_q0hfj")]([SubResource("Resource_llftw")])
+flavor_text = "Placeholder card for testing."
+tags = PackedStringArray()

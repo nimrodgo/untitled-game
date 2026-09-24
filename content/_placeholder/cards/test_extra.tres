@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_632oc"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_dbtkh"]
+[ext_resource type="Script" path="res://scripts/data/effects/extra_action_effect.gd" id="3_7wc5m"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_m8igp"]
+
+[sub_resource type="Resource" id="Resource_a1oq6"]
+script = ExtResource("2_dbtkh")
+
+[sub_resource type="Resource" id="Resource_3l36f"]
+script = ExtResource("3_7wc5m")
+
+[resource]
+script = ExtResource("4_m8igp")
+id = &"test_extra"
+display_name = "TEST Extra Action"
+cost = 2
+on_play = Array[ExtResource("1_632oc")]([SubResource("Resource_a1oq6"), SubResource("Resource_3l36f")])
+flavor_text = "Placeholder card for testing."
+tags = PackedStringArray()

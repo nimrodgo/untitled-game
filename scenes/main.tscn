@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/encounter_screen.gd" id="1_screen"]
+[ext_resource type="Resource" path="res://content/_placeholder/encounters/test_encounter.tres" id="2_enc"]
+[ext_resource type="Resource" path="res://content/_placeholder/loadouts/test_loadout.tres" id="3_lo"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_screen")
+encounter_data = ExtResource("2_enc")
+loadout = ExtResource("3_lo")

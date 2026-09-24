@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_li4ct"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_7nn07"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_yb75k"]
+
+[sub_resource type="Resource" id="Resource_2qnom"]
+script = ExtResource("2_7nn07")
+
+[resource]
+script = ExtResource("3_yb75k")
+id = &"test_instant"
+display_name = "TEST Instant"
+cost = 3
+instant = true
+on_play = Array[ExtResource("1_li4ct")]([SubResource("Resource_2qnom")])
+flavor_text = "Placeholder card for testing."
+tags = PackedStringArray()

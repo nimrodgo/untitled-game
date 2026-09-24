@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_2ey2u"]
+[ext_resource type="Script" path="res://scripts/data/effects/discard_random_effect.gd" id="2_wuf4l"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_3pqhx"]
+
+[sub_resource type="Resource" id="Resource_d8o52"]
+script = ExtResource("2_wuf4l")
+target = 1
+
+[resource]
+script = ExtResource("3_3pqhx")
+id = &"test_discard"
+display_name = "TEST Discard"
+cost = 2
+on_play = Array[ExtResource("1_2ey2u")]([SubResource("Resource_d8o52")])
+flavor_text = "Placeholder card for testing."
+tags = PackedStringArray()

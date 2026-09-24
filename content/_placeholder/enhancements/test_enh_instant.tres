@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EnhancementData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_4m0cj"]
+[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="2_map50"]
+
+[resource]
+script = ExtResource("2_map50")
+id = &"test_enh_instant"
+display_name = "TEST Make Instant"
+cost = 3
+make_instant = true
