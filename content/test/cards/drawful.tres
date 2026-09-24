@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_diwtx"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_uaouy"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_per_stat_effect.gd" id="3_h4i8m"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_w8xtu"]
+
+[sub_resource type="Resource" id="Resource_bwtpk"]
+script = ExtResource("2_uaouy")
+
+[sub_resource type="Resource" id="Resource_bstj1"]
+script = ExtResource("3_h4i8m")
+
+[resource]
+script = ExtResource("4_w8xtu")
+id = &"drawful"
+display_name = "Draw Synergy"
+cost = 3
+on_play = Array[ExtResource("1_diwtx")]([SubResource("Resource_bstj1")])
+on_buy = Array[ExtResource("1_diwtx")]([SubResource("Resource_bwtpk")])
+on_play_text = "Gain 1 🪙 for every card drawn this turn ([i]{cards_drawn_this_turn}[/i])"
+on_buy_text = "Draw 1 🂠"
+tags = PackedStringArray()

@@ -25,7 +25,7 @@ var _enemy_chips: HBoxContainer
 var _intent_bubble: PanelContainer
 var _intent_title: Label
 var _intent_kind: Label
-var _intent_desc: Label
+var _intent_desc: RichTextLabel
 var _tab_buttons: Array[Button] = []
 var _shop_row: HBoxContainer
 var _play_zone: PanelContainer
@@ -124,10 +124,12 @@ func _refresh() -> void:
 	if intent:
 		_intent_title.text = intent.display_name
 		_intent_kind.text = "NEXT ACTION · " + EnemyIntent.kind_label(intent.kind)
-		_intent_desc.text = intent.get_description()
+		_intent_desc.clear()
+		Icons.append(_intent_desc, intent.get_description(), 19)
 	else:
 		_intent_title.text = "—"
-		_intent_desc.text = "No intents"
+		_intent_desc.clear()
+		_intent_desc.append_text("No intents")
 	_clear(_enemy_chips)
 	for it in enc.enemy.items:
 		var item: ItemInstance = it
@@ -137,8 +139,10 @@ func _refresh() -> void:
 	# Shop tabs.
 	var counts := [_count(enc.shop.cards), _count(enc.shop.items), _count(enc.shop.trinkets), _count(enc.shop.enhancements)]
 	var names := ["Cards", "Items", "Trinkets", "Upgrades"]
+	var slots := [enc.shop.cards.size(), enc.shop.items.size(), enc.shop.trinkets.size(), enc.shop.enhancements.size()]
 	for i in _tab_buttons.size():
 		_tab_buttons[i].text = "%s %d" % [names[i], counts[i]]
+		_tab_buttons[i].visible = slots[i] > 0   # hide categories this shop doesn't sell
 		_tab_buttons[i].button_pressed = (i == shop_tab)
 	_fill_shop()
 
@@ -262,24 +266,28 @@ func _count(arr: Array) -> int:
 func _card_body(play: String, buy: String) -> String:
 	var s := ""
 	if play != "":
-		s += "Play: " + play
+		s += "[color=#7fe3d0]Play:[/color] " + play
 	if buy != "":
-		s += ("\n" if s != "" else "") + "On buy: " + buy
+		s += ("\n" if s != "" else "") + "[color=#ffd166]On buy:[/color] " + buy
 	return s
 
 
 func _card_data_view(cd: CardData, sz: Vector2) -> CardView:
 	return CardView.make(cd.display_name, cd.cost,
-		_card_body(Effect.describe_list(cd.on_play), Effect.describe_list(cd.on_buy)),
-		Palette.CARD, sz, "INSTANT" if cd.instant else "")
+		_card_body(cd.get_play_text(_vars()), cd.get_buy_text(_vars())),
+		Palette.CARD, sz, "INSTANT" if cd.instant and not cd.has_custom_text() else "")
 
 
 func _card_instance_view(c: CardInstance, sz: Vector2) -> CardView:
 	var footer := ""
 	for e in c.enhancements:
 		footer += "+ " + e.display_name + "  "
-	return CardView.make(c.get_name(), c.get_cost(), _card_body(c.play_text(), c.buy_text()),
-		Palette.CARD, sz, "INSTANT" if c.is_instant() else "", footer.strip_edges())
+	return CardView.make(c.get_name(), c.get_cost(), _card_body(c.play_text(_vars()), c.buy_text(_vars())),
+		Palette.CARD, sz, "INSTANT" if c.is_instant() and not c.data.has_custom_text() else "", footer.strip_edges())
+
+
+func _vars() -> Dictionary:
+	return enc.text_vars() if enc else {}
 
 
 func _item_view(it: ItemData, show_cost: bool, sz: Vector2 = CardView.SMALL) -> CardView:
@@ -287,10 +295,10 @@ func _item_view(it: ItemData, show_cost: bool, sz: Vector2 = CardView.SMALL) -> 
 
 
 func _trinket_data_view(td: TrinketData, sz: Vector2) -> CardView:
-	var desc := Effect.describe_list(td.levels[0].effects) if not td.levels.is_empty() else ""
+	var desc := td.levels[0].get_text() if not td.levels.is_empty() else ""
 	if td.description != "":
 		desc = td.description + "\n" + desc
-	return CardView.make(td.display_name, td.cost, "Once per turn: " + desc, Palette.CARD_TRINKET, sz, "TRINKET")
+	return CardView.make(td.display_name, td.cost, "Once per turn (free): " + desc, Palette.CARD_TRINKET, sz, "TRINKET")
 
 
 func _show_trinket_popup(idx: int) -> void:
@@ -545,8 +553,7 @@ func _build_ui() -> void:
 	ib.add_child(_intent_kind)
 	_intent_title = CardView._label("", 26, Palette.FOAM)
 	ib.add_child(_intent_title)
-	_intent_desc = CardView._label("", 17, Palette.FOAM.darkened(0.1))
-	_intent_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_intent_desc = Icons.rich_label("", 17, Palette.FOAM.darkened(0.1))
 	ib.add_child(_intent_desc)
 	_enemy_chips = HBoxContainer.new()
 	_enemy_chips.add_theme_constant_override("separation", 6)

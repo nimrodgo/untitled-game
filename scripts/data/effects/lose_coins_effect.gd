@@ -14,8 +14,8 @@ func apply(ctx: EffectContext) -> void:
 
 func describe() -> String:
 	if enemy_voice and target == GameRules.Target.OPPONENT:
-		return "You lose %d coin%s" % [amount, "" if amount == 1 else "s"]
-	return "%s-%d coin%s" % [_who(), amount, "" if amount == 1 else "s"]
+		return "You lose %d 🪙" % amount
+	return "%sLose %d 🪙" % [_who(), amount]
 
 
 func ai_score() -> float:

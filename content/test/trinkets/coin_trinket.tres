@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="TrinketData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/trinket_level.gd" id="1_croky"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_vq3q8"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="3_ydh2x"]
+[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="4_qvlun"]
+
+[sub_resource type="Resource" id="Resource_h26x5"]
+script = ExtResource("3_ydh2x")
+
+[sub_resource type="Resource" id="Resource_0m0jb"]
+script = ExtResource("1_croky")
+effects = Array[ExtResource("2_vq3q8")]([SubResource("Resource_h26x5")])
+text = "🗲Gain 1 🪙"
+
+[resource]
+script = ExtResource("4_qvlun")
+id = &"coin_trinket"
+display_name = "Coin Trinket"
+levels = Array[ExtResource("1_croky")]([SubResource("Resource_0m0jb")])

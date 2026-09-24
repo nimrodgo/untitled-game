@@ -13,7 +13,7 @@ func apply(ctx: EffectContext) -> void:
 
 
 func describe() -> String:
-	return "Steal %d coin%s" % [amount, "" if amount == 1 else "s"]
+	return "Steal %d 🪙" % amount
 
 
 func ai_score() -> float:

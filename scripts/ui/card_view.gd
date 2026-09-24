@@ -61,14 +61,13 @@ static func make(title: String, cost: int, body: String, bg: Color = Palette.CAR
 	if tag != "":
 		vb.add_child(_label(tag, int(13 * k), Palette.KELP))
 
-	var body_l := _label(body, int(16 * k), Palette.FOAM.darkened(0.12))
-	body_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var body_l := Icons.rich_label(body, int(16 * k), Palette.FOAM.darkened(0.08))
 	body_l.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	if not big:
-		# Small tiles show a preview; tap for the full text.
-		body_l.max_lines_visible = 5 if tag == "" else 4
-		body_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		name_l.max_lines_visible = 2
+		# Small tiles show a preview (clipped); tap for the full text.
+		body_l.fit_content = false
+		body_l.clip_contents = true
+		body_l.custom_minimum_size.y = 0
 	vb.add_child(body_l)
 
 	if footer != "":

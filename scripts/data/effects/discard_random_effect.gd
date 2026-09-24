@@ -13,7 +13,7 @@ func apply(ctx: EffectContext) -> void:
 
 
 func describe() -> String:
-	return "%sDiscard %d at random" % [_who(), amount]
+	return "%sDiscard %d 🂠 at random" % [_who(), amount]
 
 
 func ai_score() -> float:

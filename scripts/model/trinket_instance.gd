@@ -25,13 +25,19 @@ func upgrade_cost() -> int:
 
 
 func get_name() -> String:
+	if data.levels.size() <= 1:
+		return data.display_name
 	return "%s (Lv %d)" % [data.display_name, level + 1]
 
 
+func get_text() -> String:
+	return data.levels[level].get_text() if not data.levels.is_empty() else ""
+
+
 func get_description() -> String:
-	var txt := Effect.describe_list(current_effects())
+	var txt := get_text()
 	if data.description != "":
 		txt = data.description + "\n" + txt
 	if can_upgrade():
-		txt += "\nNext level (%d coins): %s" % [upgrade_cost(), Effect.describe_list(data.levels[level + 1].effects)]
+		txt += "\nNext level (%d 🪙): %s" % [upgrade_cost(), data.levels[level + 1].get_text()]
 	return txt

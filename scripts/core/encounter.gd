@@ -148,6 +148,8 @@ func play_card(card: CardInstance) -> bool:
 	var instant := card.is_instant()
 	log_line("You play %s%s." % [_card_name(card), " (instant)" if instant else ""])
 	var ctx := _ctx(p, card)
+	p.cards_played_this_turn += 1
+	p.cards_played_this_round += 1
 	_run(card.get_on_play(), ctx)
 	p.in_play.append(card)
 	_fire(GameRules.Trigger.CARD_PLAYED, p, ctx)
@@ -292,6 +294,8 @@ func draw_cards(p: PlayerState, n: int) -> void:
 			_shuffle(p.draw_pile)
 		p.hand.append(p.draw_pile.pop_back())
 		drawn += 1
+	p.cards_drawn_this_turn += drawn
+	p.cards_drawn_this_round += drawn
 	if drawn > 0 and round_num > 0 and not p.is_enemy:
 		log_line("  %s draw %d." % [p.display_name, drawn])
 
@@ -311,6 +315,20 @@ func add_card(p: PlayerState, cd: CardData, zone: GameRules.Zone) -> void:
 	log_line("  %s gain %s." % [p.display_name, _card_name(c)])
 
 
+## Live values card text can show with {name} placeholders.
+func text_vars(p: PlayerState = null) -> Dictionary:
+	if p == null:
+		p = player
+	return {
+		"cards_drawn_this_turn": p.cards_drawn_this_turn,
+		"cards_drawn_this_round": p.cards_drawn_this_round,
+		"cards_played_this_turn": p.cards_played_this_turn,
+		"cards_played_this_round": p.cards_played_this_round,
+		"coins": p.coins,
+		"round": round_num,
+	}
+
+
 func log_line(text: String) -> void:
 	logged.emit(text)
 
@@ -322,12 +340,14 @@ func _start_round() -> void:
 	log_line("\n[b]— Round %d / %d —[/b]" % [round_num, data.rounds])
 	player.passed = false
 	player.buys_this_round = 0
+	player.cards_played_this_round = 0
 	for p in [player, enemy]:
 		for it in p.items:
 			it.uses_this_round = 0
 	for t in player.trinkets:
 		t.used = false
 	draw_cards(player, GameRules.HAND_SIZE - player.hand.size())
+	player.cards_drawn_this_round = 0   # the opening hand doesn't count
 	_fire(GameRules.Trigger.ROUND_START, player, _ctx(player))
 	_fire(GameRules.Trigger.ROUND_START, enemy, _ctx(enemy))
 	_actions_since_enemy = 0
@@ -359,6 +379,8 @@ func _finish_encounter() -> void:
 
 func _begin_player_turn() -> void:
 	active = player
+	player.cards_drawn_this_turn = 0
+	player.cards_played_this_turn = 0
 	if GameRules.TRINKET_LIMIT == GameRules.TrinketLimit.PER_TURN:
 		for t in player.trinkets:
 			t.used = false

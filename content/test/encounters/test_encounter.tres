@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="1_lh0tf"]
+[ext_resource type="Resource" path="res://content/test/cards/example1.tres" id="2_b05ht"]
+[ext_resource type="Resource" path="res://content/test/cards/example2.tres" id="3_e20vv"]
+[ext_resource type="Resource" path="res://content/test/cards/drawful.tres" id="4_fq2up"]
+[ext_resource type="Resource" path="res://content/test/enemies/test_enemy.tres" id="5_jhwox"]
+[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="6_n0bhn"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="7_cwc2l"]
+[ext_resource type="Resource" path="res://content/test/items/rebate.tres" id="8_wrxkw"]
+[ext_resource type="Resource" path="res://content/test/items/express_delivery.tres" id="9_oba2e"]
+[ext_resource type="Script" path="res://scripts/data/encounter_data.gd" id="10_ce7l7"]
+[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="11_ew26u"]
+[ext_resource type="Resource" path="res://content/test/trinkets/coin_trinket.tres" id="12_oh0ge"]
+
+[resource]
+script = ExtResource("10_ce7l7")
+display_name = "TEST Encounter"
+coin_target = 10
+enemy = ExtResource("5_jhwox")
+card_pool = Array[ExtResource("1_lh0tf")]([ExtResource("2_b05ht"), ExtResource("3_e20vv"), ExtResource("4_fq2up")])
+item_pool = Array[ExtResource("7_cwc2l")]([ExtResource("8_wrxkw"), ExtResource("9_oba2e")])
+trinket_pool = Array[ExtResource("11_ew26u")]([ExtResource("12_oh0ge")])
+card_slots = 3
+enhancement_slots = 0

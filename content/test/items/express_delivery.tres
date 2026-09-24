@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_r6xr6"]
+[ext_resource type="Script" path="res://scripts/data/effects/set_buy_destination_effect.gd" id="2_mr4kr"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="3_yytpu"]
+
+[sub_resource type="Resource" id="Resource_w4ax2"]
+script = ExtResource("2_mr4kr")
+
+[resource]
+script = ExtResource("3_yytpu")
+id = &"express_delivery"
+display_name = "Express Delivery"
+cost = 2
+trigger = 3
+effects = Array[ExtResource("1_r6xr6")]([SubResource("Resource_w4ax2")])
+limit_per_encounter = 1
+description = "The first card you buy each encounter goes to your hand"

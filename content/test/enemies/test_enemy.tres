@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_intent.gd" id="1_gev7w"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_ws6cn"]
+[ext_resource type="Script" path="res://scripts/data/effects/steal_coins_effect.gd" id="3_v1cng"]
+[ext_resource type="Script" path="res://scripts/data/effects/lose_coins_effect.gd" id="4_wbjk8"]
+[ext_resource type="Script" path="res://scripts/data/effects/snatch_shop_card_effect.gd" id="5_ckp7j"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="6_iosf3"]
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="7_xvy4j"]
+
+[sub_resource type="Resource" id="Resource_q7jck"]
+script = ExtResource("3_v1cng")
+
+[sub_resource type="Resource" id="Resource_45yah"]
+script = ExtResource("1_gev7w")
+display_name = "Pinch"
+kind = 1
+effects = Array[ExtResource("2_ws6cn")]([SubResource("Resource_q7jck")])
+
+[sub_resource type="Resource" id="Resource_u0w64"]
+script = ExtResource("4_wbjk8")
+target = 1
+
+[sub_resource type="Resource" id="Resource_fwkq3"]
+script = ExtResource("1_gev7w")
+display_name = "Toll"
+effects = Array[ExtResource("2_ws6cn")]([SubResource("Resource_u0w64")])
+
+[sub_resource type="Resource" id="Resource_qpxxp"]
+script = ExtResource("5_ckp7j")
+
+[sub_resource type="Resource" id="Resource_6vo31"]
+script = ExtResource("1_gev7w")
+display_name = "Snatch"
+kind = 2
+effects = Array[ExtResource("2_ws6cn")]([SubResource("Resource_qpxxp")])
+
+[resource]
+script = ExtResource("7_xvy4j")
+display_name = "TEST Moray"
+intents = Array[ExtResource("1_gev7w")]([SubResource("Resource_45yah"), SubResource("Resource_fwkq3"), SubResource("Resource_6vo31")])

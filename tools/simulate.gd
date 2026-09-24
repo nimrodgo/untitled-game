@@ -6,8 +6,8 @@ extends SceneTree
 
 func _init() -> void:
 	var args := OS.get_cmdline_user_args()
-	var enc_path := args[0] if args.size() > 0 else "res://content/_placeholder/encounters/test_encounter.tres"
-	var lo_path := args[1] if args.size() > 1 else "res://content/_placeholder/loadouts/test_loadout.tres"
+	var enc_path := args[0] if args.size() > 0 else "res://content/test/encounters/test_encounter.tres"
+	var lo_path := args[1] if args.size() > 1 else "res://content/test/loadouts/test_loadout.tres"
 	var runs := int(args[2]) if args.size() > 2 else 200
 
 	var data: EncounterData = load(enc_path)

@@ -40,9 +40,13 @@ func get_name() -> String:
 	return data.display_name + "+".repeat(enhancements.size())
 
 
-func play_text() -> String:
-	return Effect.describe_list(get_on_play())
+func play_text(vars: Dictionary = {}) -> String:
+	var t := data.get_play_text(vars)
+	for e in enhancements:
+		if not e.extra_on_play.is_empty():
+			t += (". " if t != "" else "") + Effect.describe_list(e.extra_on_play)
+	return t
 
 
-func buy_text() -> String:
-	return Effect.describe_list(data.on_buy)
+func buy_text(vars: Dictionary = {}) -> String:
+	return data.get_buy_text(vars)
