@@ -1,10 +1,10 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://dp0gcs4i20bp1"]
 
-[ext_resource type="Script" path="res://scripts/ui/encounter_screen.gd" id="1_screen"]
+[ext_resource type="Script" uid="uid://dmte46lkrjogn" path="res://scripts/ui/encounter_screen.gd" id="1_screen"]
 [ext_resource type="Resource" path="res://content/test/encounters/test_encounter.tres" id="2_enc"]
 [ext_resource type="Resource" path="res://content/test/loadouts/test_loadout.tres" id="3_lo"]
 
-[node name="Main" type="Control"]
+[node name="Main" type="Control" unique_id=628252777]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

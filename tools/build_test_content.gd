@@ -16,7 +16,7 @@ func _init() -> void:
 		[_draw(2)], "Draw 2 🂠",
 		[_draw(1)], "Draw 1 🂠")
 	var example2 := _card("example2", "This is another card", 0, true,
-		[_gain(1)], "🗲Gain 1 🪙",
+		[_gain(1)], "⚡Gain 1 🪙",
 		[_gain(1)], "Gain 1 🪙")
 	var per_draw := GainCoinsPerStatEffect.new()
 	per_draw.stat = &"cards_drawn_this_turn"
@@ -40,7 +40,7 @@ func _init() -> void:
 	trinket.cost = 4
 	var lvl := TrinketLevel.new()
 	lvl.effects.assign([_gain(1)])
-	lvl.text = "🗲Gain 1 🪙"
+	lvl.text = "⚡Gain 1 🪙"
 	trinket.levels.assign([lvl])
 	_save(trinket, "trinkets/coin_trinket.tres")
 

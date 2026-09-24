@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="EnemyData" format=3]
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cs5mgaw4n57ls"]
 
-[ext_resource type="Script" path="res://scripts/data/enemy_intent.gd" id="1_gev7w"]
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_ws6cn"]
-[ext_resource type="Script" path="res://scripts/data/effects/steal_coins_effect.gd" id="3_v1cng"]
-[ext_resource type="Script" path="res://scripts/data/effects/lose_coins_effect.gd" id="4_wbjk8"]
-[ext_resource type="Script" path="res://scripts/data/effects/snatch_shop_card_effect.gd" id="5_ckp7j"]
-[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="6_iosf3"]
-[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="7_xvy4j"]
+[ext_resource type="Script" uid="uid://uxmsbv8vrnsc" path="res://scripts/data/enemy_intent.gd" id="1_gev7w"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="2_ws6cn"]
+[ext_resource type="Script" uid="uid://cpogkm2ysngib" path="res://scripts/data/effects/steal_coins_effect.gd" id="3_v1cng"]
+[ext_resource type="Script" uid="uid://xmr04atmryoj" path="res://scripts/data/effects/lose_coins_effect.gd" id="4_wbjk8"]
+[ext_resource type="Script" uid="uid://c2bwmjsio3xu5" path="res://scripts/data/effects/snatch_shop_card_effect.gd" id="5_ckp7j"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="6_iosf3"]
+[ext_resource type="Script" uid="uid://wehshrsqaulc" path="res://scripts/data/enemy_data.gd" id="7_xvy4j"]
 
 [sub_resource type="Resource" id="Resource_q7jck"]
 script = ExtResource("3_v1cng")
