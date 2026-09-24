@@ -1,6 +1,6 @@
 class_name Icons
 extends RefCounted
-## Inline icons for game text. Designers write 🪙 (coin), 🂠 (card) and 🗲
+## Inline icons for game text. Designers write 🪙 (coin), 🂠 (card) and 🗲 or ⚡
 ## (instant) in card text; these are drawn as small images instead of relying
 ## on emoji fonts (web builds have none). Icons are built at runtime from SVG,
 ## so no import step is needed.
@@ -8,6 +8,8 @@ extends RefCounted
 const COIN := "🪙"
 const CARD := "🂠"
 const BOLT := "⚡"
+## Alternative spellings that draw the same icon.
+const ALIASES := {"🗲": "⚡"}
 
 const SVG := {
 	"🪙": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
@@ -25,6 +27,7 @@ static var _cache := {}
 
 
 static func texture(token: String) -> Texture2D:
+	token = ALIASES.get(token, token)
 	if not _cache.has(token):
 		var img := Image.new()
 		img.load_svg_from_string(SVG[token], 3.0)
@@ -38,7 +41,7 @@ static func append(r: RichTextLabel, text: String, icon_size: int) -> void:
 	for ch in text:
 		if ch == "️":   # emoji variation selector
 			continue
-		if SVG.has(ch):
+		if SVG.has(ch) or ALIASES.has(ch):
 			if buf.ends_with(" "):
 				buf = buf.left(-1) + "\u00A0"   # keep "Gain 1" and its icon together
 			if buf != "":
@@ -53,7 +56,7 @@ static func append(r: RichTextLabel, text: String, icon_size: int) -> void:
 
 ## Plain-text fallback (for Labels/buttons): replaces icons with words.
 static func plain(text: String) -> String:
-	return text.replace(COIN, "coin").replace(CARD, "card").replace(BOLT, "").replace("️", "")
+	return text.replace(COIN, "coin").replace(CARD, "card").replace(BOLT, "").replace("🗲", "").replace("️", "")
 
 
 ## A RichTextLabel set up for game text.

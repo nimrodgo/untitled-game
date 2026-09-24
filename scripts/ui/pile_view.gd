@@ -51,11 +51,11 @@ func _init() -> void:
 	holder.add_child(_sub_label)
 
 
-func set_counts(draw: int, discard: int) -> void:
-	_count_label.text = str(draw)
+func set_counts(draw_count: int, discard: int) -> void:
+	_count_label.text = str(draw_count)
 	_sub_label.text = "discard %d" % discard
 	for i in _backs.size():
-		_backs[i].visible = draw > i or i == 0
+		_backs[i].visible = draw_count > i or i == 0
 
 
 func target_center() -> Vector2:
