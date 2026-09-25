@@ -45,6 +45,8 @@ func set_views(views: Array[CardView]) -> void:
 		add_child(v)
 		v.gui_input.connect(_on_view_input.bind(v))
 		v.tapped.connect(func(): card_tapped.emit(v.payload))
+		v.hover_grow = false
+		v.hover_changed.connect(_on_view_hover.bind(v))
 		var uid: int = v.payload.uid if v.payload is CardInstance else -1
 		uids[uid] = true
 		if not _known_uids.has(uid) and spawn_point != Vector2.INF:
@@ -84,6 +86,7 @@ func _layout(animate: bool, fresh: Array) -> void:
 		v.size = CardView.HAND
 		v.pivot_offset = Vector2(w * 0.5, h)
 		v.z_index = i
+		v.set_meta("home", [target_pos, target_rot, i])
 		if fresh.has(v):
 			# Deal in from the deck.
 			v.set_meta("flying", true)
@@ -106,6 +109,24 @@ func _layout(animate: bool, fresh: Array) -> void:
 			v.position = target_pos
 			v.rotation = target_rot
 			v.scale = Vector2.ONE
+
+
+## Desktop hover: lift the card out of the fan so it's easy to read.
+func _on_view_hover(on: bool, v: CardView) -> void:
+	if _dragging or v.has_meta("flying") or not v.has_meta("home"):
+		return
+	var home: Array = v.get_meta("home")
+	var tw := v.create_tween().set_parallel().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if on:
+		v.z_index = 50
+		tw.tween_property(v, "position", home[0] + Vector2(0, -34), 0.12)
+		tw.tween_property(v, "rotation", 0.0, 0.12)
+		tw.tween_property(v, "scale", Vector2(1.1, 1.1), 0.12)
+	else:
+		v.z_index = home[2]
+		tw.tween_property(v, "position", home[0], 0.12)
+		tw.tween_property(v, "rotation", home[1], 0.12)
+		tw.tween_property(v, "scale", Vector2.ONE, 0.12)
 
 
 func _on_view_input(event: InputEvent, v: CardView) -> void:

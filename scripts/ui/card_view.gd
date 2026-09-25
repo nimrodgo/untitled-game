@@ -4,6 +4,8 @@ extends PanelContainer
 ## Emits `tapped` on a short press-release (not after a drag/scroll).
 
 signal tapped
+## Pointer entered/left the tile (desktop hover; ignored while a button is held).
+signal hover_changed(is_hovered: bool)
 
 const SMALL := Vector2(124, 184)
 const HAND := Vector2(144, 200)
@@ -15,6 +17,11 @@ var enabled := true
 var highlighted := false
 ## Read-only tiles stay fully opaque even when not interactive.
 var dim_when_disabled := true
+## Hover feedback. `hover_grow` = the tile scales up itself (the hand does
+## its own "lift" instead, so it turns this off).
+var hoverable := true
+var hover_grow := true
+var hovered := false
 ## Whatever the owner wants to attach (CardInstance, slot index, ...).
 var payload: Variant
 
@@ -82,6 +89,9 @@ static func make(title: String, cost: int, body: String, bg: Color = Palette.CAR
 		vb.add_child(_buy_strip(buy_text, k))
 
 	v._restyle()
+	v.mouse_entered.connect(v._on_hover.bind(true))
+	v.mouse_exited.connect(v._on_hover.bind(false))
+	v.resized.connect(func(): v.pivot_offset = v.size * 0.5 if v.hover_grow else v.pivot_offset)
 	return v
 
 
@@ -129,15 +139,35 @@ func set_highlighted(value: bool) -> void:
 	_restyle()
 
 
+func _on_hover(on: bool) -> void:
+	if on and (not hoverable or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)):
+		return
+	if on == hovered:
+		return
+	hovered = on
+	_restyle()
+	if hover_grow:
+		pivot_offset = size * 0.5
+		var tw := create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		tw.tween_property(self, "scale", Vector2(1.06, 1.06) if on else Vector2.ONE, 0.12)
+		z_index = 5 if on else 0
+	hover_changed.emit(on)
+
+
 func _restyle() -> void:
 	var border := _accent.darkened(0.4)
 	var bw := 2
+	var bg := _bg
 	if highlighted:
 		border = Palette.GOLD
 		bw = 4
+	elif hovered:
+		border = Palette.FOAM if enabled else _accent
+		bw = 3
+		bg = _bg.lightened(0.08)
 	elif enabled:
 		border = _accent
-	add_theme_stylebox_override("panel", Palette.box(_bg, border, 12, bw, 10))
+	add_theme_stylebox_override("panel", Palette.box(bg, border, 12, bw, 10))
 	modulate = Color(1, 1, 1, 1) if enabled or highlighted or not dim_when_disabled else Color(0.75, 0.75, 0.8, 0.6)
 
 

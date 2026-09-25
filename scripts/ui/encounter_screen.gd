@@ -137,6 +137,8 @@ func _on_hand_tapped(card: Variant) -> void:
 ## Adds `view` to the effects layer centred on `center_global`.
 func _add_fx(view: Control, center_global: Vector2) -> void:
 	view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if view is CardView:
+		(view as CardView).hoverable = false
 	_fx_layer.add_child(view)
 	view.size = view.custom_minimum_size
 	view.global_position = center_global - view.size * 0.5
@@ -633,6 +635,7 @@ func _show_popup(content: Control, subtitle: String, actions: Array, note := "")
 	center.add_child(hb)
 	if content is CardView:
 		(content as CardView).dim_when_disabled = false
+		(content as CardView).hoverable = false
 	content.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	hb.add_child(content)
 	var vb := VBoxContainer.new()
@@ -833,11 +836,15 @@ func _build_ui() -> void:
 	var left_bottom := HBoxContainer.new()
 	left_bottom.add_theme_constant_override("separation", 8)
 	left.add_child(left_bottom)
-	for pair in [["Log", _show_log], ["Fullscreen", _toggle_fullscreen]]:
+	var buttons := [["Log", _show_log], ["Fullscreen", _toggle_fullscreen]]
+	if not OS.has_feature("web"):   # browsers can't close the tab from the game
+		buttons.append(["Exit", _confirm_exit])
+	for pair in buttons:
 		var b := _big_button(pair[0], Palette.PANEL)
 		b.custom_minimum_size = Vector2(0, 52)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.add_theme_font_size_override("font_size", 18)
+		b.custom_minimum_size.x = 0
+		b.add_theme_font_size_override("font_size", 16)
 		b.pressed.connect(pair[1])
 		left_bottom.add_child(b)
 
@@ -941,6 +948,11 @@ func _table_center() -> Vector2:
 	return Vector2(h.get_center().x, h.position.y - 110.0)
 
 
+func _confirm_exit() -> void:
+	var l := CardView._label("Quit Card Sharks?", 34, Palette.FOAM)
+	_show_popup(l, "", [{"label": "Quit", "enabled": true, "cb": func(): get_tree().quit()}])
+
+
 func _check_orientation() -> void:
 	var s := get_viewport_rect().size
 	_rotate_overlay.visible = s.y > s.x
@@ -956,5 +968,3 @@ func _toggle_fullscreen() -> void:
 		if OS.has_feature("web"):
 			# Lock to landscape on phones that support it (needs fullscreen).
 			JavaScriptBridge.eval("try { screen.orientation.lock('landscape').catch(function(){}); } catch (e) {}")
-
-
