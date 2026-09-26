@@ -3,6 +3,8 @@
 Aquatic roguelike deckbuilder where every encounter is a shop. Current slice:
 one encounter, full rules engine, landscape (phone-friendly) placeholder UI, TEST content.
 
+**Full documentation:** see [`docs/`](docs/README.md) — rules, architecture, content design, effects reference, UI, tools & deploy, extending.
+
 ## Encounter rules (as implemented)
 - An encounter lasts `rounds` rounds (default 3). Win = at least `coin_target` coins after the last round.
 - Each round is **your turn**: draw up to 5, then take actions one at a time until you **Pass**.
