@@ -43,6 +43,7 @@ var _rotate_overlay: Control
 var _hand: HandView
 var _pile: PileView
 var _pass_btn: Button
+var _fs_button: Button
 var _fx_layer: Control
 var _popup_layer: Control
 var _log_text := ""
@@ -237,6 +238,7 @@ func _refresh() -> void:
 	_hand.set_views(views)
 	_hand.modulate = Color.WHITE if my_turn or enc.is_over else Color(0.6, 0.62, 0.7)
 
+	_hand.spawn_point = _pile.target_center()   # the pile moves when the window resizes
 	_pile.set_counts(me.draw_pile.size(), me.discard.size() + me.in_play.size())
 	_pass_btn.disabled = not my_turn or pending_enh_slot >= 0
 	_pass_btn.text = "Pass" if enc.round_num < enc.data.rounds else "Finish"
@@ -847,6 +849,8 @@ func _build_ui() -> void:
 		b.add_theme_font_size_override("font_size", 16)
 		b.pressed.connect(pair[1])
 		left_bottom.add_child(b)
+		if pair[0] == "Fullscreen":
+			_fs_button = b
 
 	# ================= RIGHT: market, table, hand
 	var right := VBoxContainer.new()
@@ -956,15 +960,50 @@ func _confirm_exit() -> void:
 func _check_orientation() -> void:
 	var s := get_viewport_rect().size
 	_rotate_overlay.visible = s.y > s.x
+	_update_fullscreen_button()
 	if enc:
 		_refresh.call_deferred()   # market tiles are sized to the screen width
 
 
+func _is_fullscreen() -> bool:
+	var m := DisplayServer.window_get_mode()
+	return m == DisplayServer.WINDOW_MODE_FULLSCREEN or m == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
+
+
 func _toggle_fullscreen() -> void:
-	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
+	if _is_fullscreen():
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		if not OS.has_feature("web"):
+			# Leaving fullscreen keeps the full-screen size (title bar off-screen)
+			# unless we give the window a sensible size and centre it.
+			await get_tree().process_frame
+			_center_window()
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		if OS.has_feature("web"):
 			# Lock to landscape on phones that support it (needs fullscreen).
 			JavaScriptBridge.eval("try { screen.orientation.lock('landscape').catch(function(){}); } catch (e) {}")
+	_update_fullscreen_button.call_deferred()
+
+
+## Windowed mode: 16:9 window at 80% of the usable screen, centred.
+func _center_window() -> void:
+	var screen := DisplayServer.window_get_current_screen()
+	var usable := DisplayServer.screen_get_usable_rect(screen)
+	var base := Vector2(1280, 720)
+	var f := minf(usable.size.x * 0.8 / base.x, usable.size.y * 0.8 / base.y)
+	var sz := Vector2i(base * f)
+	DisplayServer.window_set_size(sz)
+	DisplayServer.window_set_position(usable.position + Vector2i(Vector2(usable.size - sz) * 0.5))
+
+
+func _update_fullscreen_button() -> void:
+	if _fs_button:
+		_fs_button.text = "Window" if _is_fullscreen() else "Fullscreen"
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	# Esc leaves fullscreen (desktop).
+	if event.is_action_pressed("ui_cancel") and _is_fullscreen() and not OS.has_feature("web"):
+		get_viewport().set_input_as_handled()
+		_toggle_fullscreen()
