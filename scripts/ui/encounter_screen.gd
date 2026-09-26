@@ -44,6 +44,9 @@ var _hand: HandView
 var _pile: PileView
 var _pass_btn: Button
 var _fs_button: Button
+var _install_button: Button
+var _margin: MarginContainer
+var _snap_again_pending := false
 var _fx_layer: Control
 var _popup_layer: Control
 var _log_text := ""
@@ -278,7 +281,7 @@ func _empty_gear_slot() -> Control:
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.add_theme_stylebox_override("panel", Palette.box(Color.TRANSPARENT, Palette.MUTED.darkened(0.45), 22, 2, 0))
 	var l := CardView._label("+", 26, Palette.MUTED.darkened(0.3))
-	l.set_anchors_preset(Control.PRESET_FULL_RECT)
+	l.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	p.add_child(l)
@@ -299,7 +302,7 @@ func _fill_shop() -> void:
 	# Space available inside the market panel.
 	var vp := get_viewport_rect().size
 	var avail_w := vp.x - 290.0 - 12.0 * 3 - 24.0 - 20.0
-	var avail_h := vp.y - 24.0 - (CardView.HAND.y + 36.0) - 10.0 - 20.0 - 2 * 18.0 - 10.0
+	var avail_h := vp.y - 24.0 - (CardView.HAND.y + 30.0) - 10.0 - 20.0 - 2 * 18.0 - 10.0
 	var card_h := avail_h * (0.58 if gear_n > 0 else 1.0)
 	var gear_h := avail_h - card_h
 	var n_cards := maxi(1, shop.cards.size())
@@ -622,13 +625,13 @@ func _show_popup(content: Control, subtitle: String, actions: Array, note := "")
 	_close_popup()
 	var dim := ColorRect.new()
 	dim.color = Color(0.0, 0.03, 0.07, 0.82)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.gui_input.connect(func(e: InputEvent):
 		if e is InputEventMouseButton and e.pressed: _close_popup())
 	_popup_layer.add_child(dim)
 
 	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_popup_layer.add_child(center)
 	# Landscape: content on the left, text + buttons stacked on the right.
@@ -734,11 +737,12 @@ func _build_ui() -> void:
 
 	var bg := ColorRect.new()
 	bg.color = Palette.ABYSS
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 
 	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_margin = margin
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 12)
 	add_child(margin)
@@ -839,7 +843,9 @@ func _build_ui() -> void:
 	left_bottom.add_theme_constant_override("separation", 8)
 	left.add_child(left_bottom)
 	var buttons := [["Log", _show_log], ["Fullscreen", _toggle_fullscreen]]
-	if not OS.has_feature("web"):   # browsers can't close the tab from the game
+	if OS.has_feature("web"):
+		buttons.append(["Install", _install_app])   # shown once the browser offers it
+	else:   # browsers can't close the tab from the game
 		buttons.append(["Exit", _confirm_exit])
 	for pair in buttons:
 		var b := _big_button(pair[0], Palette.PANEL)
@@ -851,6 +857,14 @@ func _build_ui() -> void:
 		left_bottom.add_child(b)
 		if pair[0] == "Fullscreen":
 			_fs_button = b
+		if pair[0] == "Install":
+			_install_button = b
+			b.visible = false
+			var t := Timer.new()
+			t.wait_time = 1.5
+			t.autostart = true
+			t.timeout.connect(_update_install_button)
+			add_child(t)
 
 	# ================= RIGHT: market, table, hand
 	var right := VBoxContainer.new()
@@ -876,7 +890,7 @@ func _build_ui() -> void:
 	right.add_child(bottom)
 	_hand = HandView.new()
 	_hand.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_hand.custom_minimum_size.y = CardView.HAND.y + 36
+	_hand.custom_minimum_size.y = CardView.HAND.y + 30
 	_hand.card_dropped.connect(_on_card_dropped)
 	_hand.card_tapped.connect(_on_hand_tapped)
 	bottom.add_child(_hand)
@@ -891,7 +905,7 @@ func _build_ui() -> void:
 	bottom.add_child(_pass_btn)
 
 	_fx_layer = Control.new()
-	_fx_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_fx_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_fx_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fx_layer.z_index = 400   # above the fanned hand
 	add_child(_fx_layer)
@@ -907,7 +921,7 @@ func _build_ui() -> void:
 	_table_hint.position.y -= 260
 
 	_popup_layer = Control.new()
-	_popup_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_popup_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_popup_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_popup_layer.z_index = 500
 	add_child(_popup_layer)
@@ -915,12 +929,12 @@ func _build_ui() -> void:
 	# Shown when a phone is held upright.
 	_rotate_overlay = ColorRect.new()
 	(_rotate_overlay as ColorRect).color = Palette.ABYSS
-	_rotate_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_rotate_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_rotate_overlay.z_index = 1000
 	_rotate_overlay.visible = false
 	add_child(_rotate_overlay)
 	var rc := CenterContainer.new()
-	rc.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rc.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_rotate_overlay.add_child(rc)
 	var rl := CardView._label("Please rotate your device\nto landscape", 40, Palette.TEAL)
 	rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -952,6 +966,18 @@ func _table_center() -> Vector2:
 	return Vector2(h.get_center().x, h.position.y - 110.0)
 
 
+## Web: install as an app (Chrome "Add to Home screen" / desktop install).
+## The page stashes the browser's install prompt in window.__csInstall.
+func _update_install_button() -> void:
+	if _install_button and OS.has_feature("web"):
+		_install_button.visible = bool(JavaScriptBridge.eval("!!window.__csInstall", true))
+
+
+func _install_app() -> void:
+	JavaScriptBridge.eval("if (window.__csInstall) { window.__csInstall.prompt(); window.__csInstall.userChoice.then(function(){ window.__csInstall = null; }); }", true)
+	_install_button.visible = false
+
+
 func _confirm_exit() -> void:
 	var l := CardView._label("Quit Card Sharks?", 34, Palette.FOAM)
 	_show_popup(l, "", [{"label": "Quit", "enabled": true, "cb": func(): get_tree().quit()}])
@@ -962,7 +988,29 @@ func _check_orientation() -> void:
 	_rotate_overlay.visible = s.y > s.x
 	_update_fullscreen_button()
 	if enc:
-		_refresh.call_deferred()   # market tiles are sized to the screen width
+		_refresh.call_deferred()   # market tiles are sized to the screen size
+	_snap_to_viewport.call_deferred()
+
+
+## During a fullscreen <-> window switch the viewport briefly reports odd
+## sizes; containers that grew then keep stale offsets and push the hand off
+## screen. Re-pin everything to the viewport once things settle.
+func _snap_to_viewport() -> void:
+	var vp := get_viewport_rect().size
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	set_deferred("size", vp)
+	for c in get_children():
+		if c is Control:
+			(c as Control).set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			(c as Control).position = Vector2.ZERO
+			(c as Control).set_deferred("size", vp)
+	# The window can settle a few frames later; check once more.
+	if not _snap_again_pending:
+		_snap_again_pending = true
+		await get_tree().create_timer(0.25).timeout
+		_snap_again_pending = false
+		if not _margin.size.is_equal_approx(get_viewport_rect().size):
+			_snap_to_viewport()
 
 
 func _is_fullscreen() -> bool:

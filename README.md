@@ -3,8 +3,6 @@
 Aquatic roguelike deckbuilder where every encounter is a shop. Current slice:
 one encounter, full rules engine, landscape (phone-friendly) placeholder UI, TEST content.
 
-**Full documentation:** see [`docs/`](docs/README.md) — rules, architecture, content design, effects reference, UI, tools & deploy, extending.
-
 ## Encounter rules (as implemented)
 - An encounter lasts `rounds` rounds (default 3). Win = at least `coin_target` coins after the last round.
 - Each round is **your turn**: draw up to 5, then take actions one at a time until you **Pass**.
@@ -54,6 +52,10 @@ One-time setup:
    Then **Actions → "Deploy web build to GitHub Pages" → Run workflow** (only needed the first time;
    afterwards every push redeploys automatically, ~2 minutes).
 4. Open the link on your phone, turn it sideways, and tap **Fullscreen** (locks landscape on Android).
+5. **Install it as an app:** in Chrome on Android tap the in-game **Install** button (appears once Chrome
+   offers it) or Chrome menu ⋮ → **Add to Home screen / Install app**. It then opens fullscreen and
+   landscape from its own icon, and works offline after the first load. (iPhone: Safari → Share →
+   Add to Home Screen.)
 
 Same-Wi-Fi alternative without GitHub: `playtest_mobile.bat` exports and serves the build over HTTPS
 from your PC (`tools/serve_web.gd`); accept the self-signed certificate warning on the phone.
