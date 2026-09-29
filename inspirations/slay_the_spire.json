@@ -29,37 +29,37 @@
   "cards": [
     {
       "name": "Burning Pact",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "Exhaust 1 card in your hand.\nDraw 2 cards."
     },
     {
       "name": "Havoc",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "Draw 1 card.\nImmediately play it for 0 Energy. Exhaust it, unless it's a Power."
     },
     {
       "name": "Carnage",
-      "type": "Attack",
+      "type": "Normal",
       "cost": 2,
       "effect_text": "Ethereal.\n4{damage}"
     },
     {
       "name": "Exhume",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "Put a card from your Exhaust pile into your hand.\nExhaust."
     },
     {
       "name": "Offering",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 0,
       "effect_text": "Lose 1 HP.\nGain {energy}{energy}.\nDraw 3 cards.\nExhaust."
     },
     {
       "name": "Fiend Fire",
-      "type": "Attack",
+      "type": "Normal",
       "cost": 2,
       "effect_text": "Exhaust your hand.\nDeal 1{damage} for each other card Exhausted this way.\nExhaust."
     },
@@ -71,7 +71,7 @@
     },
     {
       "name": "Double Tap",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "This turn, your next Attack is played twice."
     },
@@ -89,7 +89,7 @@
     },
     {
       "name": "Wild Strike",
-      "type": "Attack",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "{daze}\n3{damage}"
     },
@@ -101,13 +101,13 @@
     },
     {
       "name": "Sentinel",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "2{block} to any player.\nIf this card is Exhausted, gain {energy}{energy}."
     },
     {
       "name": "Warcry",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 0,
       "effect_text": "Draw 2 cards.\nThen put a card from your hand on top of your draw pile.\nExhaust.",
       "cost_note": "cost badge hidden by sleeve glare"
@@ -120,13 +120,13 @@
     },
     {
       "name": "Battle Trance",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 0,
-      "effect_text": "Draw 3 cards.\nYou can't draw additional cards this turn.",
+      "effect_text": "Draw 3 cards.\nYou can't draw additional cards this turn."
     },
     {
       "name": "Expertise",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "Draw cards until you have 6 in your hand."
     },
@@ -138,31 +138,31 @@
     },
     {
       "name": "Calculated Gamble",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 0,
       "effect_text": "Discard your hand, then draw that many cards.\nExhaust."
     },
     {
       "name": "Reflex",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "Unplayable.\nIf this card is discarded by a card's effect, draw 2 cards."
     },
     {
       "name": "Prepared",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 0,
       "effect_text": "Draw 1 card.\nDiscard 1 card."
     },
     {
       "name": "Survivor",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "2{block}\nDiscard 1 card."
     },
     {
       "name": "Acrobatics",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "Draw 3 cards.\nDiscard 1 card."
     },
@@ -174,49 +174,49 @@
     },
     {
       "name": "Grand Finale",
-      "type": "Attack",
+      "type": "Normal",
       "cost": 0,
       "effect_text": "Can only be played if there are no cards in your draw pile.\n10{damage}"
     },
     {
       "name": "Doppelganger",
-      "type": "Skill",
+      "type": "Normal",
       "cost": "X",
       "effect_text": "Play a copy of the last Attack or Skill played by any player this turn with cost equal to X.\nExhaust."
     },
     {
       "name": "Burst",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "This turn, your next Skill is played twice.\nBurst can't be copied or \"played twice\"."
     },
     {
       "name": "Dagger Throw",
-      "type": "Attack",
+      "type": "Normal",
       "cost": 1,
-      "effect_text": "2{damage}\nDraw 1 card.\nDiscard 1 card.",
+      "effect_text": "2{damage}\nDraw 1 card.\nDiscard 1 card."
     },
     {
       "name": "Tricks of the Trade",
       "type": "Power",
       "cost": 1,
-      "effect_text": "Start of turn:\nDraw 1 card then discard 1 card.",
+      "effect_text": "Start of turn:\nDraw 1 card then discard 1 card."
     },
     {
       "name": "Scrawl",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "Draw 5 cards.\nExhaust."
     },
     {
       "name": "Vault",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 3,
       "effect_text": "Discard all cards without Retain. Draw 5 cards. Gain {energy}{energy}{energy}.\nExhaust."
     },
     {
       "name": "Third Eye",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "2{block}\nScry 3."
     },
@@ -234,7 +234,7 @@
     },
     {
       "name": "Cut Through Fate",
-      "type": "Attack",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "1{damage}\nScry 2.\nDraw 1 card."
     },
@@ -242,13 +242,13 @@
       "name": "Establishment",
       "type": "Power",
       "cost": 1,
-      "effect_text": "Start of turn:\nCards you Retained last turn cost 1 less {energy} this turn.",
+      "effect_text": "Start of turn:\nCards you Retained last turn cost 1 less {energy} this turn."
     },
     {
       "name": "Blasphemy",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 2,
-      "effect_text": "Your next Attack this turn is played 3 times.\nExhaust your draw pile.\nExhaust.",
+      "effect_text": "Your next Attack this turn is played 3 times.\nExhaust your draw pile.\nExhaust."
     },
     {
       "name": "Buffer",
@@ -258,43 +258,43 @@
     },
     {
       "name": "Seek",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 0,
       "effect_text": "Search your draw pile for 1 card. Put that card into your hand, then shuffle your draw pile.\nExhaust."
     },
     {
       "name": "Core Surge",
-      "type": "Attack",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "Retain.\nRemove all debuffs from any player.\n3{damage}"
     },
     {
       "name": "Equilibrium",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 2,
       "effect_text": "3{block}\nYou may Retain 1 card this turn."
     },
     {
       "name": "Hologram",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "1{block}\nPut a card from your discard pile into your hand.\nExhaust."
     },
     {
       "name": "Overclock",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 0,
       "effect_text": "Draw 2 cards.\nPut a {daze} in your discard pile."
     },
     {
       "name": "Claw",
-      "type": "Attack",
+      "type": "Normal",
       "cost": 0,
       "effect_text": "Gain a red cube.\nX{damage}\nX is how many red cubes you gained this combat."
     },
     {
       "name": "Recycle",
-      "type": "Skill",
+      "type": "Normal",
       "cost": 1,
       "effect_text": "Exhaust a card.\nGain {energy} equal to its cost.\nIf it costs \"X\", instead double your {energy}."
     },
@@ -314,7 +314,7 @@
       "name": "Echo Form",
       "type": "Power",
       "cost": 3,
-      "effect_text": "Ethereal.\nStart of turn:\nThe first Attack or Skill you play is played twice.",
+      "effect_text": "Ethereal.\nStart of turn:\nThe first Attack or Skill you play is played twice."
     }
   ]
 }
