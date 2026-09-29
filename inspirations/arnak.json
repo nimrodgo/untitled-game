@@ -1,0 +1,1175 @@
+{
+  "game": "The Lost Ruins of Arnak",
+  "notes": [
+    "Transcribed from photos. Text is verbatim; icons are written as {tokens} (see icon_glossary).",
+    "66 cards: 40 items and 26 artifacts. Cards only partly visible in one photo were taken from the photo where they are fully visible.",
+    "Icon rows are written left-to-right as printed; lines are separated by \\n.",
+    "travel_icons lists the round icons at the top of the title strip.",
+    "certainty in icon_glossary: high = official rulebook name, medium = likely, low = described by appearance only (name not confirmed)."
+  ],
+  "icon_glossary": {
+    "coin": {
+      "appearance": "gold coin",
+      "certainty": "high"
+    },
+    "compass": {
+      "appearance": "green circle with compass",
+      "certainty": "high"
+    },
+    "gem": {
+      "appearance": "red faceted gem",
+      "certainty": "high"
+    },
+    "tablet": {
+      "appearance": "grey stone tablet with glyphs",
+      "certainty": "high"
+    },
+    "arrowhead": {
+      "appearance": "blue arrowhead",
+      "certainty": "high"
+    },
+    "fear_card": {
+      "appearance": "dark card with glowing eyes",
+      "certainty": "high"
+    },
+    "artifact": {
+      "appearance": "blue idol/vase icon; also the blue hexagon at bottom-right of artifact cards",
+      "certainty": "high"
+    },
+    "item": {
+      "appearance": "brown crate/rope frame with red arrowhead; bottom-right corner of item cards; also inline in text",
+      "certainty": "high"
+    },
+    "exile_card": {
+      "appearance": "card icon with a big red X",
+      "certainty": "high"
+    },
+    "draw_card": {
+      "appearance": "dark card with green plus",
+      "certainty": "high"
+    },
+    "discard_card": {
+      "appearance": "dark card with yellow curved arrow",
+      "certainty": "high"
+    },
+    "stack_arrow": {
+      "appearance": "card with dark silhouette on a grey/yellow base and a brown curved arrow",
+      "certainty": "low"
+    },
+    "bottom_draw": {
+      "appearance": "card with green plus on a grey base and a brown curved arrow",
+      "certainty": "high"
+    },
+    "instant": {
+      "appearance": "black lightning bolt at the start of an effect row",
+      "certainty": "high"
+    },
+    "arrow_next": {
+      "appearance": "dark triangle separating input from result",
+      "certainty": "low"
+    },
+    "minus_red": {
+      "appearance": "small red minus sign in front of coins/compasses (Crowbar, Army Belt)",
+      "certainty": "low"
+    },
+    "green_leaf": {
+      "appearance": "green folded leaf/tent shape (Calming Extract)",
+      "certainty": "low"
+    },
+    "assistant": {
+      "appearance": "assistant portrait card icon",
+      "certainty": "low"
+    },
+    "assistant_grey": {
+      "appearance": "grey assistant portrait card",
+      "certainty": "low"
+    },
+    "assistant_yellow": {
+      "appearance": "yellow assistant portrait card",
+      "certainty": "low"
+    },
+    "check_green": {
+      "appearance": "green check mark",
+      "certainty": "low"
+    }
+  },
+  "cards": [
+    {
+      "name": "Brush",
+      "kind": "item",
+      "source_photo": "73010",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 3,
+      "travel_icons": [
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Gain {compass} for each {artifact} you have, up to 3."
+    },
+    {
+      "name": "Cursed Coin",
+      "kind": "item",
+      "source_photo": "73010",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{coin}{coin}\nYou may take 1 {fear_card} card from your play area into your hand."
+    },
+    {
+      "name": "Trowel",
+      "kind": "item",
+      "source_photo": "73010",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{compass} {arrow_next} {gem}"
+    },
+    {
+      "name": "Whip",
+      "kind": "item",
+      "source_photo": "73010",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Exile this card to buy {artifact} with a discount of {compass}{compass}{compass}{compass}."
+    },
+    {
+      "name": "Parrot",
+      "kind": "item",
+      "source_photo": "73010",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{discard_card} {arrow_next} {gem}"
+    },
+    {
+      "name": "Pickaxe",
+      "kind": "item",
+      "source_photo": "73010",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{compass} {arrow_next} {tablet}{arrowhead}"
+    },
+    {
+      "name": "Calming Extract",
+      "kind": "item",
+      "source_photo": "73009",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{stack_arrow}{exile_card}\nOR\nExile this card to {green_leaf}."
+    },
+    {
+      "name": "Shovel",
+      "kind": "item",
+      "source_photo": "73009",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown",
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Buy {artifact} with a discount of {compass}{compass} and exile it after resolving its effect."
+    },
+    {
+      "name": "Sieve",
+      "kind": "item",
+      "source_photo": "73009",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{coin}\nYou may {draw_card}{discard_card} up to twice."
+    },
+    {
+      "name": "Machete",
+      "kind": "item",
+      "source_photo": "73009",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{exile_card}{compass}{compass}"
+    },
+    {
+      "name": "Precision Compass",
+      "kind": "item",
+      "source_photo": "73009",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Buy {artifact} with a discount of {compass}{compass}{compass}, include the top card of the artifact deck."
+    },
+    {
+      "name": "Soda Pop",
+      "kind": "item",
+      "source_photo": "73009",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green",
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Exile this card to {compass}{stack_arrow}",
+      "notes": "travel icons partly washed out by glare"
+    },
+    {
+      "name": "Horse",
+      "kind": "item",
+      "source_photo": "73009",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown",
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{draw_card}{coin}{compass}"
+    },
+    {
+      "name": "Hat",
+      "kind": "item",
+      "source_photo": "73009",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{instant}{coin}{compass}"
+    },
+    {
+      "name": "Airship",
+      "kind": "item",
+      "source_photo": "73008",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_blue",
+        "biplane_blue"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{instant}{compass}{compass}"
+    },
+    {
+      "name": "Spectacles",
+      "kind": "item",
+      "source_photo": "73008",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "ship_green",
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{compass}{tablet}\nYou may buy artifacts from the exile pile this round."
+    },
+    {
+      "name": "Chronometer",
+      "kind": "item",
+      "source_photo": "73008",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "ship_green",
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{instant}{coin}{compass}\nOR\nPass to gain {compass}{compass}{compass}."
+    },
+    {
+      "name": "Axe",
+      "kind": "item",
+      "source_photo": "73008",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{exile_card}{compass}",
+      "notes": "glare on the card"
+    },
+    {
+      "name": "Improvised Weapon",
+      "kind": "item",
+      "source_photo": "73008",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{exile_card}{exile_card}\nOR\nExile this card to gain {arrowhead}."
+    },
+    {
+      "name": "Army Knife",
+      "kind": "item",
+      "source_photo": "73008",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green",
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Choose two different options:\n{exile_card}{coin}{compass}{tablet}",
+      "notes": "glare on the card"
+    },
+    {
+      "name": "Rough Map",
+      "kind": "item",
+      "source_photo": "73008",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Exile this card to gain {compass}{compass}{compass}."
+    },
+    {
+      "name": "Map to the Temple",
+      "kind": "item",
+      "source_photo": "73008",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Exile this card to gain {bottom_draw}{compass}{compass}"
+    },
+    {
+      "name": "Grappling Hook",
+      "kind": "item",
+      "source_photo": "73013",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{discard_card} {arrow_next} {draw_card}{exile_card}",
+      "notes": "cost coins partly cut off at photo edge; two coins visible"
+    },
+    {
+      "name": "Pack Donkey",
+      "kind": "item",
+      "source_photo": "73013",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown",
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{draw_card}{draw_card}"
+    },
+    {
+      "name": "Thoughtful Gift",
+      "kind": "item",
+      "source_photo": "73013",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_blue"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Exile this card and {discard_card} to gain {item} to your hand."
+    },
+    {
+      "name": "Rope",
+      "kind": "item",
+      "source_photo": "73013",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{discard_card} {arrow_next} {draw_card}{draw_card}"
+    },
+    {
+      "name": "First Aid Kit",
+      "kind": "item",
+      "source_photo": "73013",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green",
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Look at the top 4 cards of your deck. Either exile up to 2, or keep 1. Return the rest in any order."
+    },
+    {
+      "name": "Flask",
+      "kind": "item",
+      "source_photo": "73013",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Exile this card to {draw_card}{draw_card}{draw_card}."
+    },
+    {
+      "name": "Fishing Rod",
+      "kind": "item",
+      "source_photo": "73013",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Buy {item} with a discount of {coin}{coin}{coin}, include the top card of the item deck."
+    },
+    {
+      "name": "Airdrop",
+      "kind": "item",
+      "source_photo": "73013",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_blue"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Exile this card to gain {item} to your hand."
+    },
+    {
+      "name": "Crowbar",
+      "kind": "item",
+      "source_photo": "73014",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Exile a card from the card row and refill it.\n{minus_red}{coin}{coin}{item} / {minus_red}{compass}{compass}{artifact}",
+      "notes": "icon row below the text: red minus + coins + item icon, a slash, red minus + compasses + artifact icon; coin/compass counts read as 2 each, low certainty"
+    },
+    {
+      "name": "Army Belt",
+      "kind": "item",
+      "source_photo": "73014",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown",
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Choose two different options:\n{minus_red}{coin}{coin}{item} {draw_card} {stack_arrow}",
+      "notes": "first option has coin count read as 2, low certainty"
+    },
+    {
+      "name": "Tool Box",
+      "kind": "item",
+      "source_photo": "73014",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green",
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "Use the effect of any {item} from the card row. (If that {item} says to exile it, exile Tool Box instead.)"
+    },
+    {
+      "name": "Coffee",
+      "kind": "item",
+      "source_photo": "73014",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{compass}{stack_arrow}"
+    },
+    {
+      "name": "Watch",
+      "kind": "item",
+      "source_photo": "73014",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{instant}{coin}{coin}\nOR\nPass to gain {coin}{coin}{coin}."
+    },
+    {
+      "name": "Gold Pan",
+      "kind": "item",
+      "source_photo": "73014",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green",
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{instant}{coin}{coin}"
+    },
+    {
+      "name": "Well Bucket",
+      "kind": "item",
+      "source_photo": "73014",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{bottom_draw}",
+      "notes": "heavy glare on the card"
+    },
+    {
+      "name": "Landing Net",
+      "kind": "item",
+      "source_photo": "73014",
+      "cost": [
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "ship_green",
+        "ship_green"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{instant}{coin}{coin}\nFor the rest of this round, whenever you buy {item} you may put it on top of your deck."
+    },
+    {
+      "name": "Large Backpack",
+      "kind": "item",
+      "source_photo": "73014",
+      "cost": [
+        "{coin}",
+        "{coin}",
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "jeep_brown"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{coin}\nDraw a card from the bottom of your deck."
+    },
+    {
+      "name": "Little Monkey",
+      "kind": "item",
+      "source_photo": "73014",
+      "cost": [
+        "{coin}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "unclear_white_x2"
+      ],
+      "bottom_right_icon": "{item}",
+      "effect_text": "{instant}{coin}{coin}\nAnd you may exile one {item} from the card row and refill it.",
+      "notes": "travel icons washed out by glare (two white/grey circles with dark silhouettes)"
+    },
+    {
+      "name": "Ceremonial Rattle",
+      "kind": "artifact",
+      "source_photo": "73011",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{stack_arrow}"
+    },
+    {
+      "name": "Ornate Hammer",
+      "kind": "artifact",
+      "source_photo": "73011",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "Exile the rightmost {item} in the card row. Gain any {item} from exile to the bottom of your deck."
+    },
+    {
+      "name": "Serpent Idol",
+      "kind": "artifact",
+      "source_photo": "73011",
+      "cost": [
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{fear_card} {gem}"
+    },
+    {
+      "name": "Mantle of Dusk",
+      "kind": "artifact",
+      "source_photo": "73011",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "If you have no cards in your hand, then {draw_card}{draw_card}. Otherwise gain {gem}."
+    },
+    {
+      "name": "Ritual Dagger",
+      "kind": "artifact",
+      "source_photo": "73011",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{exile_card} {arrowhead}"
+    },
+    {
+      "name": "Friendship Medallion",
+      "kind": "artifact",
+      "source_photo": "73011",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{assistant_grey}{check_green} {assistant_yellow}{check_green}\nin either order. Must be 2 different assistants."
+    },
+    {
+      "name": "Ancient Wine",
+      "kind": "artifact",
+      "source_photo": "73011",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{coin}\nUse the effect on the gold side of one {assistant} available on the supply board."
+    },
+    {
+      "name": "Stone Calendar",
+      "kind": "artifact",
+      "source_photo": "73011",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "<some action>\nYou may pass to start next round with 1 additional card."
+    },
+    {
+      "name": "Dark Statuette",
+      "kind": "artifact",
+      "source_photo": "73012",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "Look at your entire deck. Return all {fear_card} cards. Then keep up to 2 and {discard_card} the rest."
+    },
+    {
+      "name": "One-Eyed Statue",
+      "kind": "artifact",
+      "source_photo": "73012",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{gem} {arrow_next} {tablet}{tablet}{arrowhead}{arrowhead}"
+    },
+    {
+      "name": "Hunting Arrows",
+      "kind": "artifact",
+      "source_photo": "73012",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{fear_card} {arrowhead}{arrowhead}"
+    },
+    {
+      "name": "Serpent's Gold",
+      "kind": "artifact",
+      "source_photo": "73012",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "unclear_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{fear_card} {coin}{coin}{coin}{coin}",
+      "notes": "top-right icon washed out by glare"
+    },
+    {
+      "name": "Sundial",
+      "kind": "artifact",
+      "source_photo": "73012",
+      "cost": [
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{tablet}{tablet}\nOR\nPass to gain {gem}."
+    },
+    {
+      "name": "Runes of the Dead",
+      "kind": "artifact",
+      "source_photo": "73012",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{fear_card} {coin} {tablet}{tablet}{tablet}"
+    },
+    {
+      "name": "Decorated Horn",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "Exchange one of your {assistant} with one available on the supply board. The new one is the same level and refreshed."
+    },
+    {
+      "name": "Cape of Dawn",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "If there is no other card in your play area, then {draw_card}{draw_card}. Otherwise {coin}{coin}{coin}."
+    },
+    {
+      "name": "Rod of Division",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{draw_card}{draw_card}\nYou may {discard_card} one of the drawn cards to {exile_card}{coin}."
+    },
+    {
+      "name": "Obsidian Earring",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "Draw up to 2 cards from the bottom of your deck.\nKeep 1, {discard_card} the other."
+    },
+    {
+      "name": "Monkey Medallion",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "Gain {item} and place it on the top of your deck."
+    },
+    {
+      "name": "Treasure Chest",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 3,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{draw_card}{coin}"
+    },
+    {
+      "name": "Coconut Flask",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{coin}{coin}\nUse the effect on the silver side of one {assistant} available on the supply board."
+    },
+    {
+      "name": "Mortar",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{exile_card}{coin}{coin}"
+    },
+    {
+      "name": "Stone Jar",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{draw_card}"
+    },
+    {
+      "name": "Crystal Earring",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 2,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "Draw up to 3 cards and keep 1. You may return 1 of them to the top of your deck.\n{discard_card} the rest."
+    },
+    {
+      "name": "Sacred Drum",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{discard_card} {arrow_next} {stack_arrow}{stack_arrow}"
+    },
+    {
+      "name": "Cleansing Cauldron",
+      "kind": "artifact",
+      "source_photo": "73015",
+      "cost": [
+        "{compass}",
+        "{compass}",
+        "{compass}"
+      ],
+      "victory_points": 1,
+      "travel_icons": [
+        "biplane_white"
+      ],
+      "bottom_right_icon": "{artifact}",
+      "activation_icon": "{tablet}{arrow_next}",
+      "effect_text": "{draw_card}{exile_card}"
+    }
+  ]
+}

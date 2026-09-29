@@ -1,0 +1,320 @@
+{
+  "game": "Slay the Spire: The Board Game",
+  "icon_glossary": {
+    "damage": {
+      "appearance": "red sword",
+      "certainty": "high"
+    },
+    "block": {
+      "appearance": "blue shield",
+      "certainty": "high"
+    },
+    "energy": {
+      "appearance": "class-colored gem/orb in the cost badge; two orange orbs in Ironclad text, blue square in Defect text, pink in Watcher text",
+      "certainty": "high"
+    },
+    "daze": {
+      "appearance": "pink spiral circle (status card)",
+      "certainty": "low"
+    },
+    "burn": {
+      "appearance": "orange flame (status card)",
+      "certainty": "low"
+    },
+    "slime": {
+      "appearance": "green spiral (status card)",
+      "certainty": "low"
+    }
+  },
+  "cards": [
+    {
+      "name": "Burning Pact",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "Exhaust 1 card in your hand.\nDraw 2 cards."
+    },
+    {
+      "name": "Havoc",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "Draw 1 card.\nImmediately play it for 0 Energy. Exhaust it, unless it's a Power."
+    },
+    {
+      "name": "Carnage",
+      "type": "Attack",
+      "cost": 2,
+      "effect_text": "Ethereal.\n4{damage}"
+    },
+    {
+      "name": "Exhume",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "Put a card from your Exhaust pile into your hand.\nExhaust."
+    },
+    {
+      "name": "Offering",
+      "type": "Skill",
+      "cost": 0,
+      "effect_text": "Lose 1 HP.\nGain {energy}{energy}.\nDraw 3 cards.\nExhaust."
+    },
+    {
+      "name": "Fiend Fire",
+      "type": "Attack",
+      "cost": 2,
+      "effect_text": "Exhaust your hand.\nDeal 1{damage} for each other card Exhausted this way.\nExhaust."
+    },
+    {
+      "name": "Corruption",
+      "type": "Power",
+      "cost": 3,
+      "effect_text": "Your Skills cost 0.\nWhenever you play a Skill, Exhaust it."
+    },
+    {
+      "name": "Double Tap",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "This turn, your next Attack is played twice."
+    },
+    {
+      "name": "Feel No Pain",
+      "type": "Power",
+      "cost": 1,
+      "effect_text": "Whenever you Exhaust a card, 1{block}."
+    },
+    {
+      "name": "Fire Breathing",
+      "type": "Power",
+      "cost": 1,
+      "effect_text": "Whenever you draw {daze},{burn},{slime}, or a Curse, deal 2 damage to any row."
+    },
+    {
+      "name": "Wild Strike",
+      "type": "Attack",
+      "cost": 1,
+      "effect_text": "{daze}\n3{damage}"
+    },
+    {
+      "name": "Dark Embrace",
+      "type": "Power",
+      "cost": 2,
+      "effect_text": "Whenever you Exhaust a card, draw 1 card."
+    },
+    {
+      "name": "Sentinel",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "2{block} to any player.\nIf this card is Exhausted, gain {energy}{energy}."
+    },
+    {
+      "name": "Warcry",
+      "type": "Skill",
+      "cost": 0,
+      "effect_text": "Draw 2 cards.\nThen put a card from your hand on top of your draw pile.\nExhaust.",
+      "cost_note": "cost badge hidden by sleeve glare"
+    },
+    {
+      "name": "Evolve",
+      "type": "Power",
+      "cost": 1,
+      "effect_text": "Whenever you draw {daze},{burn}, or {slime}, draw 1 card."
+    },
+    {
+      "name": "Battle Trance",
+      "type": "Skill",
+      "cost": 0,
+      "effect_text": "Draw 3 cards.\nYou can't draw additional cards this turn.",
+    },
+    {
+      "name": "Expertise",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "Draw cards until you have 6 in your hand."
+    },
+    {
+      "name": "Well-Laid Plans",
+      "type": "Power",
+      "cost": 1,
+      "effect_text": "End of turn:\nYou may Retain 1 card."
+    },
+    {
+      "name": "Calculated Gamble",
+      "type": "Skill",
+      "cost": 0,
+      "effect_text": "Discard your hand, then draw that many cards.\nExhaust."
+    },
+    {
+      "name": "Reflex",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "Unplayable.\nIf this card is discarded by a card's effect, draw 2 cards."
+    },
+    {
+      "name": "Prepared",
+      "type": "Skill",
+      "cost": 0,
+      "effect_text": "Draw 1 card.\nDiscard 1 card."
+    },
+    {
+      "name": "Survivor",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "2{block}\nDiscard 1 card."
+    },
+    {
+      "name": "Acrobatics",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "Draw 3 cards.\nDiscard 1 card."
+    },
+    {
+      "name": "After Image",
+      "type": "Power",
+      "cost": 1,
+      "effect_text": "Whenever a card's effect makes you discard one or more cards, 1{block}."
+    },
+    {
+      "name": "Grand Finale",
+      "type": "Attack",
+      "cost": 0,
+      "effect_text": "Can only be played if there are no cards in your draw pile.\n10{damage}"
+    },
+    {
+      "name": "Doppelganger",
+      "type": "Skill",
+      "cost": "X",
+      "effect_text": "Play a copy of the last Attack or Skill played by any player this turn with cost equal to X.\nExhaust."
+    },
+    {
+      "name": "Burst",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "This turn, your next Skill is played twice.\nBurst can't be copied or \"played twice\"."
+    },
+    {
+      "name": "Dagger Throw",
+      "type": "Attack",
+      "cost": 1,
+      "effect_text": "2{damage}\nDraw 1 card.\nDiscard 1 card.",
+    },
+    {
+      "name": "Tricks of the Trade",
+      "type": "Power",
+      "cost": 1,
+      "effect_text": "Start of turn:\nDraw 1 card then discard 1 card.",
+    },
+    {
+      "name": "Scrawl",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "Draw 5 cards.\nExhaust."
+    },
+    {
+      "name": "Vault",
+      "type": "Skill",
+      "cost": 3,
+      "effect_text": "Discard all cards without Retain. Draw 5 cards. Gain {energy}{energy}{energy}.\nExhaust."
+    },
+    {
+      "name": "Third Eye",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "2{block}\nScry 3."
+    },
+    {
+      "name": "Nirvana",
+      "type": "Power",
+      "cost": 1,
+      "effect_text": "Whenever you Scry, 1{block}."
+    },
+    {
+      "name": "Foresight",
+      "type": "Power",
+      "cost": 1,
+      "effect_text": "Start of turn, before you draw:\nScry 3."
+    },
+    {
+      "name": "Cut Through Fate",
+      "type": "Attack",
+      "cost": 1,
+      "effect_text": "1{damage}\nScry 2.\nDraw 1 card."
+    },
+    {
+      "name": "Establishment",
+      "type": "Power",
+      "cost": 1,
+      "effect_text": "Start of turn:\nCards you Retained last turn cost 1 less {energy} this turn.",
+    },
+    {
+      "name": "Blasphemy",
+      "type": "Skill",
+      "cost": 2,
+      "effect_text": "Your next Attack this turn is played 3 times.\nExhaust your draw pile.\nExhaust.",
+    },
+    {
+      "name": "Buffer",
+      "type": "Power",
+      "cost": 2,
+      "effect_text": "The next time you would lose HP, prevent it and Exhaust this card."
+    },
+    {
+      "name": "Seek",
+      "type": "Skill",
+      "cost": 0,
+      "effect_text": "Search your draw pile for 1 card. Put that card into your hand, then shuffle your draw pile.\nExhaust."
+    },
+    {
+      "name": "Core Surge",
+      "type": "Attack",
+      "cost": 1,
+      "effect_text": "Retain.\nRemove all debuffs from any player.\n3{damage}"
+    },
+    {
+      "name": "Equilibrium",
+      "type": "Skill",
+      "cost": 2,
+      "effect_text": "3{block}\nYou may Retain 1 card this turn."
+    },
+    {
+      "name": "Hologram",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "1{block}\nPut a card from your discard pile into your hand.\nExhaust."
+    },
+    {
+      "name": "Overclock",
+      "type": "Skill",
+      "cost": 0,
+      "effect_text": "Draw 2 cards.\nPut a {daze} in your discard pile."
+    },
+    {
+      "name": "Claw",
+      "type": "Attack",
+      "cost": 0,
+      "effect_text": "Gain a red cube.\nX{damage}\nX is how many red cubes you gained this combat."
+    },
+    {
+      "name": "Recycle",
+      "type": "Skill",
+      "cost": 1,
+      "effect_text": "Exhaust a card.\nGain {energy} equal to its cost.\nIf it costs \"X\", instead double your {energy}."
+    },
+    {
+      "name": "Machine Learning",
+      "type": "Power",
+      "cost": 1,
+      "effect_text": "Start of turn:\nDraw 1 card."
+    },
+    {
+      "name": "Consume",
+      "type": "Power",
+      "cost": 2,
+      "effect_text": "Orb Evoke effects get +1."
+    },
+    {
+      "name": "Echo Form",
+      "type": "Power",
+      "cost": 3,
+      "effect_text": "Ethereal.\nStart of turn:\nThe first Attack or Skill you play is played twice.",
+    }
+  ]
+}
