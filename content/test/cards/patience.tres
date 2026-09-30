@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_ayial"]
+[ext_resource type="Script" path="res://scripts/data/effects/effect_option.gd" id="2_hhvaa"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="3_rwjhu"]
+[ext_resource type="Script" path="res://scripts/data/effects/pass_effect.gd" id="4_l3i7m"]
+[ext_resource type="Script" path="res://scripts/data/effects/choose_one_effect.gd" id="5_lvu8f"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="6_d1xpf"]
+
+[sub_resource type="Resource" id="Resource_evuwb"]
+script = ExtResource("3_rwjhu")
+amount = 2
+
+[sub_resource type="Resource" id="Resource_bhgsv"]
+script = ExtResource("2_hhvaa")
+label = "Gain 2 🪙"
+effects = Array[ExtResource("1_ayial")]([SubResource("Resource_evuwb")])
+
+[sub_resource type="Resource" id="Resource_xsjsq"]
+script = ExtResource("4_l3i7m")
+
+[sub_resource type="Resource" id="Resource_1ga58"]
+script = ExtResource("3_rwjhu")
+amount = 3
+
+[sub_resource type="Resource" id="Resource_xdkq3"]
+script = ExtResource("2_hhvaa")
+label = "Pass ➡ Gain 3 🪙"
+effects = Array[ExtResource("1_ayial")]([SubResource("Resource_xsjsq"), SubResource("Resource_1ga58")])
+
+[sub_resource type="Resource" id="Resource_uf1g5"]
+script = ExtResource("5_lvu8f")
+options = Array[ExtResource("2_hhvaa")]([SubResource("Resource_bhgsv"), SubResource("Resource_xdkq3")])
+
+[resource]
+script = ExtResource("6_d1xpf")
+id = &"patience"
+display_name = "Patience"
+instant = true
+on_play = Array[ExtResource("1_ayial")]([SubResource("Resource_uf1g5")])
+on_play_text = "⚡Gain 2 🪙 OR Pass ➡ Gain 3 🪙"
+tags = PackedStringArray()

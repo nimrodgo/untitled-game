@@ -4,10 +4,6 @@ extends Effect
 @export var amount: int = 1
 
 
-func _init() -> void:
-	target = GameRules.Target.OPPONENT
-
-
 func apply(ctx: EffectContext) -> void:
 	ctx.encounter.discard_random(ctx.resolve(target), amount)
 

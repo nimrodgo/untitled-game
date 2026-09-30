@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_nx0qf"]
+[ext_resource type="Script" path="res://scripts/data/effects/destroy_shop_card_effect.gd" id="2_gal1b"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="3_mw6to"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_7julw"]
+
+[sub_resource type="Resource" id="Resource_dy3he"]
+script = ExtResource("2_gal1b")
+
+[sub_resource type="Resource" id="Resource_8nam4"]
+script = ExtResource("3_mw6to")
+amount = 2
+
+[resource]
+script = ExtResource("4_7julw")
+id = &"clearance"
+display_name = "Clearance"
+cost = 2
+instant = true
+on_play = Array[ExtResource("1_nx0qf")]([SubResource("Resource_dy3he"), SubResource("Resource_8nam4")])
+on_play_text = "⚡Destroy 🔥 a card in the shop and restock it. Gain 2 🪙"
+tags = PackedStringArray()

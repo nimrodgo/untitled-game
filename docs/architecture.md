@@ -48,9 +48,10 @@ The whole rules engine. It's built with `Encounter.new(EncounterData, LoadoutDat
 |---|---|
 | State | `player`, `enemy` (`PlayerState`), `shop`, `rng`, `round_num`, `active`, `is_over`, `won`, `enemy_actions_left`, `last_bought_zone` |
 | Queries | `is_player_turn`, `can_play`, `can_buy_card/item/trinket/enhancement`, `can_use_trinket`, `can_upgrade_trinket`, `current_intent`, `upcoming_intents(n)`, `rounds_left` |
-| Player actions (return `bool`) | `play_card`, `buy_card`, `buy_item`, `buy_trinket`, `upgrade_trinket`, `buy_enhancement(slot, card)`, `use_trinket` (free), `pass_turn` |
+| Player actions (return `bool`) | `play_card`, `buy_card`, `buy_item`, `buy_trinket`, `upgrade_trinket`, `buy_enhancement(slot, card)`, `use_trinket` (free), `pass_turn`. They validate, start the action coroutine and return right away. |
+| Choices | `pending_choice`, `submit_choice(picks)`, `auto_chooser` (headless), `request_choice(req)` / `choose_cards(...)` for effects |
 | Enemy | `enemy_act()` resolves the current intent and hands the turn back |
-| Helpers for effects | `change_coins`, `draw_cards`, `discard_random`, `add_card`, `text_vars`, `log_line` |
+| Helpers for effects | `change_coins`, `draw_cards`, `draw_specific`, `discard_cards`, `discard_random`, `trash_card`, `add_card`, `move_card`, `play_extra`, `play_copy`, `buy_instance`, `run_effects`, `text_vars`, `log_line` |
 
 **Signals**
 
@@ -60,6 +61,9 @@ The whole rules engine. It's built with `Encounter.new(EncounterData, LoadoutDat
 | `logged(text)` | Each log line (BBCode) | UI log buffer |
 | `enemy_turn_pending` | The enemy is about to act | UI starts a timer, then calls `enemy_act()`. The simulator calls it immediately. |
 | `ended(won)` | After the last round | UI end overlay |
+| `choice_requested(req)` | An effect needs the player to decide | UI: pick in the hand or open the picker, then `submit_choice()` |
+
+**Choices and coroutines.** An effect that needs a decision builds a `ChoiceRequest` (`core/choice_request.gd`: kind, verb, candidates, min/max, source) and does `await encounter.request_choice(req)`. With `auto_chooser` set (simulator, tests) it's answered on the spot; otherwise `pending_choice` is set, `choice_requested` fires, and the action resumes when the UI calls `submit_choice(picks)`. So every action body is a coroutine, and `_run` awaits each effect. While anything is resolving, `is_player_turn()` is false and `is_busy()` is true.
 
 **Internal pipeline**
 
@@ -70,7 +74,7 @@ The whole rules engine. It's built with `Encounter.new(EncounterData, LoadoutDat
 
 ### `EffectContext` (`core/effect_context.gd`)
 
-This is what an effect sees: `encounter`, `owner`, `opponent`, `card`, `source_name` (for the log). Effects can also set two outputs: `buy_destination` and `grant_extra_action`. `resolve(target)` maps `SELF`/`OPPONENT` to a `PlayerState`.
+This is what an effect sees: `encounter`, `owner`, `opponent`, `card`, `source_name` (for the log), `opening_draw`, `from_pile`. Effects can also set outputs: `buy_destination`, `grant_extra_action`, `pass_after` (end the turn after this action) and `declined` (an optional item ability wasn't used, so the item isn't spent). `resolve(target)` maps `SELF`/`OPPONENT` to a `PlayerState`.
 
 ### `GameRules` (`core/game_rules.gd`)
 
@@ -80,7 +84,7 @@ This holds the shared enums (`Target`, `Zone`, `Trigger`, `TrinketLimit`) and th
 
 | Class | Holds |
 |---|---|
-| `PlayerState` | `coins`, `draw_pile`, `hand`, `discard`, `in_play`, `items`, `trinkets`, stats (`cards_drawn_this_turn`, `cards_played_this_turn`, `buys_this_round`, `cards_bought`), enemy-only `intent_index`. `all_cards()` returns every card. |
+| `PlayerState` | `coins`, `draw_pile`, `hand`, `discard`, `in_play`, `removed`, `destroyed`, `items`, `trinkets`, turn state (`played_log`, `draw_locked`, `bonus_draw_next_turn`, `replay_next`, `next_buy_to_hand`, `card_bonus`), stats (`cards_drawn_this_turn`, `cards_played_this_turn`, `buys_this_round`, `cards_bought`), enemy-only `intent_index`. `all_cards()` returns every card. |
 | `ShopState` | Slot arrays `cards/items/trinkets/enhancements` (`null` = empty) and private shuffled bags. Methods: `setup`, `restock`, `take_*`, `snatch_card(mode, rng)`. |
 | `CardInstance` | One copy of a card: `uid` (unique, used by the hand to animate new cards), `data`, `enhancements`. It merges enhancement effects in `get_on_play()` and `is_instant()`. |
 | `ItemInstance` | `uses_this_round`, `uses_this_encounter`, `can_trigger()`, `mark_used()` |

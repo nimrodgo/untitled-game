@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="TrinketData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/trinket_level.gd" id="1_q4rni"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_bd0g2"]
+[ext_resource type="Script" path="res://scripts/data/effects/discard_from_deck_effect.gd" id="3_67ep2"]
+[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="4_gc8do"]
+
+[sub_resource type="Resource" id="Resource_svlb0"]
+script = ExtResource("3_67ep2")
+look = 2
+
+[sub_resource type="Resource" id="Resource_ecoja"]
+script = ExtResource("1_q4rni")
+upgrade_cost = 0
+effects = Array[ExtResource("2_bd0g2")]([SubResource("Resource_svlb0")])
+text = "⚡Look at the top 2 cards of your deck. Discard ⤵ any of them"
+
+[sub_resource type="Resource" id="Resource_572i5"]
+script = ExtResource("3_67ep2")
+look = 3
+
+[sub_resource type="Resource" id="Resource_dprfr"]
+script = ExtResource("1_q4rni")
+effects = Array[ExtResource("2_bd0g2")]([SubResource("Resource_572i5")])
+text = "⚡Look at the top 3 cards of your deck. Discard ⤵ any of them"
+
+[sub_resource type="Resource" id="Resource_xuery"]
+script = ExtResource("3_67ep2")
+look = 4
+
+[sub_resource type="Resource" id="Resource_swdp8"]
+script = ExtResource("1_q4rni")
+effects = Array[ExtResource("2_bd0g2")]([SubResource("Resource_xuery")])
+text = "⚡Look at the top 4 cards of your deck. Discard ⤵ any of them"
+
+[resource]
+script = ExtResource("4_gc8do")
+id = &"spyglass"
+display_name = "Spyglass"
+cost = 3
+levels = Array[ExtResource("1_q4rni")]([SubResource("Resource_ecoja"), SubResource("Resource_dprfr"), SubResource("Resource_swdp8")])

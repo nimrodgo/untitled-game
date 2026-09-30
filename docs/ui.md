@@ -34,6 +34,8 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 | Tap the deck | Deck viewer (the draw pile is sorted so it doesn't reveal the order), hand, played cards, discard | — |
 | Tap the intent bubble | The next 4 intents, and actions left | — |
 | Upgrade → "Choose card" → tap a hand card | Enhance it | Hand cards get a gold highlight |
+| A card asks you to pick cards **in your hand** | Tap cards to pick them, then **Confirm** (single picks confirm on tap) | Candidates stay bright, others dim; picked cards lift and glow gold. A bar above the hand shows the verb + icon and the count. |
+| Any other choice (deck / discard / market / trinkets / "X OR Y") | A picker popup: tap to pick, **Confirm** or **Skip** | Shows the source card, the verb + icon, cards grouped by pile. It can't be closed without answering. |
 | Hover (desktop) | The hand card lifts; market tiles grow slightly | — |
 
 - **Tap vs drag:** moving less than `TAP_SLOP` (16px) counts as a tap. Moving more than `DRAG_START` (14px) starts a drag.
@@ -66,7 +68,9 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 └───────────────────────────────┘
 ```
 
-**Colors:** cards `CARD` (blue), items `CARD_ITEM` (green), trinkets `CARD_TRINKET` (brown-gold), upgrades `CARD_ENH` (purple).
+**Colors:** cards `CARD` (blue), curses `CARD_CURSE` (dark red), items `CARD_ITEM` (green), trinkets `CARD_TRINKET` (brown-gold), upgrades `CARD_ENH` (purple).
+
+The deck viewer also lists **Removed 🗑** and **Destroyed 🔥** cards once there are any.
 
 ## Feedback and animation list
 

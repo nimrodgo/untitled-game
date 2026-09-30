@@ -6,7 +6,14 @@ extends RefCounted
 enum Target { SELF, OPPONENT }
 
 ## Where a card goes when bought / added.
-enum Zone { HAND, DRAW_TOP, DRAW_SHUFFLE, DISCARD }
+enum Zone { HAND, DRAW_TOP, DRAW_SHUFFLE, DISCARD, DRAW_BOTTOM }
+
+## Card piles an effect can pick from (bit flags, combine with |).
+const PILE_HAND := 1
+const PILE_DRAW := 2
+const PILE_DISCARD := 4
+## "Remove / destroy" pick from the deck, hand or discard unless stated otherwise.
+const PILES_ALL := PILE_HAND | PILE_DRAW | PILE_DISCARD
 
 ## Moments that passive items can react to.
 enum Trigger {
@@ -22,6 +29,13 @@ enum Trigger {
 	OPPONENT_CARD_PLAYED,
 	ROUND_END,
 	ENEMY_ACTED,           ## After the enemy resolves an intent (fires for both sides).
+	HAND_DRAWN,            ## Right after the start-of-turn draw (extra draws here don't count as "drawn this turn").
+	CARD_DRAWN,            ## Each card drawn (ctx.card; ctx.opening_draw during the start-of-turn draw).
+	CURSE_DRAWN,           ## Each curse drawn, including the opening hand.
+	CARD_DISCARDED,        ## Each card discarded by an effect (not the end-of-round cleanup).
+	CARD_REMOVED,          ## A card was removed for the encounter.
+	CARD_DESTROYED,        ## A card was destroyed permanently.
+	CARD_TRASHED_FROM_HAND, ## A card in your hand was removed or destroyed.
 }
 
 ## Terminology: a TURN is your whole round (draw a hand, act until you pass).

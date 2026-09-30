@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_yxa7p"]
+[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="2_tk1rg"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="3_elb45"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_bdirx"]
+
+[sub_resource type="Resource" id="Resource_x1i4u"]
+script = ExtResource("2_tk1rg")
+what = 0
+as_cost = true
+
+[sub_resource type="Resource" id="Resource_7niqt"]
+script = ExtResource("3_elb45")
+amount = 5
+
+[resource]
+script = ExtResource("4_bdirx")
+id = &"burnout"
+display_name = "Burnout"
+cost = 2
+instant = true
+on_play = Array[ExtResource("1_yxa7p")]([SubResource("Resource_x1i4u"), SubResource("Resource_7niqt")])
+on_play_text = "⚡🔥 this ➡ Draw 5 🂠"
+tags = PackedStringArray()

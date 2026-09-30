@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="TrinketData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/trinket_level.gd" id="1_fvu3o"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_34x4p"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="3_kvv7x"]
+[ext_resource type="Script" path="res://scripts/data/effects/discard_cards_effect.gd" id="4_bwuvo"]
+[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="5_vi5uu"]
+
+[sub_resource type="Resource" id="Resource_ekuxh"]
+script = ExtResource("3_kvv7x")
+
+[sub_resource type="Resource" id="Resource_dsti3"]
+script = ExtResource("4_bwuvo")
+
+[sub_resource type="Resource" id="Resource_2c5xc"]
+script = ExtResource("1_fvu3o")
+upgrade_cost = 0
+effects = Array[ExtResource("2_34x4p")]([SubResource("Resource_ekuxh"), SubResource("Resource_dsti3")])
+text = "⚡Draw 1 🂠. Discard 1 ⤵"
+
+[sub_resource type="Resource" id="Resource_ctmxn"]
+script = ExtResource("3_kvv7x")
+amount = 2
+
+[sub_resource type="Resource" id="Resource_flqfv"]
+script = ExtResource("4_bwuvo")
+
+[sub_resource type="Resource" id="Resource_34x3f"]
+script = ExtResource("1_fvu3o")
+effects = Array[ExtResource("2_34x4p")]([SubResource("Resource_ctmxn"), SubResource("Resource_flqfv")])
+text = "⚡Draw 2 🂠. Discard 1 ⤵"
+
+[sub_resource type="Resource" id="Resource_bdsjq"]
+script = ExtResource("3_kvv7x")
+amount = 3
+
+[sub_resource type="Resource" id="Resource_8fha4"]
+script = ExtResource("4_bwuvo")
+
+[sub_resource type="Resource" id="Resource_i12kd"]
+script = ExtResource("1_fvu3o")
+upgrade_cost = 4
+effects = Array[ExtResource("2_34x4p")]([SubResource("Resource_bdsjq"), SubResource("Resource_8fha4")])
+text = "⚡Draw 3 🂠. Discard 1 ⤵"
+
+[resource]
+script = ExtResource("5_vi5uu")
+id = &"sieve"
+display_name = "Sieve"
+levels = Array[ExtResource("1_fvu3o")]([SubResource("Resource_2c5xc"), SubResource("Resource_34x3f"), SubResource("Resource_i12kd")])

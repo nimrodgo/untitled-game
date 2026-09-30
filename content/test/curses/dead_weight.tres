@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_pcnt2"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="2_ex7k7"]
+
+[resource]
+script = ExtResource("2_ex7k7")
+id = &"dead_weight"
+display_name = "Dead Weight"
+cost = 0
+playable = false
+curse = true
+tags = PackedStringArray()

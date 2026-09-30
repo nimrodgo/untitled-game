@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_6qpdf"]
+[ext_resource type="Script" path="res://scripts/data/effects/play_copy_effect.gd" id="2_gy5jr"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_5f6l6"]
+
+[sub_resource type="Resource" id="Resource_vae0m"]
+script = ExtResource("2_gy5jr")
+source = 0
+
+[resource]
+script = ExtResource("3_5f6l6")
+id = &"necromancy"
+display_name = "Necromancy"
+cost = 2
+on_play = Array[ExtResource("1_6qpdf")]([SubResource("Resource_vae0m")])
+on_play_text = "Play the effect of a card that was destroyed 🔥 this encounter"
+tags = PackedStringArray()

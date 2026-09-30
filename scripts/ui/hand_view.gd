@@ -21,6 +21,8 @@ var spawn_point := Vector2.INF
 
 var _views: Array[CardView] = []
 var _known_uids := {}
+## Cards lifted out of the fan (picked while choosing), keyed by payload.
+var _lifted := {}
 var _drag_view: CardView
 var _dragging := false
 var _would_play := false
@@ -82,6 +84,8 @@ func _layout(animate: bool, fresh: Array) -> void:
 			continue
 		var t := i - mid
 		var target_pos := Vector2(x0 + step * i, 4.0 + t * t * 2.5)
+		if _lifted.has(v.payload):
+			target_pos.y -= 34.0
 		var target_rot := t * 0.045 if n > 1 else 0.0
 		v.size = CardView.HAND
 		v.pivot_offset = Vector2(w * 0.5, h)
@@ -172,6 +176,22 @@ func _end_drag(pos: Vector2) -> void:
 	else:
 		v.set_highlighted(false)
 		_layout(true, [])
+
+
+## Lift / lower a card (selection feedback while picking cards).
+func set_lifted(card: Variant, on: bool) -> void:
+	if on:
+		_lifted[card] = true
+	else:
+		_lifted.erase(card)
+	for v in _views:
+		if is_instance_valid(v) and v.payload == card:
+			v.set_highlighted(on)
+	_layout(true, [])
+
+
+func clear_lifted() -> void:
+	_lifted.clear()
 
 
 ## Global centre of the card view showing `card`, if it's in the hand.

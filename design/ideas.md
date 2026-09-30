@@ -1,0 +1,91 @@
+## Card Mechanics
+- helpful effects:
+    - Gain Coins (🪙)
+    - draw cards (🂠)
+    - Remove Cards (for the encounter) (🗑️)
+    - Destroy Cards (permanently) (🔥)
+    - Refresh Trinket/s (↺)
+    - Retain cards
+- unhelpful/costs (➡️)
+    - Gain Curses
+    - Discard Cards (⤵️)
+    - Pay coins (unplayable if you don't have them)
+    - Lose coins
+    - Pass
+## Card Ideas (mechanics that will be integrated into cards later)
+- Return all curses from the discard pile to your hand
+- Buy a card and play it immediately. Then destroy it
+- Draw 2 cards. Discard 2 cards
+- {instant} Destroy this card to refresh your trinkets
+- {instant} Gain 2 coins OR Pass to gain 3 coins
+- Destory a card OR Remove 2 cards
+- Discard a card to draw 2 cards
+- {instant} the next item you buy is drawn immediately
+- {instant} Destroy this card to draw 5 cards
+- {instant} Destroy a card in the shop and restock it. Gain 2 coins
+- Refresh a trinket. Draw a card
+- Draw a card from the bottom of your deck
+- Buy a card you removed this encounter
+- Buy a card you destroyed this encounter
+- Shuffle C3 to your deck. Draw 2 cards
+- Transform any cards in your hand to C3
+- Activate the level 3 effect of a trinket in the shop
+- Pass to draw 3 cards at the start of your next turn
+- Move all curses in your deck to the bottom. Draw a card
+- Gain 1 coin. If your discard pile is empty, draw a card
+- Buy an item for free and place it on the top of the draw pile
+- Draw 2 cards. Remove a card in your hand
+- Play the top 2 cards in your deck
+- Pay 2 coins to draw 3 cards
+- Remove all other cards in your hand. Gain 3 coins for each
+- The next card you play this turn is played an additional time
+- Gain C2 and 2 coins
+- Gain 2 coins. When this is destroyed draw 2 cards
+- Draw 3 cards. put a card in your hand on top of the draw pile
+- Draw 3 cards. You can't draw additional cards this turn
+- Discard your hand. Draw that many cards
+- Draw a card. When this card is discarded, draw 2 cards
+- Draw 3 cards. Discard a card
+- Play the effect of a card that was destroyed this encounter
+- Double your coins if your deck is empty
+- Play the effect of the last card you played this turn
+- Pass. If you didn't play any card this turn, take an extra one and destroy this
+- You may discard the top card of your deck. Draw a card
+- Destroy this card and your deck. Gain 5 coins
+- Gain 1 coin. Choose 1 card to retain this turn
+- Draw a card from the discard pile and remove this
+- P1: Gain 2 coins and increase gain from all P1s by 2 this encounter
+- Draw 3 cards. Shuffle C4 to your deck
+## Item Ideas
+- The first card you play each turn is destroyed
+- When you remove a card gain 2 coins
+- When you destroy a card gain 3 coins
+- When you draw a curse gain 2 coins
+- When you draw a curse draw a card
+- When you remove or destroy a card in your hand, draw a card
+- You may Retain 1 card each turn
+- When you discard gain 2 coins
+- When you draw a card during your turn you may discard it to draw another and disable this for this turn
+- Destroy a card in your hand. Gain coins equal to its cost
+- Draw an additional card at the start of the turn
+- The first card you play each turn is played an extra time
+## Trinket Ideas
+- Pay 1 coin/.../Get 1 coin. Destroy a card
+- Gain C2 and 2/4/6 coins
+- Draw 1/2/3 card(s). Discard a card
+- Shuffle 1/1/2 C2 to your deck. Destroy 1/2/3 cards
+- Shuffle 1/1/2 C1 to your deck. Remove 2/3/4 cards
+- Look at the top 2/3/4 cards of your deck. You may discard any of them
+## Curses
+- Curses are special unplayable cards and do not stay between encounters unless written otherwise explicitly
+- Currently thought of curses:
+    - C1: ...
+    - C2: permanent (stays between encounters)
+    - C3: play to remove form the deck
+    - C4: lose 2 coins at the end of the turn (might balance that differently later)
+
+## Notes
+- ... specifies an empty string
+- Curse names are currently Cx where x is the idea number, but I will name them later. Card named are Px if written
+- Remove and destroy are from either the deck/hand/discard unless specified otherwise
+- Discarding is only from the hand unless specified otherwise

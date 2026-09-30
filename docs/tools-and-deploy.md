@@ -8,6 +8,7 @@ All of them run with `godot --headless --path . --script res://tools/<name>.gd -
 |---|---|---|
 | `simulate.gd` | `[encounter.tres] [loadout.tres] [runs]` (test encounter, test loadout, 200) | A greedy `SimBot` plays the player side N times. It prints the win %, average final coins and enemy actions per encounter. |
 | `build_test_content.gd` | — | Rewrites everything in `content/test/` from code |
+| `test_mechanics.gd` | — | Rules tests: plays every card, item and trinket level, then checks specific rules (costs, choices, retain, pass, extra turn, curses, items). Prints FAILs and a summary; exit code 1 on failure. |
 | `serve_web.gd` | `[port]` (8443) | A tiny HTTPS static server for `build/web`, using a self-signed certificate |
 
 Output format:
@@ -24,7 +25,7 @@ Each step, the bot does the following:
 2. Picks the best of: playing a card (`score_list(on_play)`), or buying a card (`on_buy + on_play × future × 1.5 − cost × 0.6`, where `future` is how many rounds are left).
 3. Passes if nothing beats `MIN_VALUE` (0.25). It buys at most 4 cards per round.
 
-It never buys items, trinkets or upgrades, so **treat its win rate as a floor**. For reproducible runs, set `rng_seed` on the encounter.
+It answers choices with `SimBot.choose` (gets rid of curses / weakest cards, keeps the best). It never buys trinkets or upgrades and rarely buys items, so **treat its win rate as a floor**. For reproducible runs, set `rng_seed` on the encounter.
 
 ## Playtesting on a phone
 

@@ -19,6 +19,7 @@ func _init() -> void:
 		var enc := Encounter.new(data, lo)
 		var acts := [0]
 		enc.enemy_turn_pending.connect(func(): acts[0] += 1)
+		enc.auto_chooser = SimBot.choose
 		enc.start()
 		var steps := 0
 		while not enc.is_over and steps < 2000:
@@ -27,7 +28,7 @@ func _init() -> void:
 			else:
 				SimBot.take_turn(enc)
 			steps += 1
-		if steps >= 2000:
+		if steps >= 2000 or (not enc.is_over and enc.is_busy()):
 			push_error("Encounter did not terminate!")
 		total_coins += enc.player.coins
 		total_enemy_acts += acts[0]

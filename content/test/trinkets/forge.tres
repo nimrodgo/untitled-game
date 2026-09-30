@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="TrinketData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/trinket_level.gd" id="1_8vyrv"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_uu1bk"]
+[ext_resource type="Script" path="res://scripts/data/effects/pay_coins_effect.gd" id="3_lvacr"]
+[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="4_xassp"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="5_mkg5b"]
+[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="6_y4h6i"]
+
+[sub_resource type="Resource" id="Resource_ml1r1"]
+script = ExtResource("3_lvacr")
+
+[sub_resource type="Resource" id="Resource_0dwtn"]
+script = ExtResource("4_xassp")
+
+[sub_resource type="Resource" id="Resource_0yv6q"]
+script = ExtResource("1_8vyrv")
+upgrade_cost = 0
+effects = Array[ExtResource("2_uu1bk")]([SubResource("Resource_ml1r1"), SubResource("Resource_0dwtn")])
+text = "⚡Pay 1 🪙 ➡ Destroy 1 🔥"
+
+[sub_resource type="Resource" id="Resource_4m2kc"]
+script = ExtResource("4_xassp")
+
+[sub_resource type="Resource" id="Resource_5hkx3"]
+script = ExtResource("1_8vyrv")
+effects = Array[ExtResource("2_uu1bk")]([SubResource("Resource_4m2kc")])
+text = "⚡Destroy 1 🔥"
+
+[sub_resource type="Resource" id="Resource_6m6ie"]
+script = ExtResource("5_mkg5b")
+
+[sub_resource type="Resource" id="Resource_mex6d"]
+script = ExtResource("4_xassp")
+
+[sub_resource type="Resource" id="Resource_uc64m"]
+script = ExtResource("1_8vyrv")
+effects = Array[ExtResource("2_uu1bk")]([SubResource("Resource_6m6ie"), SubResource("Resource_mex6d")])
+text = "⚡Gain 1 🪙. Destroy 1 🔥"
+
+[resource]
+script = ExtResource("6_y4h6i")
+id = &"forge"
+display_name = "Forge"
+cost = 3
+levels = Array[ExtResource("1_8vyrv")]([SubResource("Resource_0yv6q"), SubResource("Resource_5hkx3"), SubResource("Resource_uc64m")])

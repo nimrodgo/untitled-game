@@ -7,10 +7,6 @@ extends Effect
 @export var zone: GameRules.Zone = GameRules.Zone.DRAW_SHUFFLE
 
 
-func _init() -> void:
-	target = GameRules.Target.OPPONENT
-
-
 func apply(ctx: EffectContext) -> void:
 	if card == null:
 		return

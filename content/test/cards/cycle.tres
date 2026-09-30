@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_8f72b"]
+[ext_resource type="Script" path="res://scripts/data/effects/discard_cards_effect.gd" id="2_flflq"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="3_uuref"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_q4p4f"]
+
+[sub_resource type="Resource" id="Resource_dl4so"]
+script = ExtResource("2_flflq")
+as_cost = true
+
+[sub_resource type="Resource" id="Resource_fm583"]
+script = ExtResource("3_uuref")
+amount = 2
+
+[resource]
+script = ExtResource("4_q4p4f")
+id = &"cycle"
+display_name = "Cycle"
+on_play = Array[ExtResource("1_8f72b")]([SubResource("Resource_dl4so"), SubResource("Resource_fm583")])
+on_play_text = "Discard 1 ⤵ ➡ Draw 2 🂠"
+tags = PackedStringArray()

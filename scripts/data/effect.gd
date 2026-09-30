@@ -7,8 +7,21 @@ extends Resource
 @export var target: GameRules.Target = GameRules.Target.SELF
 
 
+## May be a coroutine (effects that ask the player something `await`).
 func apply(_ctx: EffectContext) -> void:
 	pass
+
+
+## Costs: return false when this effect can't be paid right now; the card
+## (or trinket) is then unplayable. Most effects are always payable.
+func can_pay(_ctx: EffectContext) -> bool:
+	return true
+
+
+## True for costs ("Pay 2", "Discard 1", "Pass", "Destroy this"): the
+## generated text puts a ➡ after them instead of a full stop.
+func is_cost() -> bool:
+	return false
 
 
 ## Short human-readable text shown on cards.
@@ -32,12 +45,17 @@ func _who() -> String:
 
 
 static func describe_list(effects: Array, from_enemy := false) -> String:
-	var parts: PackedStringArray = []
+	var out := ""
+	var prev_cost := false
 	for e in effects:
-		if e:
-			e.enemy_voice = from_enemy
-			parts.append(e.describe())
-	return ". ".join(parts)
+		if not e:
+			continue
+		e.enemy_voice = from_enemy
+		if out != "":
+			out += " ➡ " if prev_cost else ". "
+		out += e.describe()
+		prev_cost = e.is_cost()
+	return out
 
 
 static func score_list(effects: Array) -> float:

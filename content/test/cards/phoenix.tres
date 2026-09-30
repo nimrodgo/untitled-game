@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_440kr"]
+[ext_resource type="Script" path="res://scripts/data/effects/buy_card_effect.gd" id="2_b13vu"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_crkkc"]
+
+[sub_resource type="Resource" id="Resource_h1l6m"]
+script = ExtResource("2_b13vu")
+source = 2
+
+[resource]
+script = ExtResource("3_crkkc")
+id = &"phoenix"
+display_name = "Phoenix"
+on_play = Array[ExtResource("1_440kr")]([SubResource("Resource_h1l6m")])
+on_play_text = "Buy a card you destroyed 🔥 this encounter"
+tags = PackedStringArray()

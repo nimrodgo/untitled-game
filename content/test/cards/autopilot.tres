@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_ogcsk"]
+[ext_resource type="Script" path="res://scripts/data/effects/play_top_cards_effect.gd" id="2_jolqb"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_vctfv"]
+
+[sub_resource type="Resource" id="Resource_0fl80"]
+script = ExtResource("2_jolqb")
+
+[resource]
+script = ExtResource("3_vctfv")
+id = &"autopilot"
+display_name = "Autopilot"
+cost = 2
+on_play = Array[ExtResource("1_ogcsk")]([SubResource("Resource_0fl80")])
+on_play_text = "Play the top 2 cards in your deck"
+tags = PackedStringArray()

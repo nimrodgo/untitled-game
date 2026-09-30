@@ -10,9 +10,6 @@
 
    @export var amount: int = 1
 
-   func _init() -> void:
-       target = GameRules.Target.SELF     # pick a sensible default
-
    func apply(ctx: EffectContext) -> void:
        var who := ctx.resolve(target)
        # Mutate state only through Encounter helpers when one exists
@@ -24,6 +21,8 @@
    func ai_score() -> float:
        return 1.0 * amount                          # used only by SimBot
    ```
+
+   Don't change `target` in `_init()`: the saved default is always SELF, so a SELF target on such an effect wouldn't be saved. If the effect asks the player something, make `apply` a coroutine and `await ctx.encounter.request_choice(req)` (or `choose_cards(...)`). If it's a cost, override `can_pay` and `is_cost`.
 
 2. Refresh the class cache (open the editor once). The effect now shows up in every Inspector effect array.
 3. If it needs new state, add a field to `PlayerState` or `EffectContext`. If it needs a new engine operation, add a helper to `Encounter` that logs.
@@ -64,9 +63,12 @@ godot --headless --path . --script res://tools/simulate.gd -- res://content/test
 | Unused fields | `PlayerState.passed` and `can_shop_items` are set but never read. |
 | Extra action | Ignored for trinket, trinket-upgrade and enhancement purchases (see [effects-reference.md](effects-reference.md#where-context-output-effects-work)). |
 | Instant + enemy | Instant cards never trigger an enemy response, even with `ExtraActionEffect`. |
+| Copies | `PlayCopyEffect` / replays resolve the original card's effects with that card as "this card", so copying "🔥 this ➡ …" destroys the original. |
+| Curses | `permanent` is only a flag until the run layer exists. |
+| Enemy choices | Enemies never get choices; effects that ask the player something are meant for the player's side. |
 | `StealCoinsEffect` | Ignores `target`. It always takes from the opponent. |
 | Test content | Regenerating it overwrites hand edits in `content/test/`. |
-| Balance | The bot wins about 94% at target 10, so the target is likely too low. |
+| Balance | With the idea cards in the pool the bot wins about 55% at target 10. It plays many new cards badly. |
 | UI | Everything is built in code with placeholder colors and no art. Emoji rely on the `Icons` SVG set. |
 
 ## Next candidates

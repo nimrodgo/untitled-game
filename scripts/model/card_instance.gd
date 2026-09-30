@@ -7,6 +7,8 @@ static var _next_uid: int = 1
 var uid: int
 var data: CardData
 var enhancements: Array[EnhancementData] = []
+## Stays in your hand at the end of this turn.
+var retain := false
 
 
 func _init(card_data: CardData) -> void:
@@ -22,6 +24,15 @@ func is_instant() -> bool:
 		if e.make_instant:
 			return true
 	return false
+
+
+func is_curse() -> bool:
+	return data.curse
+
+
+## Unplayable curses can't be played at all (from the hand or otherwise).
+func is_playable_kind() -> bool:
+	return data.playable
 
 
 func get_on_play() -> Array[Effect]:

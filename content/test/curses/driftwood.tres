@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_lt1bq"]
+[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="2_48ge3"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_3rs5d"]
+
+[sub_resource type="Resource" id="Resource_evg4k"]
+script = ExtResource("2_48ge3")
+destroy = false
+what = 0
+as_cost = true
+
+[resource]
+script = ExtResource("3_3rs5d")
+id = &"driftwood"
+display_name = "Driftwood"
+cost = 0
+on_play = Array[ExtResource("1_lt1bq")]([SubResource("Resource_evg4k")])
+on_play_text = "Play: remove 🗑 this"
+curse = true
+tags = PackedStringArray()

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_hm6me"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_2567r"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_u3bud"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_2567r"]
+
+[sub_resource type="Resource" id="Resource_wmu5d"]
+script = ExtResource("2_2567r")
+amount = 2
+
+[sub_resource type="Resource" id="Resource_5wm56"]
+script = ExtResource("2_u3bud")
+amount = 2
+
+[resource]
+script = ExtResource("3_2567r")
+id = &"ember"
+display_name = "Ember"
+on_play = Array[ExtResource("1_hm6me")]([SubResource("Resource_5wm56")])
+on_play_text = "Gain 2 🪙. When this is destroyed 🔥, draw 2 🂠"
+on_destroy = Array[ExtResource("1_hm6me")]([SubResource("Resource_wmu5d")])
+tags = PackedStringArray()

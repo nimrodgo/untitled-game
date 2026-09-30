@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_ulyvd"]
+[ext_resource type="Script" path="res://scripts/data/effects/activate_shop_trinket_effect.gd" id="2_ls072"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_2ib1a"]
+
+[sub_resource type="Resource" id="Resource_mnrv4"]
+script = ExtResource("2_ls072")
+
+[resource]
+script = ExtResource("3_2ib1a")
+id = &"borrowed_power"
+display_name = "Borrowed Power"
+cost = 2
+on_play = Array[ExtResource("1_ulyvd")]([SubResource("Resource_mnrv4")])
+on_play_text = "Activate the level 3 effect of a trinket in the shop"
+tags = PackedStringArray()

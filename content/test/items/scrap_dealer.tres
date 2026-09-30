@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_utcus"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_c44vg"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="3_4go5s"]
+
+[sub_resource type="Resource" id="Resource_fa46h"]
+script = ExtResource("2_c44vg")
+amount = 2
+
+[resource]
+script = ExtResource("3_4go5s")
+id = &"scrap_dealer"
+display_name = "Scrap Dealer"
+cost = 4
+trigger = 16
+effects = Array[ExtResource("1_utcus")]([SubResource("Resource_fa46h")])
+description = "When you remove 🗑 a card, gain 2 🪙"

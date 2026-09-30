@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_w7pht"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_pp3la"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="3_byyr5"]
+[ext_resource type="Script" path="res://scripts/data/effects/conditional_effect.gd" id="4_ng0wi"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="5_333ra"]
+
+[sub_resource type="Resource" id="Resource_mj5uc"]
+script = ExtResource("2_pp3la")
+
+[sub_resource type="Resource" id="Resource_yrdoc"]
+script = ExtResource("3_byyr5")
+
+[sub_resource type="Resource" id="Resource_ij8h1"]
+script = ExtResource("4_ng0wi")
+effects = Array[ExtResource("1_w7pht")]([SubResource("Resource_yrdoc")])
+
+[resource]
+script = ExtResource("5_333ra")
+id = &"tidy_up"
+display_name = "Tidy Up"
+on_play = Array[ExtResource("1_w7pht")]([SubResource("Resource_mj5uc"), SubResource("Resource_ij8h1")])
+on_play_text = "Gain 1 🪙. If your discard pile is empty, draw 1 🂠"
+tags = PackedStringArray()

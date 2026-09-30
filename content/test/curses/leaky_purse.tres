@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_7mydw"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="2_0q16h"]
+[ext_resource type="Script" path="res://scripts/data/effects/lose_coins_effect.gd" id="2_lemvr"]
+
+[sub_resource type="Resource" id="Resource_xehsl"]
+script = ExtResource("2_lemvr")
+amount = 2
+
+[resource]
+script = ExtResource("2_0q16h")
+id = &"leaky_purse"
+display_name = "Leaky Purse"
+cost = 0
+playable = false
+on_play_text = "End of turn in hand: lose 2 🪙"
+on_turn_end_in_hand = Array[ExtResource("1_7mydw")]([SubResource("Resource_xehsl")])
+curse = true
+tags = PackedStringArray()

@@ -55,6 +55,14 @@ var _shop_drag := {}
 var _last_coins := -1
 var _last_enemy_coins := -1
 var _last_round := 0
+## The choice being answered (see Encounter.request_choice) and the picks so far.
+var _choice: ChoiceRequest
+var _picked: Array = []
+var _choice_bar: PanelContainer
+var _choice_label: RichTextLabel
+var _choice_ok: Button
+var _picker_views := {}
+var _picker_ok: Button
 
 
 func _ready() -> void:
@@ -73,6 +81,7 @@ func _ready() -> void:
 	enc.changed.connect(_refresh)
 	enc.enemy_turn_pending.connect(_on_enemy_pending)
 	enc.ended.connect(_show_end_overlay)
+	enc.choice_requested.connect(_on_choice_requested)
 	# Let the layout settle so cards can deal in from the deck.
 	await get_tree().process_frame
 	_hand.spawn_point = _pile.target_center()
@@ -108,7 +117,7 @@ func _on_enemy_timer() -> void:
 
 
 func _on_card_dropped(card: Variant, at_global: Vector2) -> void:
-	if pending_enh_slot >= 0:
+	if pending_enh_slot >= 0 or _choice:
 		_hand._layout(true, [])
 		return
 	_play_with_fx(card, at_global)
@@ -126,6 +135,9 @@ func _play_with_fx(card: CardInstance, from_global: Vector2) -> void:
 
 func _on_hand_tapped(card: Variant) -> void:
 	var c: CardInstance = card
+	if _choice and _choice.hand_only:
+		_toggle_pick(c)
+		return
 	if pending_enh_slot >= 0:
 		var slot := pending_enh_slot
 		pending_enh_slot = -1
@@ -157,7 +169,7 @@ func _refresh() -> void:
 	var my_turn := enc.is_player_turn()
 
 	# Top bar + coin change pop-ups.
-	_round_label.text = "Round %d/%d" % [enc.round_num, enc.data.rounds]
+	_round_label.text = "Round %d/%d" % [enc.round_num, enc.total_rounds()]
 	_coins_label.text = "%d / %d" % [me.coins, enc.data.coin_target]
 	_coins_bar.max_value = enc.data.coin_target
 	_coins_bar.value = mini(me.coins, enc.data.coin_target)
@@ -231,7 +243,12 @@ func _refresh() -> void:
 	for c in me.hand:
 		var v := _card_instance_view(c, CardView.HAND)
 		v.payload = c
-		if pending_enh_slot >= 0:
+		if _choice and _choice.hand_only:
+			# Picking in place: candidates stay bright, picked ones lift + glow.
+			v.set_enabled(false)
+			v.dim_when_disabled = not _choice.candidates.has(c)
+			v.set_highlighted(_picked.has(c))
+		elif pending_enh_slot >= 0:
 			v.set_enabled(enc.can_buy_enhancement(pending_enh_slot, c))
 			v.set_highlighted(true)
 		else:
@@ -239,13 +256,15 @@ func _refresh() -> void:
 			v.dim_when_disabled = false
 		views.append(v)
 	_hand.set_views(views)
-	_hand.modulate = Color.WHITE if my_turn or enc.is_over else Color(0.6, 0.62, 0.7)
+	var picking_in_hand := _choice != null and _choice.hand_only
+	_hand.modulate = Color.WHITE if my_turn or enc.is_over or picking_in_hand else Color(0.6, 0.62, 0.7)
 
 	_hand.spawn_point = _pile.target_center()   # the pile moves when the window resizes
 	_pile.set_counts(me.draw_pile.size(), me.discard.size() + me.in_play.size())
 	_pass_btn.disabled = not my_turn or pending_enh_slot >= 0
-	_pass_btn.text = "Pass" if enc.round_num < enc.data.rounds else "Finish"
-	_table_hint.visible = pending_enh_slot >= 0
+	_pass_btn.text = "Pass" if enc.round_num < enc.total_rounds() else "Finish"
+	_table_hint.visible = pending_enh_slot >= 0 and _choice == null
+	_update_choice_bar()
 
 
 func _coin_pop(anchor: Control, before: int, now: int) -> void:
@@ -508,10 +527,15 @@ func _show_deck_viewer() -> void:
 	# The draw pile is shown sorted so it doesn't reveal the draw order.
 	var draw_sorted := me.draw_pile.duplicate()
 	draw_sorted.sort_custom(func(a, b): return a.get_name() < b.get_name())
-	for section in [["Deck", draw_sorted, "(not in draw order)"], ["Hand", me.hand, ""],
-			["Played this round", me.in_play, ""], ["Discard", me.discard, ""]]:
+	var sections := [["Deck", draw_sorted, "(not in draw order)"], ["Hand", me.hand, ""],
+			["Played this round", me.in_play, ""], ["Discard", me.discard, ""]]
+	if not me.removed.is_empty():
+		sections.append(["Removed 🗑", me.removed, "(this encounter)"])
+	if not me.destroyed.is_empty():
+		sections.append(["Destroyed 🔥", me.destroyed, ""])
+	for section in sections:
 		var cards: Array = section[1]
-		vb.add_child(CardView._label("%s  (%d)  %s" % [section[0], cards.size(), section[2]], 20, Palette.KELP))
+		vb.add_child(Icons.rich_label("%s  (%d)  %s" % [section[0], cards.size(), section[2]], 20, Palette.KELP))
 		if cards.is_empty():
 			vb.add_child(CardView._label("—", 16, Palette.MUTED))
 			continue
@@ -528,10 +552,217 @@ func _show_deck_viewer() -> void:
 	_show_popup(scroll, "", [], "All %d of your cards" % me.all_cards().size())
 
 
+# ================================================================ choices
+
+## Verb shown while picking, with its icon where the game has one.
+const VERB_ICONS := {"Discard": "⤵", "Destroy": "🔥", "Remove": "🗑", "Refresh": "↺", "Draw": "🂠", "Buy": "🛍"}
+
+
+func _verb(req: ChoiceRequest) -> String:
+	var icon: String = VERB_ICONS.get(req.verb, "")
+	return req.verb + (" " + icon if icon != "" else "")
+
+
+func _on_choice_requested(req: ChoiceRequest) -> void:
+	_choice = req
+	_picked = []
+	_hand.clear_lifted()
+	pending_enh_slot = -1
+	if req.kind == ChoiceRequest.Kind.CARDS and req.hand_only:
+		_close_popup()
+		_refresh()
+	else:
+		_show_picker()
+
+
+func _needs_confirm() -> bool:
+	return not (_choice.min_count == 1 and _choice.max_count == 1)
+
+
+func _toggle_pick(item: Variant) -> void:
+	if _choice == null or not _choice.candidates.has(item):
+		return
+	if _picked.has(item):
+		_picked.erase(item)
+	elif _picked.size() < _choice.max_count:
+		_picked.append(item)
+	elif _choice.max_count == 1:
+		_picked = [item]
+	else:
+		return
+	if not _needs_confirm() and _picked.size() == 1:
+		_submit_choice()
+		return
+	if _choice.hand_only:
+		for c in _choice.candidates:
+			_hand.set_lifted(c, _picked.has(c))
+	_update_choice_bar()
+	_update_picker()
+
+
+func _submit_choice() -> void:
+	if _choice == null:
+		return
+	var picks := _picked.duplicate()
+	var hand_only := _choice.hand_only
+	if picks.size() < _choice.min_count or picks.size() > _choice.max_count:
+		return
+	_choice = null
+	_picked = []
+	_hand.clear_lifted()
+	if not hand_only:
+		_close_popup(true)
+	enc.submit_choice(picks)
+	_refresh()
+
+
+## The bar above the hand while picking cards in place: what to do + Confirm.
+func _update_choice_bar() -> void:
+	var in_hand := _choice != null and _choice.hand_only
+	_choice_bar.visible = in_hand
+	if not in_hand:
+		return
+	_choice_label.clear()
+	var count := "%d" % _choice.max_count if _choice.min_count == _choice.max_count else \
+		("up to %d" % _choice.max_count if _choice.min_count == 0 else "%d-%d" % [_choice.min_count, _choice.max_count])
+	Icons.append(_choice_label, "[b]%s %s[/b]   %d/%d" % [_verb(_choice), count, _picked.size(), _choice.max_count], 24)
+	_choice_ok.visible = _needs_confirm()
+	_choice_ok.disabled = _picked.size() < _choice.min_count
+	_choice_ok.text = "Confirm" if not _picked.is_empty() or _choice.min_count > 0 else "Skip"
+
+
+## Modal picker for choices that aren't just "cards in your hand".
+func _show_picker() -> void:
+	var req := _choice
+	_close_popup(true)
+	var dim := ColorRect.new()
+	dim.color = Color(0.0, 0.03, 0.07, 0.86)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_popup_layer.add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_popup_layer.add_child(center)
+	var vp := get_viewport_rect().size
+	var outer := VBoxContainer.new()
+	outer.add_theme_constant_override("separation", 12)
+	center.add_child(outer)
+
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 14)
+	outer.add_child(head)
+	if req.source_card:
+		var src := _card_instance_view(req.source_card, CardView.SMALL)
+		src.hoverable = false
+		src.dim_when_disabled = false
+		src.set_enabled(false)
+		head.add_child(src)
+	var title_text := "[b]%s[/b]" % _verb(req)
+	if req.source_card == null and req.source_name != "":
+		title_text = "[color=#9fc3cf][font_size=20]%s[/font_size][/color]\n" % req.source_name + title_text
+	var title := Icons.rich_label(title_text, 30, Palette.GOLD)
+	title.custom_minimum_size.x = 260
+	title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(title)
+
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(minf(vp.x - 80.0, 820.0), clampf(vp.y - 340.0, 200.0, 420.0))
+	outer.add_child(scroll)
+	var body := VBoxContainer.new()
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_theme_constant_override("separation", 8)
+	scroll.add_child(body)
+
+	_picker_views = {}
+	_picker_ok = null
+	if req.kind == ChoiceRequest.Kind.OPTIONS:
+		scroll.custom_minimum_size.y = minf(scroll.custom_minimum_size.y, 110.0 * req.candidates.size())
+		for i in req.candidates.size():
+			var ok: bool = req.enabled.is_empty() or req.enabled[i]
+			var idx := i
+			body.add_child(_option_tile(req.candidates[i], ok, func(): _picked = [idx]; _submit_choice()))
+	else:
+		var groups := {}
+		var order: Array = []
+		for i in req.candidates.size():
+			var g: String = req.groups[i] if i < req.groups.size() else ""
+			if not groups.has(g):
+				groups[g] = []
+				order.append(g)
+			groups[g].append(req.candidates[i])
+		for g in order:
+			var items: Array = groups[g]
+			if g == "Deck" and not req.ordered:
+				items = items.duplicate()
+				items.sort_custom(func(a, b): return a.get_name() < b.get_name())
+			if g != "" and order.size() > 1 or g == "Top":
+				body.add_child(CardView._label(g, 18, Palette.KELP))
+			var grid := GridContainer.new()
+			grid.columns = maxi(1, int((scroll.custom_minimum_size.x - 10.0) / (CardView.SMALL.x + 8.0)))
+			grid.add_theme_constant_override("h_separation", 8)
+			grid.add_theme_constant_override("v_separation", 8)
+			body.add_child(grid)
+			for item in items:
+				var v := _picker_view(req, item)
+				v.dim_when_disabled = false
+				v.hover_grow = false
+				_picker_views[item] = v
+				v.tapped.connect(_toggle_pick.bind(item))
+				grid.add_child(v)
+
+	if req.kind != ChoiceRequest.Kind.OPTIONS and _needs_confirm():
+		_picker_ok = _big_button("Confirm", Palette.TEAL)
+		_picker_ok.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		_picker_ok.pressed.connect(_submit_choice)
+		outer.add_child(_picker_ok)
+	_update_picker()
+
+
+## Selection glow + Confirm state in the picker popup.
+func _update_picker() -> void:
+	for k in _picker_views:
+		if is_instance_valid(_picker_views[k]):
+			_picker_views[k].set_highlighted(_picked.has(k))
+	if _picker_ok and is_instance_valid(_picker_ok) and _choice:
+		_picker_ok.disabled = _picked.size() < _choice.min_count
+		_picker_ok.text = "Skip" if _picked.is_empty() and _choice.min_count == 0 else "Confirm  %d/%d" % [_picked.size(), _choice.max_count]
+
+
+## A wide tappable tile for "X OR Y" options.
+func _option_tile(text: String, enabled: bool, cb: Callable) -> Control:
+	var p := PanelContainer.new()
+	p.custom_minimum_size = Vector2(0, 92)
+	p.add_theme_stylebox_override("panel", Palette.box(Palette.PANEL if enabled else Palette.DEEP,
+		Palette.TEAL if enabled else Palette.MUTED.darkened(0.5), 14, 2, 16))
+	p.mouse_filter = Control.MOUSE_FILTER_STOP if enabled else Control.MOUSE_FILTER_IGNORE
+	var l := Icons.rich_label(text, 28, Palette.FOAM if enabled else Palette.MUTED.darkened(0.3))
+	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	p.add_child(l)
+	if enabled:
+		p.mouse_entered.connect(func(): p.add_theme_stylebox_override("panel", Palette.box(Palette.PANEL.lightened(0.08), Palette.GOLD, 14, 3, 16)))
+		p.mouse_exited.connect(func(): p.add_theme_stylebox_override("panel", Palette.box(Palette.PANEL, Palette.TEAL, 14, 2, 16)))
+		p.gui_input.connect(func(e: InputEvent):
+			if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed: cb.call())
+	return p
+
+
+func _picker_view(req: ChoiceRequest, item: Variant) -> CardView:
+	match req.kind:
+		ChoiceRequest.Kind.SHOP_CARD:
+			return _card_data_view(enc.shop.cards[item], CardView.SMALL)
+		ChoiceRequest.Kind.SHOP_TRINKET:
+			return _trinket_data_view(enc.shop.trinkets[item], CardView.SMALL)
+		ChoiceRequest.Kind.TRINKET:
+			var t: TrinketInstance = enc.player.trinkets[item]
+			return CardView.make(t.get_name(), -1, t.get_text(), Palette.CARD_TRINKET, CardView.SMALL)
+	return _card_instance_view(item, CardView.SMALL)
+
+
 # ================================================================= views
 
 func _card_data_view(cd: CardData, sz: Vector2) -> CardView:
-	return CardView.make(cd.display_name, cd.cost, cd.get_play_text(_vars()), Palette.CARD, sz,
+	return CardView.make(cd.display_name, cd.cost, cd.get_play_text(_vars()), Palette.CARD_CURSE if cd.curse else Palette.CARD, sz,
 		"INSTANT" if cd.instant and not cd.has_custom_text() else "", "", cd.get_buy_text(_vars()))
 
 
@@ -539,7 +770,7 @@ func _card_instance_view(c: CardInstance, sz: Vector2) -> CardView:
 	var footer := ""
 	for e in c.enhancements:
 		footer += "+ " + e.display_name + "  "
-	return CardView.make(c.get_name(), c.get_cost(), c.play_text(_vars()), Palette.CARD, sz,
+	return CardView.make(c.get_name(), c.get_cost(), c.play_text(_vars()), Palette.CARD_CURSE if c.is_curse() else Palette.CARD, sz,
 		"INSTANT" if c.is_instant() and not c.data.has_custom_text() else "", footer.strip_edges(), c.buy_text(_vars()))
 
 
@@ -622,12 +853,14 @@ func _clear(n: Node) -> void:
 ## Generic modal: dims the screen, shows `content` plus action buttons.
 ## Tap outside to close.
 func _show_popup(content: Control, subtitle: String, actions: Array, note := "") -> void:
+	if _choice and not _choice.hand_only:
+		return   # the picker stays until answered
 	_close_popup()
 	var dim := ColorRect.new()
 	dim.color = Color(0.0, 0.03, 0.07, 0.82)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.gui_input.connect(func(e: InputEvent):
-		if e is InputEventMouseButton and e.pressed: _close_popup())
+		if e is InputEventMouseButton and e.pressed: _close_popup(false))
 	_popup_layer.add_child(dim)
 
 	var center := CenterContainer.new()
@@ -665,11 +898,13 @@ func _show_popup(content: Control, subtitle: String, actions: Array, note := "")
 		b.pressed.connect(func(): _close_popup(); cb.call())
 		vb.add_child(b)
 	var close := _big_button("Close", Palette.PANEL)
-	close.pressed.connect(_close_popup)
+	close.pressed.connect(func(): _close_popup())
 	vb.add_child(close)
 
 
-func _close_popup() -> void:
+func _close_popup(force := false) -> void:
+	if _choice and not _choice.hand_only and not force:
+		return
 	for c in _popup_layer.get_children():
 		c.queue_free()
 
@@ -919,6 +1154,29 @@ func _build_ui() -> void:
 	_fx_layer.add_child(_table_hint)
 	_table_hint.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	_table_hint.position.y -= 260
+
+	# Picking cards in your hand: what to pick + Confirm, floating above the hand.
+	_choice_bar = PanelContainer.new()
+	_choice_bar.add_theme_stylebox_override("panel", Palette.box(Palette.PANEL, Palette.GOLD, 16, 3, 12))
+	_choice_bar.visible = false
+	var cb := HBoxContainer.new()
+	cb.add_theme_constant_override("separation", 16)
+	_choice_bar.add_child(cb)
+	_choice_label = Icons.rich_label("", 24, Palette.FOAM)
+	_choice_label.fit_content = true
+	_choice_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_choice_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	cb.add_child(_choice_label)
+	_choice_ok = _big_button("Confirm", Palette.TEAL)
+	_choice_ok.custom_minimum_size = Vector2(150, 56)
+	_choice_ok.pressed.connect(_submit_choice)
+	cb.add_child(_choice_ok)
+	_fx_layer.add_child(_choice_bar)
+	_choice_bar.mouse_filter = Control.MOUSE_FILTER_STOP
+	_choice_bar.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	_choice_bar.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_choice_bar.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_choice_bar.position.y -= 270
 
 	_popup_layer = Control.new()
 	_popup_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

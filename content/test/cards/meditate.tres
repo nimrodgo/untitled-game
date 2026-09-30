@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_4bcxb"]
+[ext_resource type="Script" path="res://scripts/data/effects/pass_effect.gd" id="2_3ffdx"]
+[ext_resource type="Script" path="res://scripts/data/effects/extra_round_effect.gd" id="3_044d0"]
+[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="4_ncgpv"]
+[ext_resource type="Script" path="res://scripts/data/effects/conditional_effect.gd" id="5_hjn46"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="6_0tvi2"]
+
+[sub_resource type="Resource" id="Resource_g7bvs"]
+script = ExtResource("2_3ffdx")
+
+[sub_resource type="Resource" id="Resource_lnw5y"]
+script = ExtResource("3_044d0")
+
+[sub_resource type="Resource" id="Resource_j3gb3"]
+script = ExtResource("4_ncgpv")
+what = 0
+as_cost = true
+
+[sub_resource type="Resource" id="Resource_2vvr3"]
+script = ExtResource("5_hjn46")
+condition = 2
+effects = Array[ExtResource("1_4bcxb")]([SubResource("Resource_lnw5y"), SubResource("Resource_j3gb3")])
+
+[resource]
+script = ExtResource("6_0tvi2")
+id = &"meditate"
+display_name = "Meditate"
+cost = 0
+on_play = Array[ExtResource("1_4bcxb")]([SubResource("Resource_g7bvs"), SubResource("Resource_2vvr3")])
+on_play_text = "Pass. If you didn't play any card this turn, take an extra turn and destroy 🔥 this"
+tags = PackedStringArray()

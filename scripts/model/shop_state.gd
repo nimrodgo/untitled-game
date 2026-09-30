@@ -73,6 +73,11 @@ func snatch_card(mode: int, rng: RandomNumberGenerator) -> CardData:
 	return take_card(pick)
 
 
+## Put a new random card in one card slot.
+func restock_card_slot(slot: int) -> void:
+	cards[slot] = _random_card()
+
+
 func take_item(slot: int) -> ItemData:
 	var it: ItemData = items[slot]
 	items[slot] = null

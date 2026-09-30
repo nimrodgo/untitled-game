@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_lp2db"]
+[ext_resource type="Script" path="res://scripts/data/effects/move_cards_effect.gd" id="2_axojo"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="3_07s55"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_pmy6q"]
+
+[sub_resource type="Resource" id="Resource_j5fpp"]
+script = ExtResource("2_axojo")
+from_piles = 2
+to_zone = 4
+curses_only = true
+
+[sub_resource type="Resource" id="Resource_8503p"]
+script = ExtResource("3_07s55")
+
+[resource]
+script = ExtResource("4_pmy6q")
+id = &"sweep"
+display_name = "Sweep Under"
+on_play = Array[ExtResource("1_lp2db")]([SubResource("Resource_j5fpp"), SubResource("Resource_8503p")])
+on_play_text = "Move all curses in your deck to the bottom. Draw 1 🂠"
+tags = PackedStringArray()

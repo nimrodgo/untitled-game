@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_cnjvh"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_1aq3t"]
+[ext_resource type="Resource" path="res://content/test/curses/leaky_purse.tres" id="3_t6t46"]
+[ext_resource type="Script" path="res://scripts/data/effects/add_card_effect.gd" id="4_dkrxd"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="5_116md"]
+
+[sub_resource type="Resource" id="Resource_p2syd"]
+script = ExtResource("2_1aq3t")
+amount = 3
+
+[sub_resource type="Resource" id="Resource_qanq8"]
+script = ExtResource("4_dkrxd")
+card = ExtResource("3_t6t46")
+
+[resource]
+script = ExtResource("5_116md")
+id = &"risky_draw"
+display_name = "Risky Draw"
+cost = 0
+on_play = Array[ExtResource("1_cnjvh")]([SubResource("Resource_p2syd"), SubResource("Resource_qanq8")])
+on_play_text = "Draw 3 🂠. Shuffle Leaky Purse into your deck"
+tags = PackedStringArray()

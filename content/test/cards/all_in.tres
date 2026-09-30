@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_u4nku"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_per_stat_effect.gd" id="2_q4b77"]
+[ext_resource type="Script" path="res://scripts/data/effects/conditional_effect.gd" id="3_5qbqm"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_xsyre"]
+
+[sub_resource type="Resource" id="Resource_qjhlu"]
+script = ExtResource("2_q4b77")
+stat = &"coins"
+
+[sub_resource type="Resource" id="Resource_407uy"]
+script = ExtResource("3_5qbqm")
+condition = 1
+effects = Array[ExtResource("1_u4nku")]([SubResource("Resource_qjhlu")])
+
+[resource]
+script = ExtResource("4_xsyre")
+id = &"all_in"
+display_name = "All In"
+cost = 3
+on_play = Array[ExtResource("1_u4nku")]([SubResource("Resource_407uy")])
+on_play_text = "Double your 🪙 if your deck is empty"
+tags = PackedStringArray()

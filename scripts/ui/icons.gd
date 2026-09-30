@@ -9,6 +9,11 @@ const COIN := "🪙"
 const CARD := "🂠"
 const BOLT := "⚡"
 const BUY := "🛍"   ## marks "when bought" effects
+const DISCARD := "⤵"
+const COST := "➡"    ## separates a cost from what it pays for
+const DESTROY := "🔥"
+const REMOVE := "🗑"
+const REFRESH := "↺"
 ## Alternative spellings that draw the same icon.
 const ALIASES := {"🗲": "⚡"}
 
@@ -26,6 +31,25 @@ const SVG := {
 		<path d="M11 11 V8.5 a5 5 0 0 1 10 0 V11" fill="none" stroke="#a87412" stroke-width="2.5" stroke-linecap="round"/>
 		<path d="M6 11 H26 L24.5 28 H7.5 Z" fill="#ffd166" stroke="#a87412" stroke-width="2.2" stroke-linejoin="round"/>
 		<circle cx="12" cy="15" r="1.4" fill="#a87412"/><circle cx="20" cy="15" r="1.4" fill="#a87412"/></svg>""",
+	"⤵": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+		<path d="M5 22 H27 V28 H5 Z" fill="#3a5a6e" stroke="#9fc3cf" stroke-width="1.8" stroke-linejoin="round"/>
+		<path d="M8 4 C18 4 21 8 21 16" fill="none" stroke="#ff9f7a" stroke-width="3.2" stroke-linecap="round"/>
+		<path d="M15.5 13 L21 19.5 L26.5 13" fill="none" stroke="#ff9f7a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>""",
+	"➡": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+		<path d="M4 16 H24" stroke="#e8f4f5" stroke-width="3.6" stroke-linecap="round"/>
+		<path d="M17 8 L26 16 L17 24" fill="none" stroke="#e8f4f5" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>""",
+	"🔥": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+		<path d="M16 2 C18 9 26 12 26 20 A10 10 0 0 1 6 20 C6 14 10 12 11 7 C13 10 13 12 14 13 C15 9 15 6 16 2 Z"
+		fill="#ff6a3d" stroke="#8a2a10" stroke-width="2" stroke-linejoin="round"/>
+		<path d="M16 15 C17 19 21 20 21 24 A5 5 0 0 1 11 24 C11 21 14 19 16 15 Z" fill="#ffd166"/></svg>""",
+	"🗑": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+		<path d="M6 8 H26" stroke="#9fc3cf" stroke-width="2.6" stroke-linecap="round"/>
+		<path d="M12 8 V5 H20 V8" fill="none" stroke="#9fc3cf" stroke-width="2.2" stroke-linejoin="round"/>
+		<path d="M8 11 H24 L22.5 28 H9.5 Z" fill="#6f8f9c" stroke="#243c48" stroke-width="2" stroke-linejoin="round"/>
+		<path d="M13 14 V25 M16 14 V25 M19 14 V25" stroke="#243c48" stroke-width="1.6"/></svg>""",
+	"↺": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+		<path d="M9 9 A10 10 0 1 1 6.5 18" fill="none" stroke="#7fe3d0" stroke-width="3.4" stroke-linecap="round"/>
+		<path d="M4 4 L9.5 9.5 L3.5 12" fill="none" stroke="#7fe3d0" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>""",
 }
 
 static var _cache := {}
@@ -61,7 +85,9 @@ static func append(r: RichTextLabel, text: String, icon_size: int) -> void:
 
 ## Plain-text fallback (for Labels/buttons): replaces icons with words.
 static func plain(text: String) -> String:
-	return text.replace(COIN, "coin").replace(CARD, "card").replace(BOLT, "").replace("🗲", "").replace("️", "")
+	return text.replace(COIN, "coin").replace(CARD, "card").replace(BOLT, "").replace("🗲", "") \
+		.replace(DISCARD, "").replace(COST, "->").replace(DESTROY, "").replace(REMOVE, "").replace(REFRESH, "") \
+		.replace("️", "").replace("  ", " ").strip_edges()
 
 
 ## A RichTextLabel set up for game text.

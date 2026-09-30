@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_48ptf"]
+[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="2_3dxyr"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="3_knvjr"]
+
+[sub_resource type="Resource" id="Resource_a8ylv"]
+script = ExtResource("2_3dxyr")
+what = 0
+as_cost = true
+
+[resource]
+script = ExtResource("3_knvjr")
+id = &"furnace"
+display_name = "Furnace"
+cost = 2
+trigger = 5
+effects = Array[ExtResource("1_48ptf")]([SubResource("Resource_a8ylv")])
+limit_per_round = 1
+description = "The first card you play each turn is destroyed 🔥"

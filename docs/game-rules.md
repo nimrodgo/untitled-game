@@ -7,7 +7,7 @@ What `scripts/core/encounter.gd` actually does. The tunables are listed at the e
 | Term | Meaning |
 |---|---|
 | **Encounter** | One shop plus one enemy, played over N **rounds** (default 3). |
-| **Round = Turn** | Your whole round. You draw a hand, then act until you **Pass**. "This turn" in card text means this round. |
+| **Round = Turn** | Your whole round. You draw a hand, then act until you **Pass**. "This turn" in card text means this round. Effects can add extra rounds. |
 | **Action** | One thing you do. It's either **free** or **normal** (see below). |
 | **Intent** | One scripted step of the enemy's pattern. The next one is always visible. |
 | **In play** | Cards you played this round. They go to the discard pile at round end. |
@@ -78,9 +78,39 @@ flowchart TD
 
 **Upgrade (enhancement):** pay, then pick a card **in your hand**. The upgrade attaches to that card instance: it adds on-play effects and/or makes the card instant, and the card's name gets a `+`.
 
+## Choices
+
+Some effects make you decide something while they resolve: pick cards to discard / remove / destroy / retain, pick one of two options ("X OR Y"), a market card, a trinket. Nothing else can happen until you answer.
+
+- **Exactly N:** "Destroy 2" / "Remove 2" / "Discard 2" must pick 2 if possible, fewer only if there aren't enough cards. "You may…" and "any" are optional.
+- **Unplayable costs:** a card whose cost can't be paid can't be played ("Pay 2 🪙 ➡", "Discard 1 ⤵ ➡" with no other card in hand). "All" effects work on zero ("Remove all other cards…" with an empty hand is fine).
+- **Hidden order:** when you pick from your deck the cards are shown sorted, so the order isn't revealed. "Look at the top N" shows them in order.
+
+## Remove, destroy, discard, retain
+
+| Term | Meaning |
+|---|---|
+| **Remove** 🗑 | Out of the deck for this encounter (`PlayerState.removed`) |
+| **Destroy** 🔥 | Out permanently (`PlayerState.destroyed`). Fires the card's `on_destroy`. |
+| **Discard** ⤵ | From the hand to the discard pile, unless the text says otherwise. Fires `on_discard` and `CARD_DISCARDED`. The end-of-round cleanup is **not** a discard. |
+| **Retain** | The card stays in your hand at the end of the turn. You then draw a **full** new hand of 5 on top of it. |
+| **Refresh** ↺ | A used trinket can be used again this turn |
+
+Remove and destroy pick from the deck, hand or discard pile unless stated otherwise.
+
+## Curses
+
+Curses are cards with `curse = true`, usually **unplayable**, and shown in dark red. They don't stay between encounters unless `permanent` (there's no run layer yet, so this is only a flag for now). The test curses (dummy names) are C1 Dead Weight (does nothing), C2 Barnacle (permanent), C3 Driftwood (playable as a normal action: removes itself) and C4 Leaky Purse (lose 2 🪙 at the end of your turn if it's in your hand).
+
+## Pass, extra turns, playing extra cards
+
+- **Pass** on a card ends your turn right after that action. The enemy doesn't answer it.
+- An **extra turn** adds one more normal round to the encounter (restock, full hand, enemy actions refill).
+- **Replays, copies and cards played from the deck all count as playing a card** (cards-played count and "when you play a card" items).
+
 ## Deck mechanics
 
-- **Hand size is 5.** At round start you draw up to 5.
+- **Hand size is 5.** At round start you draw 5, on top of any retained cards, plus any "draw at the start of your next turn" bonus.
 - When the draw pile is empty, the **discard pile is shuffled** into a new draw pile. Cards **in play** aren't included, which prevents infinite draw loops within a round.
 - At round end, in-play cards and your remaining hand go to the discard pile (`DISCARD_HAND_AT_ROUND_END`).
 - Coins can never drop below 0. A steal only takes what the opponent has.

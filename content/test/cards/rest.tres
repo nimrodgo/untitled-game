@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_ws4xy"]
+[ext_resource type="Script" path="res://scripts/data/effects/pass_effect.gd" id="2_6203d"]
+[ext_resource type="Script" path="res://scripts/data/effects/next_turn_draw_effect.gd" id="3_8neki"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_u4q8q"]
+
+[sub_resource type="Resource" id="Resource_kyne1"]
+script = ExtResource("2_6203d")
+
+[sub_resource type="Resource" id="Resource_pe1vx"]
+script = ExtResource("3_8neki")
+amount = 3
+
+[resource]
+script = ExtResource("4_u4q8q")
+id = &"rest"
+display_name = "Rest"
+cost = 0
+on_play = Array[ExtResource("1_ws4xy")]([SubResource("Resource_kyne1"), SubResource("Resource_pe1vx")])
+on_play_text = "Pass ➡ Draw 3 🂠 at the start of your next turn"
+tags = PackedStringArray()

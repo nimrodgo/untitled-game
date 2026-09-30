@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_cj48i"]
+[ext_resource type="Script" path="res://scripts/data/effects/discard_cards_effect.gd" id="2_y5xsa"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_t7kp1"]
+
+[sub_resource type="Resource" id="Resource_6g3k3"]
+script = ExtResource("2_y5xsa")
+all_hand = true
+draw_that_many = true
+
+[resource]
+script = ExtResource("3_t7kp1")
+id = &"mulligan"
+display_name = "Mulligan"
+on_play = Array[ExtResource("1_cj48i")]([SubResource("Resource_6g3k3")])
+on_play_text = "Discard your hand ⤵. Draw that many 🂠"
+tags = PackedStringArray()

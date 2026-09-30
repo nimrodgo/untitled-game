@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_38fl6"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_pnvb6"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_lg0jg"]
+
+[sub_resource type="Resource" id="Resource_38fl6"]
+script = ExtResource("2_pnvb6")
+amount = 2
+
+[sub_resource type="Resource" id="Resource_h2jxp"]
+script = ExtResource("2_pnvb6")
+
+[resource]
+script = ExtResource("3_lg0jg")
+id = &"spring"
+display_name = "Spring"
+on_play = Array[ExtResource("1_38fl6")]([SubResource("Resource_h2jxp")])
+on_play_text = "Draw 1 🂠. When this card is discarded ⤵, draw 2 🂠"
+on_discard = Array[ExtResource("1_38fl6")]([SubResource("Resource_38fl6")])
+tags = PackedStringArray()

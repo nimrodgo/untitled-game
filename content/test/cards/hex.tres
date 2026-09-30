@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_fdifk"]
+[ext_resource type="Resource" path="res://content/test/curses/driftwood.tres" id="2_sd0ix"]
+[ext_resource type="Script" path="res://scripts/data/effects/transform_cards_effect.gd" id="3_8btgk"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_ne07u"]
+
+[sub_resource type="Resource" id="Resource_7hnpn"]
+script = ExtResource("3_8btgk")
+into = ExtResource("2_sd0ix")
+
+[resource]
+script = ExtResource("4_ne07u")
+id = &"hex"
+display_name = "Hex"
+on_play = Array[ExtResource("1_fdifk")]([SubResource("Resource_7hnpn")])
+on_play_text = "Transform any cards in your hand to Driftwood"
+tags = PackedStringArray()

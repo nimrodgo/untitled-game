@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_q81en"]
+[ext_resource type="Script" path="res://scripts/data/effects/replay_effect.gd" id="2_3nkke"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="3_heqlf"]
+
+[sub_resource type="Resource" id="Resource_vai53"]
+script = ExtResource("2_3nkke")
+mode = 1
+
+[resource]
+script = ExtResource("3_heqlf")
+id = &"echo_chamber"
+display_name = "Echo Chamber"
+cost = 6
+trigger = 5
+effects = Array[ExtResource("1_q81en")]([SubResource("Resource_vai53")])
+limit_per_round = 1
+description = "The first card you play each turn is played an extra time"

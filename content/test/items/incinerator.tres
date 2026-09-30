@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_3d476"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_ynemy"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="3_agwne"]
+
+[sub_resource type="Resource" id="Resource_5aosn"]
+script = ExtResource("2_ynemy")
+amount = 3
+
+[resource]
+script = ExtResource("3_agwne")
+id = &"incinerator"
+display_name = "Incinerator"
+cost = 5
+trigger = 17
+effects = Array[ExtResource("1_3d476")]([SubResource("Resource_5aosn")])
+description = "When you destroy 🔥 a card, gain 3 🪙"

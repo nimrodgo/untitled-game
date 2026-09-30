@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_oukbh"]
+[ext_resource type="Script" path="res://scripts/data/effects/offer_redraw_effect.gd" id="2_djrv1"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="3_h7pjt"]
+
+[sub_resource type="Resource" id="Resource_gqer6"]
+script = ExtResource("2_djrv1")
+
+[resource]
+script = ExtResource("3_h7pjt")
+id = &"second_look"
+display_name = "Second Look"
+trigger = 13
+effects = Array[ExtResource("1_oukbh")]([SubResource("Resource_gqer6")])
+limit_per_round = 1
+description = "When you draw a card during your turn, you may discard ⤵ it to draw another. Then this is disabled for the turn"

@@ -1,14 +1,32 @@
 class_name DrawCardsEffect
 extends Effect
+## Draw cards. source: the top of the deck (default), the bottom, or cards
+## you choose from the discard pile.
+
+enum Source { TOP, BOTTOM, DISCARD_CHOOSE }
 
 @export var amount: int = 1
+@export var source: Source = Source.TOP
 
 
 func apply(ctx: EffectContext) -> void:
-	ctx.encounter.draw_cards(ctx.resolve(target), amount)
+	var who := ctx.resolve(target)
+	match source:
+		Source.DISCARD_CHOOSE:
+			var picks: Array = await ctx.encounter.choose_cards(who, GameRules.PILE_DISCARD, amount, "Draw", ctx)
+			for c in picks:
+				await ctx.encounter.draw_specific(who, c)
+		Source.BOTTOM:
+			await ctx.encounter.draw_cards(who, amount, true)
+		_:
+			await ctx.encounter.draw_cards(who, amount)
 
 
 func describe() -> String:
+	var n := "a card" if amount == 1 else "%d cards" % amount
+	match source:
+		Source.BOTTOM: return "%sDraw %s from the bottom of your deck" % [_who(), n]
+		Source.DISCARD_CHOOSE: return "%sDraw %s from the discard pile" % [_who(), n]
 	return "%sDraw %d 🂠" % [_who(), amount]
 
 

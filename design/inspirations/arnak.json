@@ -376,7 +376,6 @@
       "kind": "artifact",
       "cost": 3,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{refresh_assistant}"
     },
     {
@@ -384,7 +383,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "Exile the rightmost {item} in the card row. Gain any {item} from exile to the bottom of your deck."
     },
     {
@@ -392,7 +390,6 @@
       "kind": "artifact",
       "cost": 2,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{fear_card} {gem}"
     },
     {
@@ -400,7 +397,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "If you have no cards in your hand, then {draw_card}{draw_card}. Otherwise gain {gem}."
     },
     {
@@ -408,7 +404,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{exile_card} {arrowhead}"
     },
     {
@@ -416,7 +411,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{assistant_grey}{check_green} {assistant_yellow}{check_green}\nin either order. Must be 2 different assistants."
     },
     {
@@ -424,7 +418,6 @@
       "kind": "artifact",
       "cost": 3,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{coin}\nUse the effect on the gold side of one {assistant} available on the supply board."
     },
     {
@@ -432,7 +425,6 @@
       "kind": "artifact",
       "cost": 3,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "<some action>\nYou may pass to start next round with 1 additional card."
     },
     {
@@ -440,7 +432,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "Look at your entire deck. Return all {fear_card} cards. Then keep up to 2 and {discard_card} the rest."
     },
     {
@@ -448,7 +439,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{gem} {arrow_next} {tablet}{tablet}{arrowhead}{arrowhead}"
     },
     {
@@ -456,7 +446,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{fear_card} {arrowhead}{arrowhead}"
     },
     {
@@ -464,7 +453,6 @@
       "kind": "artifact",
       "cost": 3,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{fear_card} {coin}{coin}{coin}{coin}"
     },
     {
@@ -472,7 +460,6 @@
       "kind": "artifact",
       "cost": 2,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{tablet}{tablet}\nOR\nPass to gain {gem}."
     },
     {
@@ -480,7 +467,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{fear_card} {coin} {tablet}{tablet}{tablet}"
     },
     {
@@ -488,7 +474,6 @@
       "kind": "artifact",
       "cost": 2,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "Exchange one of your {assistant} with one available on the supply board. The new one is the same level and refreshed."
     },
     {
@@ -496,7 +481,6 @@
       "kind": "artifact",
       "cost": 3,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "If there is no other card in your play area, then {draw_card}{draw_card}. Otherwise {coin}{coin}{coin}."
     },
     {
@@ -504,7 +488,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{draw_card}{draw_card}\nYou may {discard_card} one of the drawn cards to {exile_card}{coin}."
     },
     {
@@ -512,7 +495,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "Draw up to 2 cards from the bottom of your deck.\nKeep 1, {discard_card} the other."
     },
     {
@@ -520,7 +502,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "Gain {item} and place it on the top of your deck."
     },
     {
@@ -528,7 +509,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 3,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{draw_card}{coin}"
     },
     {
@@ -536,7 +516,6 @@
       "kind": "artifact",
       "cost": 3,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{coin}{coin}\nUse the effect on the silver side of one {assistant} available on the supply board."
     },
     {
@@ -544,7 +523,6 @@
       "kind": "artifact",
       "cost": 3,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{exile_card}{coin}{coin}"
     },
     {
@@ -552,7 +530,6 @@
       "kind": "artifact",
       "cost": 2,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{draw_card}"
     },
     {
@@ -560,7 +537,6 @@
       "kind": "artifact",
       "cost": 4,
       "victory_points": 2,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "Draw up to 3 cards and keep 1. You may return 1 of them to the top of your deck.\n{discard_card} the rest."
     },
     {
@@ -568,7 +544,6 @@
       "kind": "artifact",
       "cost": 3,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{discard_card} {arrow_next} {refresh_assistant}{refresh_assistant}"
     },
     {
@@ -576,7 +551,6 @@
       "kind": "artifact",
       "cost": 3,
       "victory_points": 1,
-      "activation_icon": "{tablet}{arrow_next}",
       "effect_text": "{draw_card}{exile_card}"
     }
   ]

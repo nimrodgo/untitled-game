@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_jt6pp"]
+[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="2_oflvr"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_3eu7q"]
+
+[sub_resource type="Resource" id="Resource_gdv25"]
+script = ExtResource("2_oflvr")
+destroy = false
+what = 2
+coins_per_card = 3
+
+[resource]
+script = ExtResource("3_3eu7q")
+id = &"liquidate"
+display_name = "Liquidate"
+cost = 2
+on_play = Array[ExtResource("1_jt6pp")]([SubResource("Resource_gdv25")])
+on_play_text = "Remove 🗑 all other cards in your hand. Gain 3 🪙 for each"
+tags = PackedStringArray()

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_23qyq"]
+[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="2_4yem8"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="3_5h5p8"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_j8mhd"]
+
+[sub_resource type="Resource" id="Resource_j5aoa"]
+script = ExtResource("2_4yem8")
+what = 0
+as_cost = true
+
+[sub_resource type="Resource" id="Resource_oq20i"]
+script = ExtResource("2_4yem8")
+what = 3
+
+[sub_resource type="Resource" id="Resource_1plnt"]
+script = ExtResource("3_5h5p8")
+amount = 5
+
+[resource]
+script = ExtResource("4_j8mhd")
+id = &"scorched_earth"
+display_name = "Scorched Earth"
+on_play = Array[ExtResource("1_23qyq")]([SubResource("Resource_j5aoa"), SubResource("Resource_oq20i"), SubResource("Resource_1plnt")])
+on_play_text = "Destroy 🔥 this card and your deck. Gain 5 🪙"
+tags = PackedStringArray()

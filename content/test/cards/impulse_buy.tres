@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_2mht2"]
+[ext_resource type="Script" path="res://scripts/data/effects/buy_card_effect.gd" id="2_jl065"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_rt135"]
+
+[sub_resource type="Resource" id="Resource_vmg64"]
+script = ExtResource("2_jl065")
+play_then_destroy = true
+
+[resource]
+script = ExtResource("3_rt135")
+id = &"impulse_buy"
+display_name = "Impulse Buy"
+cost = 2
+on_play = Array[ExtResource("1_2mht2")]([SubResource("Resource_vmg64")])
+on_play_text = "Buy a card and play it immediately. Then destroy 🔥 it"
+tags = PackedStringArray()

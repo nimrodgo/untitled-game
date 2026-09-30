@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_b25r3"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="2_faf21"]
+
+[resource]
+script = ExtResource("2_faf21")
+id = &"barnacle"
+display_name = "Barnacle"
+cost = 0
+playable = false
+on_play_text = "Permanent"
+curse = true
+permanent = true
+tags = PackedStringArray()

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_3jvgk"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_qpxbo"]
+[ext_resource type="Script" path="res://scripts/data/effects/move_cards_effect.gd" id="3_pjaqw"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_vaoqi"]
+
+[sub_resource type="Resource" id="Resource_pwrlg"]
+script = ExtResource("2_qpxbo")
+amount = 3
+
+[sub_resource type="Resource" id="Resource_vcpoe"]
+script = ExtResource("3_pjaqw")
+from_piles = 1
+to_zone = 1
+amount = 1
+
+[resource]
+script = ExtResource("4_vaoqi")
+id = &"scheme"
+display_name = "Scheme"
+on_play = Array[ExtResource("1_3jvgk")]([SubResource("Resource_pwrlg"), SubResource("Resource_vcpoe")])
+on_play_text = "Draw 3 🂠. Put a card in your hand on top of the draw pile"
+tags = PackedStringArray()
