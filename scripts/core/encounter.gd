@@ -253,7 +253,8 @@ func buy_trinket(slot: int) -> bool:
 		player.coins -= cost
 		owned.paid += cost
 		owned.level += 1
-		log_line("You upgrade trinket [color=#ffd166]%s[/color]." % owned.get_name())
+		owned.used = false   # an upgrade refreshes the trinket
+		log_line("You upgrade trinket [color=#ffd166]%s[/color] (refreshed)." % owned.get_name())
 	else:
 		player.coins -= td.cost
 		player.trinkets.append(TrinketInstance.new(td))
