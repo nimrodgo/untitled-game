@@ -82,7 +82,7 @@ flowchart TD
 
 - You can own at most **3 trinkets** (`GameRules.MAX_TRINKETS`). The Trinkets panel always shows 3 frames; the free ones are empty.
 - The market has **2 trinket slots** and **1 item slot** in the test encounter. Trinket slots are **rerolled every round** from the whole pool, and trinkets you own (and can still upgrade) are **twice as likely**. A trinket you own at its top level never appears.
-- **Buying a trinket you already own upgrades it** (no second copy). It costs the **next level's `upgrade_cost`**, and the market tile shows that next level in purple. A **new** trinket costs its base cost and needs a free slot, so with 3 trinkets it's greyed out.
+- **Buying a trinket you already own upgrades it** (no second copy). It costs the **next level's `upgrade_cost`**, and the market tile shows that next level in purple. **An upgrade also refreshes the trinket** (a used one can be used again this turn). A **new** trinket costs its base cost and needs a free slot, so with 3 trinkets it's greyed out.
 - **Selling:** drag a trinket onto the market. You get **half of everything you paid for it** (purchase + upgrades), rounded down. It's a **free action** (`TRINKET_SELL_IS_ACTION = false`) and frees the slot.
 
 ## Choices

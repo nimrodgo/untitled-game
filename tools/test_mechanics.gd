@@ -369,7 +369,10 @@ func _trinket_shop_rules() -> void:
 	var up := e.trinket_buy_cost(td)
 	_check(up == td.levels[1].upgrade_cost, "duplicate costs the next upgrade cost (%d)" % up)
 	var before := e.player.coins
+	e.player.trinkets[0].used = true
+	_check(not e.can_use_trinket(0), "a used trinket can't be used again")
 	_check(e.buy_trinket(1), "buy the duplicate")
+	_check(not e.player.trinkets[0].used, "upgrading refreshes a used trinket")
 	_check(e.player.trinkets.size() == 1 and e.player.trinkets[0].level == 1 and e.player.coins == before - up,
 		"duplicate upgraded the owned trinket (level %d)" % e.player.trinkets[0].level)
 	_check(e.player.trinkets[0].paid == cost + up, "paid tracks purchase + upgrades")
