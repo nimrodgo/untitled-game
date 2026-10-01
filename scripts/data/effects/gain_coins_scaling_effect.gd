@@ -17,7 +17,8 @@ func apply(ctx: EffectContext) -> void:
 
 
 func describe() -> String:
-	return "Gain %d 🪙 and increase gain from all copies of this card by %d this encounter" % [amount, increase]
+	var coin_text: String = "🪙".repeat(amount) if amount <= 5 else "%d🪙" % amount
+	return "%s and increase gain from all copies of this card by %d this encounter" % [coin_text, increase]
 
 
 func ai_score() -> float:

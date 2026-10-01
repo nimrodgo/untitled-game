@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://kasxgd4qfnx5"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_lfa0w"]
-[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_a37aw"]
-[ext_resource type="Script" path="res://scripts/data/effects/retain_cards_effect.gd" id="3_35f6j"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_wpfef"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_lfa0w"]
+[ext_resource type="Script" uid="uid://dow1kbluxxx0s" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_a37aw"]
+[ext_resource type="Script" uid="uid://7ispvwv44rfb" path="res://scripts/data/effects/retain_cards_effect.gd" id="3_35f6j"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="4_wpfef"]
 
 [sub_resource type="Resource" id="Resource_7e5y2"]
 script = ExtResource("2_a37aw")
@@ -16,5 +16,4 @@ script = ExtResource("4_wpfef")
 id = &"hold"
 display_name = "Hold"
 on_play = Array[ExtResource("1_lfa0w")]([SubResource("Resource_7e5y2"), SubResource("Resource_tu6ha")])
-on_play_text = "Gain 1 🪙. Choose 1 card to retain this turn"
-tags = PackedStringArray()
+on_play_text = "🪙. 📌 a card"

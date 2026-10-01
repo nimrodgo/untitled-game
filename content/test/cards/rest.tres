@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://d43hb3nr61rb"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_ws4xy"]
-[ext_resource type="Script" path="res://scripts/data/effects/pass_effect.gd" id="2_6203d"]
-[ext_resource type="Script" path="res://scripts/data/effects/next_turn_draw_effect.gd" id="3_8neki"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_u4q8q"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_ws4xy"]
+[ext_resource type="Script" uid="uid://dtw8gorwismdf" path="res://scripts/data/effects/pass_effect.gd" id="2_6203d"]
+[ext_resource type="Script" uid="uid://712xags3i4ts" path="res://scripts/data/effects/next_turn_draw_effect.gd" id="3_8neki"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="4_u4q8q"]
 
 [sub_resource type="Resource" id="Resource_kyne1"]
 script = ExtResource("2_6203d")
@@ -18,5 +18,4 @@ id = &"rest"
 display_name = "Rest"
 cost = 0
 on_play = Array[ExtResource("1_ws4xy")]([SubResource("Resource_kyne1"), SubResource("Resource_pe1vx")])
-on_play_text = "Pass ➡ Draw 3 🂠 at the start of your next turn"
-tags = PackedStringArray()
+on_play_text = "Pass ➡ 🂠🂠🂠 at the start of your next turn"

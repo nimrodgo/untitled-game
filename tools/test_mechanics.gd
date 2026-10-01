@@ -345,6 +345,85 @@ func _rules(_data: EncounterData) -> void:
 	_check(e.player.coins == before - 1 and e.enemy.coins == enemy_before, "enemy Toll: you lose 1")
 
 
+	_trinket_shop_rules()
+
+
+## Trinkets: 2 in the shop, max 3 owned, buy a duplicate to upgrade, sell for
+## half of everything paid (free action), maxed ones leave the shop.
+func _trinket_shop_rules() -> void:
+	var e := _enc(["example1", "example1", "example1", "example1", "example1"], true, true)
+	_check(e.shop.trinkets.size() == 2 and e.shop.items.size() == 1, "shop: 2 trinket slots, 1 item slot")
+	_check(e.shop.trinkets[0] != null and e.shop.trinkets[1] != null and e.shop.trinkets[0] != e.shop.trinkets[1],
+		"shop: two different trinkets")
+	e.player.coins = 50
+	# Buy a new one (Forge: 3 levels) into slot 0.
+	e.shop.trinkets[0] = _trinket("forge")
+	var td: TrinketData = e.shop.trinkets[0]
+	var cost := td.cost
+	_check(e.can_buy_trinket(0) and e.buy_trinket(0), "buy a new trinket")
+	_check(e.player.coins == 50 - cost and e.player.trinkets.size() == 1, "new trinket costs its price")
+	while e.active == e.enemy:
+		e.enemy_act()
+	# Put the same trinket back in the shop: buying it upgrades yours.
+	e.shop.trinkets[1] = td
+	var up := e.trinket_buy_cost(td)
+	_check(up == td.levels[1].upgrade_cost, "duplicate costs the next upgrade cost (%d)" % up)
+	var before := e.player.coins
+	_check(e.buy_trinket(1), "buy the duplicate")
+	_check(e.player.trinkets.size() == 1 and e.player.trinkets[0].level == 1 and e.player.coins == before - up,
+		"duplicate upgraded the owned trinket (level %d)" % e.player.trinkets[0].level)
+	_check(e.player.trinkets[0].paid == cost + up, "paid tracks purchase + upgrades")
+	while e.active == e.enemy:
+		e.enemy_act()
+	# Max level: no longer offered, can't be bought.
+	e.player.trinkets[0].level = td.levels.size() - 1
+	e.shop.trinkets[1] = td
+	_check(not e.can_buy_trinket(1), "max-level duplicate can't be bought")
+	var seen_max := false
+	for i in 40:
+		e.shop.restock_trinkets()
+		if e.shop.trinkets.has(td):
+			seen_max = true
+	_check(not seen_max, "max-level owned trinket never appears in the shop")
+	# Owned, not maxed: shows up more often than others.
+	e.player.trinkets[0].level = 0
+	var owned_seen := 0
+	var other_seen := 0
+	for i in 400:
+		e.shop.restock_trinkets()
+		for t in e.shop.trinkets:
+			if t == td: owned_seen += 1
+			elif t != null: other_seen += 1
+	var pool_n := e.data.trinket_pool.size()
+	_check(float(owned_seen) > float(other_seen) / float(pool_n - 1) * 1.4, "owned trinkets are favoured (%d vs %.0f avg)" % [owned_seen, float(other_seen) / float(pool_n - 1)])
+
+	# Three slots max: a fourth NEW trinket can't be bought.
+	e = _enc(["example1", "example1", "example1", "example1", "example1"], true, true)
+	e.player.coins = 99
+	for i in 3:
+		var t := TrinketInstance.new(e.data.trinket_pool[i])
+		e.player.trinkets.append(t)
+	var fresh := -1
+	for s in e.shop.trinkets.size():
+		e.shop.trinkets[s] = e.data.trinket_pool[5 + s]
+		fresh = s
+	_check(not e.can_buy_trinket(fresh), "full slots: can't buy a new trinket")
+	# ...but an upgrade of an owned one is fine.
+	e.shop.trinkets[0] = e.data.trinket_pool[1]
+	_check(e.can_buy_trinket(0), "full slots: upgrading an owned trinket is allowed")
+
+	# Selling: half of everything paid, rounded down, free action, frees a slot.
+	var t0: TrinketInstance = e.player.trinkets[1]
+	t0.paid = 7
+	before = e.player.coins
+	var acts_before := e.enemy_actions_left
+	_check(e.can_sell_trinket(1) and e.sell_trinket(1), "sell a trinket")
+	_check(e.player.coins == before + 3, "sold for half of 7 rounded down = 3 (got %d)" % (e.player.coins - before))
+	_check(e.player.trinkets.size() == 2 and e.is_player_turn() and e.enemy_actions_left == acts_before,
+		"selling is a free action (enemy doesn't answer)")
+	_check(e.can_buy_trinket(fresh), "a slot opened up for a new trinket")
+
+
 func _count_id(arr: Array, id: String) -> int:
 	var n := 0
 	for c in arr:

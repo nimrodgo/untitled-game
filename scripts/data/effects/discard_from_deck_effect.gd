@@ -31,8 +31,8 @@ func apply(ctx: EffectContext) -> void:
 
 func describe() -> String:
 	if look == 1:
-		return "You may discard ⤵ the top card of your deck"
-	return "Look at the top %d cards of your deck. Discard ⤵ any of them" % look
+		return "You may ⤵ the top card of your deck"
+	return "Look at the top %d cards of your deck. ⤵ any of them" % look
 
 
 func ai_score() -> float:

@@ -17,5 +17,5 @@ id = &"example1"
 display_name = "This is a card"
 on_play = Array[ExtResource("1_iw18t")]([SubResource("Resource_5n5gp")])
 on_buy = Array[ExtResource("1_iw18t")]([SubResource("Resource_gy235")])
-on_play_text = "Draw 2 🂠"
-on_buy_text = "Draw 1 🂠"
+on_play_text = "🂠🂠"
+on_buy_text = "🂠"

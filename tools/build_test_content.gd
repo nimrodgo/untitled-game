@@ -22,25 +22,25 @@ func _init() -> void:
 
 	# --- Nimrod's original cards (text exactly as designed) ----------------
 	var example1 := _card("example1", "This is a card", 1, false,
-		[_draw(2)], "Draw 2 🂠",
-		[_draw(1)], "Draw 1 🂠")
+		[_draw(2)], "2🂠",
+		[_draw(1)], "🂠")
 	var example2 := _card("example2", "This is another card", 0, true,
-		[_gain(1)], "⚡Gain 1 🪙",
-		[_gain(1)], "Gain 1 🪙")
+		[_gain(1)], "⚡+1🪙",
+		[_gain(1)], "+1🪙")
 	var per_draw := GainCoinsPerStatEffect.new()
 	per_draw.stat = &"cards_drawn_this_turn"
 	per_draw.per = 1
 	var drawful := _card("drawful", "Draw Synergy", 3, false,
-		[per_draw], "Gain 1 🪙 for every card drawn this turn ([i]{cards_drawn_this_turn}[/i])",
-		[_draw(1)], "Draw 1 🂠")
+		[per_draw], "+1🪙 for every card drawn this turn ([i]{cards_drawn_this_turn}[/i])",
+		[_draw(1)], "🂠")
 
 	# --- Curses (ideas.md) ---------------------------------------------------
 	var dead_weight := _curse("dead_weight", "Dead Weight", [], "", false)
 	var barnacle := _curse("barnacle", "Barnacle", [], "Permanent", true)
-	var driftwood := _curse("driftwood", "Driftwood", [_trash_self(false)], "Play: remove 🗑 this", false)
+	var driftwood := _curse("driftwood", "Driftwood", [_trash_self(false)], "Play: 🗑 this", false)
 	driftwood.playable = true
 	_save(driftwood, "curses/driftwood.tres")
-	var leaky_purse := _curse("leaky_purse", "Leaky Purse", [], "End of turn in hand: lose 2 🪙", false)
+	var leaky_purse := _curse("leaky_purse", "Leaky Purse", [], "End of turn in hand: -2🪙", false)
 	var lose2 := LoseCoinsEffect.new(); lose2.target = SELF; lose2.amount = 2
 	leaky_purse.on_turn_end_in_hand.assign([lose2])
 	_save(leaky_purse, "curses/leaky_purse.tres")
@@ -54,42 +54,42 @@ func _init() -> void:
 
 	var impulse := BuyCardEffect.new(); impulse.play_then_destroy = true
 	ideas.append(_card("impulse_buy", "Impulse Buy", 2, false, [impulse],
-		"Buy a card and play it immediately. Then destroy 🔥 it"))
+		"Buy a card and play it immediately. Then 🔥 it"))
 
 	ideas.append(_card("sift", "Sift", 1, false, [_draw(2), _discard(2)],
-		"Draw 2 🂠. Discard 2 ⤵"))
+		"2🂠. 2⤵"))
 
 	var refresh_all := RefreshTrinketsEffect.new(); refresh_all.all = true
 	ideas.append(_card("spark", "Spark", 1, true, [_trash_self(true), refresh_all],
-		"⚡🔥 this ➡ Refresh ↺ all trinkets"))
+		"⚡🔥 this ➡ ↺ all trinkets"))
 
 	ideas.append(_card("patience", "Patience", 1, true,
-		[_choose([_opt([_gain(2)], "Gain 2 🪙"), _opt([PassEffect.new(), _gain(3)], "Pass ➡ Gain 3 🪙")])],
-		"⚡Gain 2 🪙 OR Pass ➡ Gain 3 🪙"))
+		[_choose([_opt([_gain(2)], "+2🪙"), _opt([PassEffect.new(), _gain(3)], "Pass ➡ +3🪙")])],
+		"⚡+2🪙 OR Pass ➡ +3🪙"))
 
 	ideas.append(_card("purge", "Purge", 2, false,
-		[_choose([_opt([_trash(true, 1)], "Destroy 1 🔥"), _opt([_trash(false, 2)], "Remove 2 🗑")])],
-		"Destroy 1 🔥 OR Remove 2 🗑"))
+		[_choose([_opt([_trash(true, 1)], "🔥"), _opt([_trash(false, 2)], "2🗑")])],
+		"🔥 OR 2🗑"))
 
 	ideas.append(_card("cycle", "Cycle", 1, false, [_discard(1, true), _draw(2)],
-		"Discard 1 ⤵ ➡ Draw 2 🂠"))
+		"⤵ ➡ 2🂠"))
 
 	ideas.append(_card("rush_order", "Rush Order", 1, true, [NextBuyToHandEffect.new()],
 		"⚡The next card you buy is drawn immediately"))
 
 	ideas.append(_card("burnout", "Burnout", 2, true, [_trash_self(true), _draw(5)],
-		"⚡🔥 this ➡ Draw 5 🂠"))
+		"⚡🔥 this ➡ 5🂠"))
 
 	ideas.append(_card("clearance", "Clearance", 2, true, [DestroyShopCardEffect.new(), _gain(2)],
-		"⚡Destroy 🔥 a card in the shop and restock it. Gain 2 🪙"))
+		"⚡🔥 a card in the shop and restock it. +2🪙"))
 
 	var refresh1 := RefreshTrinketsEffect.new()
 	ideas.append(_card("tinker", "Tinker", 1, false, [refresh1, _draw(1)],
-		"Refresh ↺ a trinket. Draw 1 🂠"))
+		"↺ a trinket. 🂠"))
 
 	var bottom := _draw(1); bottom.source = DrawCardsEffect.Source.BOTTOM
 	ideas.append(_card("undertow", "Undertow", 1, false, [bottom],
-		"Draw 1 🂠 from the bottom of your deck"))
+		"🂠 from the bottom of your deck"))
 
 	var buy_removed := BuyCardEffect.new(); buy_removed.source = BuyCardEffect.Source.REMOVED
 	ideas.append(_card("salvage", "Salvage", 1, false, [buy_removed],
@@ -100,7 +100,7 @@ func _init() -> void:
 		"Buy a card you destroyed 🔥 this encounter"))
 
 	ideas.append(_card("cursed_cache", "Cursed Cache", 0, false, [_add(driftwood), _draw(2)],
-		"Shuffle Driftwood into your deck. Draw 2 🂠"))
+		"Shuffle Driftwood into your deck. 2🂠"))
 
 	var tf := TransformCardsEffect.new(); tf.into = driftwood
 	ideas.append(_card("hex", "Hex", 1, false, [tf],
@@ -111,16 +111,16 @@ func _init() -> void:
 
 	var ntd := NextTurnDrawEffect.new(); ntd.amount = 3
 	ideas.append(_card("rest", "Rest", 0, false, [PassEffect.new(), ntd],
-		"Pass ➡ Draw 3 🂠 at the start of your next turn"))
+		"Pass ➡ 3🂠 at the start of your next turn"))
 
 	var sweep := MoveCardsEffect.new()
 	sweep.from_piles = DECK; sweep.to_zone = GameRules.Zone.DRAW_BOTTOM; sweep.curses_only = true
 	ideas.append(_card("sweep", "Sweep Under", 1, false, [sweep, _draw(1)],
-		"Move all curses in your deck to the bottom. Draw 1 🂠"))
+		"Move all curses in your deck to the bottom. 🂠"))
 
 	ideas.append(_card("tidy_up", "Tidy Up", 1, false,
 		[_gain(1), _if(ConditionalEffect.Condition.DISCARD_EMPTY, [_draw(1)])],
-		"Gain 1 🪙. If your discard pile is empty, draw 1 🂠"))
+		"+1🪙. If your discard pile is empty, 🂠"))
 
 	var sample := BuyCardEffect.new(); sample.free = true; sample.zone = GameRules.Zone.DRAW_TOP
 	ideas.append(_card("free_sample", "Free Sample", 3, false, [sample],
@@ -128,19 +128,19 @@ func _init() -> void:
 
 	var prune_rm := _trash(false, 1); prune_rm.piles = HAND
 	ideas.append(_card("prune", "Prune", 1, false, [_draw(2), prune_rm],
-		"Draw 2 🂠. Remove 1 🗑 in hand"))
+		"2🂠. 🗑 in hand"))
 
 	ideas.append(_card("autopilot", "Autopilot", 2, false, [PlayTopCardsEffect.new()],
 		"Play the top 2 cards in your deck"))
 
 	var pay2 := PayCoinsEffect.new(); pay2.amount = 2
 	ideas.append(_card("invest", "Invest", 1, false, [pay2, _draw(3)],
-		"Pay 2 🪙 ➡ Draw 3 🂠"))
+		"-2🪙 ➡ 3🂠"))
 
 	var liq := TrashCardsEffect.new()
 	liq.destroy = false; liq.what = TrashCardsEffect.What.ALL_OTHER_HAND; liq.coins_per_card = 3
 	ideas.append(_card("liquidate", "Liquidate", 2, false, [liq],
-		"Remove 🗑 all other cards in your hand. Gain 3 🪙 for each"))
+		"🗑 all other cards in your hand. +3🪙 for each"))
 
 	ideas.append(_card("echo", "Echo", 2, false, [ReplayEffect.new()],
 		"The next card you play this turn is played an additional time"))
@@ -149,7 +149,7 @@ func _init() -> void:
 		"Gain Barnacle and 2 🪙"))
 
 	var ember := _card("ember", "Ember", 1, false, [_gain(2)],
-		"Gain 2 🪙. When this is destroyed 🔥, draw 2 🂠")
+		"+2🪙. When this is destroyed 🔥, 2🂠")
 	ember.on_destroy.assign([_draw(2)])
 	_save(ember, "cards/ember.tres")
 	ideas.append(ember)
@@ -157,23 +157,23 @@ func _init() -> void:
 	var ontop := MoveCardsEffect.new()
 	ontop.from_piles = HAND; ontop.to_zone = GameRules.Zone.DRAW_TOP; ontop.amount = 1
 	ideas.append(_card("scheme", "Scheme", 1, false, [_draw(3), ontop],
-		"Draw 3 🂠. Put a card in your hand on top of the draw pile"))
+		"3🂠. Put a card in your hand on top of the draw pile"))
 
 	ideas.append(_card("binge", "Binge", 1, false, [_draw(3), DrawLockEffect.new()],
-		"Draw 3 🂠. You can't draw additional cards this turn"))
+		"3🂠. You can't draw additional cards this turn"))
 
 	var mull := DiscardCardsEffect.new(); mull.all_hand = true; mull.draw_that_many = true
 	ideas.append(_card("mulligan", "Mulligan", 1, false, [mull],
 		"Discard your hand ⤵. Draw that many 🂠"))
 
 	var spring := _card("spring", "Spring", 1, false, [_draw(1)],
-		"Draw 1 🂠. When this card is discarded ⤵, draw 2 🂠")
+		"🂠. When this card is discarded ⤵, 2🂠")
 	spring.on_discard.assign([_draw(2)])
 	_save(spring, "cards/spring.tres")
 	ideas.append(spring)
 
 	ideas.append(_card("study", "Study", 1, false, [_draw(3), _discard(1)],
-		"Draw 3 🂠. Discard 1 ⤵"))
+		"3🂠. ⤵"))
 
 	var necro := PlayCopyEffect.new(); necro.source = PlayCopyEffect.Source.DESTROYED
 	ideas.append(_card("necromancy", "Necromancy", 2, false, [necro],
@@ -188,37 +188,37 @@ func _init() -> void:
 
 	ideas.append(_card("meditate", "Meditate", 0, false,
 		[PassEffect.new(), _if(ConditionalEffect.Condition.NO_OTHER_CARD_PLAYED, [ExtraRoundEffect.new(), _trash_self(true)])],
-		"Pass. If you didn't play any card this turn, take an extra turn and destroy 🔥 this"))
+		"Pass. If you didn't play any card this turn, take an extra turn and 🔥 this"))
 
 	ideas.append(_card("peek", "Peek", 0, false, [DiscardFromDeckEffect.new(), _draw(1)],
-		"You may discard ⤵ the top card of your deck. Draw 1 🂠"))
+		"You may ⤵ the top card of your deck. 🂠"))
 
 	var burn_deck := TrashCardsEffect.new(); burn_deck.what = TrashCardsEffect.What.DRAW_PILE
 	ideas.append(_card("scorched_earth", "Scorched Earth", 1, false, [_trash_self(true), burn_deck, _gain(5)],
-		"Destroy 🔥 this card and your deck. Gain 5 🪙"))
+		"🔥 this card and your deck. +5🪙"))
 
 	ideas.append(_card("hold", "Hold", 1, false, [_gain(1), RetainCardsEffect.new()],
-		"Gain 1 🪙. Choose 1 card to retain this turn"))
+		"+1🪙. 📌"))
 
 	var dig_draw := _draw(1); dig_draw.source = DrawCardsEffect.Source.DISCARD_CHOOSE
 	ideas.append(_card("dig", "Dig", 1, false, [dig_draw, _trash_self(false)],
-		"Draw 1 🂠 from the discard pile and remove 🗑 this"))
+		"🂠 from the discard pile and 🗑 this"))
 
 	ideas.append(_card("snowball", "Snowball", 1, false, [GainCoinsScalingEffect.new()],
-		"Gain 2 🪙 and increase gain from all Snowballs by 2 this encounter"))
+		"+2🪙 and increase gain from all Snowballs by 2 this encounter"))
 
 	ideas.append(_card("risky_draw", "Risky Draw", 0, false, [_draw(3), _add(leaky_purse)],
-		"Draw 3 🂠. Shuffle Leaky Purse into your deck"))
+		"3🂠. Shuffle Leaky Purse into your deck"))
 
 	# Listed under items in ideas.md, but meant to be a card.
 	var pawn := _trash(true, 1); pawn.piles = HAND; pawn.gain_cost_as_coins = true
 	ideas.append(_card("pawn", "Pawn", 1, false, [pawn],
-		"Destroy 1 🔥 in hand. Gain 🪙 equal to its cost"))
+		"🔥 in hand. +🪙 equal to its cost"))
 
 	# --- Items -----------------------------------------------------------------
 	var T := GameRules.Trigger
 	var original_items := [
-		_item("rebate", "Rebate", 3, T.CARD_BOUGHT, [_gain(1)], 0, 0, "Gain 1 🪙 when you buy a card"),
+		_item("rebate", "Rebate", 3, T.CARD_BOUGHT, [_gain(1)], 0, 0, "+1🪙 when you buy a card"),
 	]
 	var dest := SetBuyDestinationEffect.new()
 	dest.destination = GameRules.Zone.HAND
@@ -232,21 +232,21 @@ func _init() -> void:
 		_item("furnace", "Furnace", 2, T.CARD_PLAYED, [burn_played], 0, 1,
 			"The first card you play each turn is destroyed 🔥"),
 		_item("scrap_dealer", "Scrap Dealer", 4, T.CARD_REMOVED, [_gain(2)], 0, 0,
-			"When you remove 🗑 a card, gain 2 🪙"),
+			"When you 🗑 a card, +2🪙"),
 		_item("incinerator", "Incinerator", 5, T.CARD_DESTROYED, [_gain(3)], 0, 0,
-			"When you destroy 🔥 a card, gain 3 🪙"),
+			"When you 🔥 a card, +3🪙"),
 		_item("cursed_luck", "Cursed Luck", 3, T.CURSE_DRAWN, [_gain(2)], 0, 0,
-			"When you draw a curse, gain 2 🪙"),
+			"When you draw a curse, +2🪙"),
 		_item("curse_ward", "Curse Ward", 3, T.CURSE_DRAWN, [_draw(1)], 0, 0,
-			"When you draw a curse, draw 1 🂠"),
+			"When you draw a curse, 🂠"),
 		_item("recycler", "Recycler", 4, T.CARD_TRASHED_FROM_HAND, [_draw(1)], 0, 0,
-			"When you remove 🗑 or destroy 🔥 a card in your hand, draw 1 🂠"),
+			"When you 🗑 or 🔥 a card in your hand, 🂠"),
 		_item("pocket", "Pocket", 4, T.ROUND_END, [retain_opt], 0, 0,
-			"You may retain 1 card each turn"),
+			"You may 📌 each turn"),
 		_item("grindstone", "Grindstone", 5, T.CARD_DISCARDED, [_gain(2)], 0, 0,
-			"When you discard ⤵, gain 2 🪙"),
+			"When you ⤵, +2🪙"),
 		_item("second_look", "Second Look", 3, T.CARD_DRAWN, [OfferRedrawEffect.new()], 0, 1,
-			"When you draw a card during your turn, you may discard ⤵ it to draw another. Then this is disabled for the turn"),
+			"When you 🂠 during your turn, you may ⤵ it to draw another. Then this is disabled for the turn"),
 		_item("big_hands", "Big Hands", 5, T.HAND_DRAWN, [_draw(1)], 0, 0,
 			"Draw an additional 🂠 at the start of the turn"),
 		_item("echo_chamber", "Echo Chamber", 6, T.CARD_PLAYED, [extra_play], 0, 1,
@@ -254,32 +254,35 @@ func _init() -> void:
 	]
 
 	# --- Trinkets ------------------------------------------------------------------
-	var coin_trinket := _trinket("coin_trinket", "Coin Trinket", 4, [[[_gain(1)], "⚡Gain 1 🪙", 0]])
+	var coin_trinket := _trinket("coin_trinket", "Coin Trinket", 4, [
+		[[_gain(1)], "⚡🪙", 0],
+		[[_gain(2)], "⚡🪙🪙", 3],
+		[[_gain(3)], "⚡🪙🪙🪙", 4]])
 	var pay1 := PayCoinsEffect.new(); pay1.amount = 1
 	var t_forge := _trinket("forge", "Forge", 3, [
-		[[pay1, _trash(true, 1)], "⚡Pay 1 🪙 ➡ Destroy 1 🔥", 0],
-		[[_trash(true, 1)], "⚡Destroy 1 🔥", 3],
-		[[_gain(1), _trash(true, 1)], "⚡Gain 1 🪙. Destroy 1 🔥", 3]])
+		[[pay1, _trash(true, 1)], "⚡-1🪙 ➡ 🔥", 0],
+		[[_trash(true, 1)], "⚡🔥", 3],
+		[[_gain(1), _trash(true, 1)], "⚡+1🪙. 🔥", 3]])
 	var t_idol := _trinket("cursed_idol", "Cursed Idol", 4, [
 		[[_add(barnacle), _gain(2)], "⚡Gain Barnacle and 2 🪙", 0],
 		[[_add(barnacle), _gain(4)], "⚡Gain Barnacle and 4 🪙", 4],
 		[[_add(barnacle), _gain(6)], "⚡Gain Barnacle and 6 🪙", 5]])
 	var t_sieve := _trinket("sieve", "Sieve", 4, [
-		[[_draw(1), _discard(1)], "⚡Draw 1 🂠. Discard 1 ⤵", 0],
-		[[_draw(2), _discard(1)], "⚡Draw 2 🂠. Discard 1 ⤵", 3],
-		[[_draw(3), _discard(1)], "⚡Draw 3 🂠. Discard 1 ⤵", 4]])
+		[[_draw(1), _discard(1)], "⚡🂠. ⤵", 0],
+		[[_draw(2), _discard(1)], "⚡2🂠. ⤵", 3],
+		[[_draw(3), _discard(1)], "⚡3🂠. ⤵", 4]])
 	var t_urn := _trinket("ash_urn", "Ash Urn", 3, [
-		[[_add(barnacle), _trash(true, 1)], "⚡Shuffle 1 Barnacle into your deck. Destroy 1 🔥", 0],
-		[[_add(barnacle), _trash(true, 2)], "⚡Shuffle 1 Barnacle into your deck. Destroy 2 🔥", 3],
-		[[_add(barnacle, 2), _trash(true, 3)], "⚡Shuffle 2 Barnacles into your deck. Destroy 3 🔥", 4]])
+		[[_add(barnacle), _trash(true, 1)], "⚡Shuffle 1 Barnacle into your deck. 🔥", 0],
+		[[_add(barnacle), _trash(true, 2)], "⚡Shuffle 1 Barnacle into your deck. 2🔥", 3],
+		[[_add(barnacle, 2), _trash(true, 3)], "⚡Shuffle 2 Barnacles into your deck. 3🔥", 4]])
 	var t_pan := _trinket("dust_pan", "Dust Pan", 3, [
-		[[_add(dead_weight), _trash(false, 2)], "⚡Shuffle 1 Dead Weight into your deck. Remove 2 🗑", 0],
-		[[_add(dead_weight), _trash(false, 3)], "⚡Shuffle 1 Dead Weight into your deck. Remove 3 🗑", 3],
-		[[_add(dead_weight, 2), _trash(false, 4)], "⚡Shuffle 2 Dead Weights into your deck. Remove 4 🗑", 4]])
+		[[_add(dead_weight), _trash(false, 2)], "⚡Shuffle 1 Dead Weight into your deck. 2🗑", 0],
+		[[_add(dead_weight), _trash(false, 3)], "⚡Shuffle 1 Dead Weight into your deck. 3🗑", 3],
+		[[_add(dead_weight, 2), _trash(false, 4)], "⚡Shuffle 2 Dead Weights into your deck. 4🗑", 4]])
 	var t_glass := _trinket("spyglass", "Spyglass", 3, [
-		[[_peek(2)], "⚡Look at the top 2 cards of your deck. Discard ⤵ any of them", 0],
-		[[_peek(3)], "⚡Look at the top 3 cards of your deck. Discard ⤵ any of them", 3],
-		[[_peek(4)], "⚡Look at the top 4 cards of your deck. Discard ⤵ any of them", 3]])
+		[[_peek(2)], "⚡Look at the top 2 cards of your deck. ⤵ any of them", 0],
+		[[_peek(3)], "⚡Look at the top 3 cards of your deck. ⤵ any of them", 3],
+		[[_peek(4)], "⚡Look at the top 4 cards of your deck. ⤵ any of them", 3]])
 
 	# --- Enemy (scripted intents; no cards/items) ---------------------------
 	var snatch := SnatchShopCardEffect.new()

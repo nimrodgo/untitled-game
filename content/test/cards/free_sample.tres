@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://b2g0kkhi5cj8o"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_ps2q2"]
-[ext_resource type="Script" path="res://scripts/data/effects/buy_card_effect.gd" id="2_6fr4l"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_w7h2o"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_ps2q2"]
+[ext_resource type="Script" uid="uid://dkswjgn5ega1g" path="res://scripts/data/effects/buy_card_effect.gd" id="2_6fr4l"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_w7h2o"]
 
 [sub_resource type="Resource" id="Resource_a4k5q"]
 script = ExtResource("2_6fr4l")
@@ -16,4 +16,3 @@ display_name = "Free Sample"
 cost = 3
 on_play = Array[ExtResource("1_ps2q2")]([SubResource("Resource_a4k5q")])
 on_play_text = "Buy a card for free and place it on top of the draw pile"
-tags = PackedStringArray()

@@ -30,8 +30,8 @@ func apply(ctx: EffectContext) -> void:
 
 func describe() -> String:
 	if all:
-		return "Refresh ↺ all trinkets"
-	return "Refresh ↺ a trinket" if amount == 1 else "Refresh ↺ %d trinkets" % amount
+		return "↺ all trinkets"
+	return "↺ a trinket" if amount == 1 else "↺ %d trinkets" % amount
 
 
 func ai_score() -> float:

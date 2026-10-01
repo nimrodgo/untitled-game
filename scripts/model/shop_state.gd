@@ -10,15 +10,17 @@ var enhancements: Array = []
 var _data: EncounterData
 var _rng: RandomNumberGenerator
 var _item_bag: Array = []
-var _trinket_bag: Array = []
 var _enh_bag: Array = []
+## TrinketData -> weight (0 = never shown, 1 = normal, 2 = twice as likely).
+## The encounter sets this so owned trinkets show up more often (buying one
+## again upgrades it) and maxed-out ones never do.
+var trinket_weight: Callable
 
 
 func setup(data: EncounterData, rng: RandomNumberGenerator) -> void:
 	_data = data
 	_rng = rng
 	_item_bag = _shuffled(data.item_pool)
-	_trinket_bag = _shuffled(data.trinket_pool)
 	_enh_bag = _shuffled(data.enhancement_pool)
 	cards.clear(); items.clear(); trinkets.clear(); enhancements.clear()
 	for i in data.card_slots:
@@ -26,12 +28,13 @@ func setup(data: EncounterData, rng: RandomNumberGenerator) -> void:
 	for i in data.item_slots:
 		items.append(_item_bag.pop_back() if not _item_bag.is_empty() else null)
 	for i in data.trinket_slots:
-		trinkets.append(_trinket_bag.pop_back() if not _trinket_bag.is_empty() else null)
+		trinkets.append(null)
+	restock_trinkets()
 	for i in data.enhancement_slots:
 		enhancements.append(_enh_bag.pop_back() if not _enh_bag.is_empty() else null)
 
 
-## New round: fresh cards in every card slot; sold-out item / trinket /
+## New round: fresh cards and trinkets in every slot; sold-out item /
 ## upgrade slots are refilled from what's left in their pools.
 func restock() -> void:
 	for i in cards.size():
@@ -39,12 +42,41 @@ func restock() -> void:
 	for i in items.size():
 		if items[i] == null and not _item_bag.is_empty():
 			items[i] = _item_bag.pop_back()
-	for i in trinkets.size():
-		if trinkets[i] == null and not _trinket_bag.is_empty():
-			trinkets[i] = _trinket_bag.pop_back()
+	restock_trinkets()
 	for i in enhancements.size():
 		if enhancements[i] == null and not _enh_bag.is_empty():
 			enhancements[i] = _enh_bag.pop_back()
+
+
+## Reroll every trinket slot from the whole pool (no trinket twice at once).
+func restock_trinkets() -> void:
+	for i in trinkets.size():
+		trinkets[i] = null
+	for i in trinkets.size():
+		trinkets[i] = _pick_trinket()
+
+
+func _pick_trinket() -> TrinketData:
+	var cands: Array = []
+	var weights: Array = []
+	var total := 0.0
+	for td in _data.trinket_pool:
+		if td == null or trinkets.has(td) or cands.has(td):
+			continue
+		var w := 1.0 if not trinket_weight.is_valid() else float(trinket_weight.call(td))
+		if w <= 0.0:
+			continue
+		cands.append(td)
+		weights.append(w)
+		total += w
+	if cands.is_empty():
+		return null
+	var r := _rng.randf() * total
+	for i in cands.size():
+		r -= weights[i]
+		if r <= 0.0:
+			return cands[i]
+	return cands.back()
 
 
 func take_card(slot: int) -> CardData:

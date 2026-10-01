@@ -8,6 +8,8 @@ enum State { IDLE, ACTIVE, HOVER }
 var bg_color: Color = Palette.PANEL
 var accent: Color = Palette.TEAL
 var radius := 14
+## How much the panel grows while a drag hovers it (1.0 for big panels).
+var hover_scale := 1.06
 var state: State = State.IDLE
 var _pulse: Tween
 
@@ -27,7 +29,7 @@ func set_state(s: State) -> void:
 		_pulse = null
 	self_modulate = Color.WHITE
 	var tw := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tw.tween_property(self, "scale", Vector2(1.06, 1.06) if s == State.HOVER else Vector2.ONE, 0.15)
+	tw.tween_property(self, "scale", Vector2(hover_scale, hover_scale) if s == State.HOVER else Vector2.ONE, 0.15)
 	if s == State.ACTIVE:
 		_pulse = create_tween().set_loops()
 		_pulse.tween_property(self, "self_modulate", Color(1.35, 1.35, 1.35), 0.45)

@@ -16,8 +16,8 @@ func apply(ctx: EffectContext) -> void:
 
 
 func describe() -> String:
-	var n := "a card" if amount == 1 else "%d cards" % amount
-	return ("You may retain %s" if optional else "Retain %s") % n
+	var n := Icons.n(amount, "📌")
+	return ("You may %s" if optional else "%s") % n
 
 
 func ai_score() -> float:

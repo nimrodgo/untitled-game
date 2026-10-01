@@ -37,7 +37,7 @@ func is_cost() -> bool:
 func describe() -> String:
 	if all_hand:
 		return "Discard your hand ⤵" + (". Draw that many 🂠" if draw_that_many else "")
-	return "Discard %d ⤵" % amount
+	return Icons.n(amount, "⤵")
 
 
 func ai_score() -> float:

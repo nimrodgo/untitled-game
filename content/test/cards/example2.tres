@@ -18,5 +18,5 @@ cost = 0
 instant = true
 on_play = Array[ExtResource("1_g4hb1")]([SubResource("Resource_krxac")])
 on_buy = Array[ExtResource("1_g4hb1")]([SubResource("Resource_h4sp4")])
-on_play_text = "⚡Gain 1 🪙"
-on_buy_text = "Gain 1 🪙"
+on_play_text = "⚡🪙"
+on_buy_text = "🪙"

@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="TrinketData" format=3]
+[gd_resource type="Resource" script_class="TrinketData" format=3 uid="uid://bcv3kuhxpa6gk"]
 
-[ext_resource type="Script" path="res://scripts/data/trinket_level.gd" id="1_mvuqc"]
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_7fgb8"]
+[ext_resource type="Script" uid="uid://dvhdcguit2rs0" path="res://scripts/data/trinket_level.gd" id="1_mvuqc"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="2_7fgb8"]
 [ext_resource type="Resource" path="res://content/test/curses/barnacle.tres" id="3_4c2mp"]
-[ext_resource type="Script" path="res://scripts/data/effects/add_card_effect.gd" id="4_lpqld"]
-[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="5_62mjj"]
-[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="6_0ar5r"]
+[ext_resource type="Script" uid="uid://bs8xb6e8kjq6f" path="res://scripts/data/effects/add_card_effect.gd" id="4_lpqld"]
+[ext_resource type="Script" uid="uid://dow1kbluxxx0s" path="res://scripts/data/effects/gain_coins_effect.gd" id="5_62mjj"]
+[ext_resource type="Script" uid="uid://bldvg83fphc0b" path="res://scripts/data/trinket_data.gd" id="6_0ar5r"]
 
 [sub_resource type="Resource" id="Resource_b81r2"]
 script = ExtResource("4_lpqld")
@@ -19,7 +19,7 @@ amount = 2
 script = ExtResource("1_mvuqc")
 upgrade_cost = 0
 effects = Array[ExtResource("2_7fgb8")]([SubResource("Resource_b81r2"), SubResource("Resource_5gr5t")])
-text = "⚡Gain Barnacle and 2 🪙"
+text = "⚡Gain Barnacle and 🪙🪙"
 
 [sub_resource type="Resource" id="Resource_rilc1"]
 script = ExtResource("4_lpqld")
@@ -33,7 +33,7 @@ amount = 4
 script = ExtResource("1_mvuqc")
 upgrade_cost = 4
 effects = Array[ExtResource("2_7fgb8")]([SubResource("Resource_rilc1"), SubResource("Resource_04a47")])
-text = "⚡Gain Barnacle and 4 🪙"
+text = "⚡Gain Barnacle and 🪙🪙🪙🪙"
 
 [sub_resource type="Resource" id="Resource_nhl45"]
 script = ExtResource("4_lpqld")
@@ -47,7 +47,7 @@ amount = 6
 script = ExtResource("1_mvuqc")
 upgrade_cost = 5
 effects = Array[ExtResource("2_7fgb8")]([SubResource("Resource_nhl45"), SubResource("Resource_uq8qr")])
-text = "⚡Gain Barnacle and 6 🪙"
+text = "⚡Gain Barnacle and 6🪙"
 
 [resource]
 script = ExtResource("6_0ar5r")

@@ -15,7 +15,7 @@ func apply(ctx: EffectContext) -> void:
 
 
 func describe() -> String:
-	return "%sGain %d 🪙 for every %s" % [_who(), per, String(stat).replace("_", " ")]
+	return "%s+%d🪙 for every %s" % [_who(), per, String(stat).replace("_", " ")]
 
 
 func ai_score() -> float:

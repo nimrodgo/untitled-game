@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://rqam2b0gbloj"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_3fu4m"]
-[ext_resource type="Script" path="res://scripts/data/effects/next_buy_to_hand_effect.gd" id="2_kxya4"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_y2xac"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_3fu4m"]
+[ext_resource type="Script" uid="uid://djrtep6ds448g" path="res://scripts/data/effects/next_buy_to_hand_effect.gd" id="2_kxya4"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_y2xac"]
 
 [sub_resource type="Resource" id="Resource_hjdat"]
 script = ExtResource("2_kxya4")
@@ -14,4 +14,3 @@ display_name = "Rush Order"
 instant = true
 on_play = Array[ExtResource("1_3fu4m")]([SubResource("Resource_hjdat")])
 on_play_text = "⚡The next card you buy is drawn immediately"
-tags = PackedStringArray()

@@ -9,7 +9,7 @@ func apply(ctx: EffectContext) -> void:
 
 
 func describe() -> String:
-	return "%sGain %d 🪙" % [_who(), amount]
+	return "%s+%d🪙" % [_who(), amount]
 
 
 func ai_score() -> float:

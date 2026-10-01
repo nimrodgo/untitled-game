@@ -83,6 +83,7 @@ func _init(encounter_data: EncounterData, loadout: LoadoutData) -> void:
 
 
 func start() -> void:
+	shop.trinket_weight = _trinket_weight
 	shop.setup(data, rng)
 	_shuffle(player.draw_pile)
 	log_line("[b]%s[/b] — have %d coins after %d rounds." % [data.display_name, data.coin_target, data.rounds])
@@ -160,11 +161,43 @@ func can_buy_item(slot: int) -> bool:
 	return it != null and player.coins >= it.cost
 
 
+## Buying a trinket you already own upgrades it (for its next upgrade cost);
+## a new one needs a free slot (GameRules.MAX_TRINKETS).
 func can_buy_trinket(slot: int) -> bool:
 	if not is_player_turn() or slot < 0 or slot >= shop.trinkets.size():
 		return false
 	var t: TrinketData = shop.trinkets[slot]
-	return t != null and player.coins >= t.cost
+	if t == null:
+		return false
+	var owned := owned_trinket(t)
+	if owned:
+		return owned.can_upgrade() and player.coins >= owned.upgrade_cost()
+	return player.trinkets.size() < GameRules.MAX_TRINKETS and player.coins >= t.cost
+
+
+## Your copy of this trinket, or null.
+func owned_trinket(td: TrinketData) -> TrinketInstance:
+	for t in player.trinkets:
+		if t.data == td or (td.id != &"" and t.data.id == td.id):
+			return t
+	return null
+
+
+## What buying this market trinket would cost you right now.
+func trinket_buy_cost(td: TrinketData) -> int:
+	var owned := owned_trinket(td)
+	return owned.upgrade_cost() if owned and owned.can_upgrade() else td.cost
+
+
+func can_sell_trinket(idx: int) -> bool:
+	return is_player_turn() and idx >= 0 and idx < player.trinkets.size()
+
+
+func _trinket_weight(td: TrinketData) -> float:
+	var owned := owned_trinket(td)
+	if owned == null:
+		return 1.0
+	return 2.0 if owned.can_upgrade() else 0.0
 
 
 func can_use_trinket(idx: int) -> bool:
@@ -175,13 +208,6 @@ func can_use_trinket(idx: int) -> bool:
 		if e and not e.can_pay(ctx):
 			return false
 	return true
-
-
-func can_upgrade_trinket(idx: int) -> bool:
-	if not is_player_turn() or idx >= player.trinkets.size():
-		return false
-	var t := player.trinkets[idx]
-	return t.can_upgrade() and player.coins >= t.upgrade_cost()
 
 
 func can_buy_enhancement(slot: int, card: CardInstance = null) -> bool:
@@ -220,24 +246,34 @@ func buy_item(slot: int) -> bool:
 func buy_trinket(slot: int) -> bool:
 	if not can_buy_trinket(slot):
 		return false
-	var t := shop.take_trinket(slot)
-	player.coins -= t.cost
-	player.trinkets.append(TrinketInstance.new(t))
-	log_line("You buy trinket [color=#ffd166]%s[/color]." % t.display_name)
+	var td := shop.take_trinket(slot)
+	var owned := owned_trinket(td)
+	if owned:
+		var cost := owned.upgrade_cost()
+		player.coins -= cost
+		owned.paid += cost
+		owned.level += 1
+		log_line("You upgrade trinket [color=#ffd166]%s[/color]." % owned.get_name())
+	else:
+		player.coins -= td.cost
+		player.trinkets.append(TrinketInstance.new(td))
+		log_line("You buy trinket [color=#ffd166]%s[/color]." % td.display_name)
 	_begin_action()
 	_finish_action_if(GameRules.TRINKET_BUY_IS_ACTION, false)
 	return true
 
 
-func upgrade_trinket(idx: int) -> bool:
-	if not can_upgrade_trinket(idx):
+## Sell a trinket for half of everything you paid for it (rounded down).
+## A free action by default (GameRules.TRINKET_SELL_IS_ACTION).
+func sell_trinket(idx: int) -> bool:
+	if not can_sell_trinket(idx):
 		return false
 	var t := player.trinkets[idx]
-	player.coins -= t.upgrade_cost()
-	t.level += 1
-	log_line("You upgrade %s." % t.get_name())
+	player.trinkets.remove_at(idx)
+	log_line("You sell trinket [color=#ffd166]%s[/color]." % t.get_name())
+	change_coins(player, t.sell_value(), "sale")
 	_begin_action()
-	_finish_action_if(GameRules.TRINKET_UPGRADE_IS_ACTION, false)
+	_finish_action_if(GameRules.TRINKET_SELL_IS_ACTION, false)
 	return true
 
 

@@ -10,7 +10,7 @@ func apply(ctx: EffectContext) -> void:
 
 
 func describe() -> String:
-	return "Draw %d 🂠 at the start of your next turn" % amount
+	return "%s at the start of your next turn" % Icons.n(amount, "🂠")
 
 
 func ai_score() -> float:

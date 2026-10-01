@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://bkv567r60wk18"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_8516y"]
-[ext_resource type="Script" path="res://scripts/data/effects/pay_coins_effect.gd" id="2_uin8w"]
-[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="3_6tlb6"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_ksba6"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_8516y"]
+[ext_resource type="Script" uid="uid://ggw16a8n3int" path="res://scripts/data/effects/pay_coins_effect.gd" id="2_uin8w"]
+[ext_resource type="Script" uid="uid://8karyx1sco5o" path="res://scripts/data/effects/draw_cards_effect.gd" id="3_6tlb6"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="4_ksba6"]
 
 [sub_resource type="Resource" id="Resource_unhhe"]
 script = ExtResource("2_uin8w")
@@ -18,5 +18,4 @@ script = ExtResource("4_ksba6")
 id = &"invest"
 display_name = "Invest"
 on_play = Array[ExtResource("1_8516y")]([SubResource("Resource_unhhe"), SubResource("Resource_5wips")])
-on_play_text = "Pay 2 🪙 ➡ Draw 3 🂠"
-tags = PackedStringArray()
+on_play_text = "Pay 🪙🪙 ➡ 🂠🂠🂠"

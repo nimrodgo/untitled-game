@@ -14,6 +14,7 @@ const COST := "➡"    ## separates a cost from what it pays for
 const DESTROY := "🔥"
 const REMOVE := "🗑"
 const REFRESH := "↺"
+const RETAIN := "📌"   ## keep a card in hand at the end of the turn
 ## Alternative spellings that draw the same icon.
 const ALIASES := {"🗲": "⚡"}
 
@@ -47,12 +48,37 @@ const SVG := {
 		<path d="M12 8 V5 H20 V8" fill="none" stroke="#9fc3cf" stroke-width="2.2" stroke-linejoin="round"/>
 		<path d="M8 11 H24 L22.5 28 H9.5 Z" fill="#6f8f9c" stroke="#243c48" stroke-width="2" stroke-linejoin="round"/>
 		<path d="M13 14 V25 M16 14 V25 M19 14 V25" stroke="#243c48" stroke-width="1.6"/></svg>""",
+	"📌": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+		<path d="M11 4 H21 L20 13 L25 19 H7 L12 13 Z" fill="#ff9f7a" stroke="#8a2a10" stroke-width="2.2" stroke-linejoin="round"/>
+		<path d="M16 19 V29" stroke="#8a2a10" stroke-width="2.8" stroke-linecap="round"/></svg>""",
 	"↺": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-		<path d="M9 9 A10 10 0 1 1 6.5 18" fill="none" stroke="#7fe3d0" stroke-width="3.4" stroke-linecap="round"/>
-		<path d="M4 4 L9.5 9.5 L3.5 12" fill="none" stroke="#7fe3d0" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>""",
+		<path d="M11.8 6.9 A10 10 0 1 0 21.7 7.8" fill="none" stroke="#7fe3d0" stroke-width="3.4" stroke-linecap="round"/>
+		<path d="M18.5 5.5 L25.1 4.7 L20 12.1 Z" fill="#7fe3d0" stroke="#7fe3d0" stroke-width="2" stroke-linejoin="round"/></svg>""",
+}
+
+## What each icon means (shown as a hover pop-up).
+const TIPS := {
+	"🪙": "Coins", "🂠": "Card — draw", "⚡": "Instant — free action, doesn't end your turn",
+	"🛍": "On buy — happens when you buy it", "⤵": "Discard", "➡": "Pay what's on the left to get what's on the right",
+	"🔥": "Destroy — gone for good", "🗑": "Remove — gone for this encounter", "↺": "Refresh", "📌": "Retain — keep the card in your hand at the end of the turn",
 }
 
 static var _cache := {}
+
+
+## Amount + icon for card-ish verbs: 1 is implied ("⤵", "3⤵").
+static func n(amount: int, icon: String) -> String:
+	return icon if amount == 1 else "%d%s" % [amount, icon]
+
+
+## The distinct icons used in `text` (after symbolizing), in order of appearance.
+static func icons_in(text: String) -> Array:
+	var out: Array = []
+	for ch in text:
+		var t: String = ALIASES.get(ch, ch)
+		if TIPS.has(t) and not out.has(t):
+			out.append(t)
+	return out
 
 
 static func texture(token: String) -> Texture2D:
@@ -76,7 +102,8 @@ static func append(r: RichTextLabel, text: String, icon_size: int) -> void:
 			if buf != "":
 				r.append_text(buf)
 				buf = ""
-			r.add_image(texture(ch), icon_size, icon_size, Color.WHITE, INLINE_ALIGNMENT_CENTER)
+			r.add_image(texture(ch), icon_size, icon_size, Color.WHITE, INLINE_ALIGNMENT_CENTER,
+				Rect2(), null, false, "")
 		else:
 			buf += ch
 	if buf != "":
@@ -97,7 +124,9 @@ static func rich_label(text: String, font_size: int, color: Color) -> RichTextLa
 	r.fit_content = true
 	r.scroll_active = false
 	r.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	r.mouse_filter = Control.MOUSE_FILTER_PASS   # lets icon tooltips show; clicks still reach the parent
+	r.selection_enabled = false
+	r.context_menu_enabled = false
 	for key in ["normal_font_size", "bold_font_size", "italics_font_size", "bold_italics_font_size"]:
 		r.add_theme_font_size_override(key, font_size)
 	r.add_theme_color_override("default_color", color)

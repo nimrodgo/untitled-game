@@ -19,7 +19,7 @@ func is_cost() -> bool:
 
 
 func describe() -> String:
-	return "Pay %d 🪙" % amount
+	return "-%d🪙" % amount
 
 
 func ai_score() -> float:

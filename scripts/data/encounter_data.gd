@@ -17,8 +17,8 @@ extends Resource
 @export var trinket_pool: Array[TrinketData] = []
 @export var enhancement_pool: Array[EnhancementData] = []
 @export var card_slots: int = 5
-@export var item_slots: int = 2
-@export var trinket_slots: int = 1
+@export var item_slots: int = 1
+@export var trinket_slots: int = 2
 @export var enhancement_slots: int = 1
 ## Legacy: refill a card slot immediately when it's bought (off = restock per round).
 @export var refill_card_slots: bool = false

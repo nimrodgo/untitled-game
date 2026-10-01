@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://djg7gf6dnckyr"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_7fgqu"]
-[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="2_gu5bq"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_qh11t"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_7fgqu"]
+[ext_resource type="Script" uid="uid://4udkm66plln6" path="res://scripts/data/effects/trash_cards_effect.gd" id="2_gu5bq"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_qh11t"]
 
 [sub_resource type="Resource" id="Resource_e5hfx"]
 script = ExtResource("2_gu5bq")
@@ -14,5 +14,4 @@ script = ExtResource("3_qh11t")
 id = &"pawn"
 display_name = "Pawn"
 on_play = Array[ExtResource("1_7fgqu")]([SubResource("Resource_e5hfx")])
-on_play_text = "Destroy 1 🔥 in hand. Gain 🪙 equal to its cost"
-tags = PackedStringArray()
+on_play_text = "🔥 from hand. Gain 🪙 equal to its cost"

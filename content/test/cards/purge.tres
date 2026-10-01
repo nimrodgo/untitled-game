@@ -1,17 +1,17 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://qgpwpy6fswa5"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_7jqd5"]
-[ext_resource type="Script" path="res://scripts/data/effects/effect_option.gd" id="2_qrun0"]
-[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="3_n5ard"]
-[ext_resource type="Script" path="res://scripts/data/effects/choose_one_effect.gd" id="4_8g6eb"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="5_kucm3"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_7jqd5"]
+[ext_resource type="Script" uid="uid://bigojjehyrp7k" path="res://scripts/data/effects/effect_option.gd" id="2_qrun0"]
+[ext_resource type="Script" uid="uid://4udkm66plln6" path="res://scripts/data/effects/trash_cards_effect.gd" id="3_n5ard"]
+[ext_resource type="Script" uid="uid://bgg5ex8skfref" path="res://scripts/data/effects/choose_one_effect.gd" id="4_8g6eb"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="5_kucm3"]
 
 [sub_resource type="Resource" id="Resource_qpmdh"]
 script = ExtResource("3_n5ard")
 
 [sub_resource type="Resource" id="Resource_7cp2b"]
 script = ExtResource("2_qrun0")
-label = "Destroy 1 🔥"
+label = "🔥"
 effects = Array[ExtResource("1_7jqd5")]([SubResource("Resource_qpmdh")])
 
 [sub_resource type="Resource" id="Resource_3mop5"]
@@ -21,7 +21,7 @@ amount = 2
 
 [sub_resource type="Resource" id="Resource_ks02l"]
 script = ExtResource("2_qrun0")
-label = "Remove 2 🗑"
+label = "🗑🗑"
 effects = Array[ExtResource("1_7jqd5")]([SubResource("Resource_3mop5")])
 
 [sub_resource type="Resource" id="Resource_bxe20"]
@@ -34,5 +34,4 @@ id = &"purge"
 display_name = "Purge"
 cost = 2
 on_play = Array[ExtResource("1_7jqd5")]([SubResource("Resource_bxe20")])
-on_play_text = "Destroy 1 🔥 OR Remove 2 🗑"
-tags = PackedStringArray()
+on_play_text = "🔥 OR 🗑🗑"

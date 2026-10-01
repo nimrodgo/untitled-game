@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="TrinketData" format=3]
+[gd_resource type="Resource" script_class="TrinketData" format=3 uid="uid://rrx236n6gbyr"]
 
-[ext_resource type="Script" path="res://scripts/data/trinket_level.gd" id="1_fvu3o"]
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_34x4p"]
-[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="3_kvv7x"]
-[ext_resource type="Script" path="res://scripts/data/effects/discard_cards_effect.gd" id="4_bwuvo"]
-[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="5_vi5uu"]
+[ext_resource type="Script" uid="uid://dvhdcguit2rs0" path="res://scripts/data/trinket_level.gd" id="1_fvu3o"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="2_34x4p"]
+[ext_resource type="Script" uid="uid://8karyx1sco5o" path="res://scripts/data/effects/draw_cards_effect.gd" id="3_kvv7x"]
+[ext_resource type="Script" uid="uid://0lmn2ygf8v1j" path="res://scripts/data/effects/discard_cards_effect.gd" id="4_bwuvo"]
+[ext_resource type="Script" uid="uid://bldvg83fphc0b" path="res://scripts/data/trinket_data.gd" id="5_vi5uu"]
 
 [sub_resource type="Resource" id="Resource_ekuxh"]
 script = ExtResource("3_kvv7x")
@@ -16,7 +16,7 @@ script = ExtResource("4_bwuvo")
 script = ExtResource("1_fvu3o")
 upgrade_cost = 0
 effects = Array[ExtResource("2_34x4p")]([SubResource("Resource_ekuxh"), SubResource("Resource_dsti3")])
-text = "⚡Draw 1 🂠. Discard 1 ⤵"
+text = "⚡🂠⤵"
 
 [sub_resource type="Resource" id="Resource_ctmxn"]
 script = ExtResource("3_kvv7x")
@@ -28,7 +28,7 @@ script = ExtResource("4_bwuvo")
 [sub_resource type="Resource" id="Resource_34x3f"]
 script = ExtResource("1_fvu3o")
 effects = Array[ExtResource("2_34x4p")]([SubResource("Resource_ctmxn"), SubResource("Resource_flqfv")])
-text = "⚡Draw 2 🂠. Discard 1 ⤵"
+text = "⚡🂠🂠⤵"
 
 [sub_resource type="Resource" id="Resource_bdsjq"]
 script = ExtResource("3_kvv7x")
@@ -41,7 +41,7 @@ script = ExtResource("4_bwuvo")
 script = ExtResource("1_fvu3o")
 upgrade_cost = 4
 effects = Array[ExtResource("2_34x4p")]([SubResource("Resource_bdsjq"), SubResource("Resource_8fha4")])
-text = "⚡Draw 3 🂠. Discard 1 ⤵"
+text = "⚡🂠🂠🂠⤵"
 
 [resource]
 script = ExtResource("5_vi5uu")

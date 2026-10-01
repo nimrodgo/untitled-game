@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="ItemData" format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cdp7dj1erqywg"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_mn4bx"]
-[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_1jg8j"]
-[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="3_xbky0"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_mn4bx"]
+[ext_resource type="Script" uid="uid://8karyx1sco5o" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_1jg8j"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="3_xbky0"]
 
 [sub_resource type="Resource" id="Resource_yxnqg"]
 script = ExtResource("2_1jg8j")
@@ -14,4 +14,4 @@ display_name = "Recycler"
 cost = 4
 trigger = 18
 effects = Array[ExtResource("1_mn4bx")]([SubResource("Resource_yxnqg")])
-description = "When you remove 🗑 or destroy 🔥 a card in your hand, draw 1 🂠"
+description = "When you 🗑 or 🔥 a card in your hand, 🂠"

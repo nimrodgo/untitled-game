@@ -13,12 +13,13 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 │ │ │ Pinch  Steal 1 🪙           │ │   │  [item] [item]    [trinket]                     │
 │ │ └─────────────────────────────┘ │   ├─────────────────────────────────────────────────┤
 │ └─────────────────────────────────┘   │        ╭hand fanned 5 cards╮     [deck] [Pass]  │
-│ TRINKETS [Coin Trinket]  ITEMS [ + ]  │                                                 │
+│ TRINKETS ▢▢▢ (3 frames)  ITEMS [ + ]  │                                                 │
 │ [Log] [Fullscreen] [Exit*]            │                                                 │
 └───────────────────────────────────────┴─────────────────────────────────────────────────┘
 * Exit is hidden on web.
 ```
 
+- The Trinkets panel always shows **3 frames** (the trinket limit): owned trinkets fill them, the rest are empty dashed "+" slots. A market trinket you can't fit is greyed out. A market trinket you **already own** is shown as its **next level**, tinted purple, at the upgrade price.
 - Market tiles **resize to fit the screen**. Cards take about 58% of the market's height when there's a gear row. `_fill_shop()` does the math.
 - If the screen is in portrait, a **"Please rotate"** overlay covers everything (`_check_orientation`).
 - **Fullscreen** on the web also tries `screen.orientation.lock('landscape')`.
@@ -29,11 +30,12 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 |---|---|---|
 | Drag a hand card out of the hand area | Play it | The card grows and turns gold once releasing would play it, then pops above the hand |
 | Drag a market card onto the **deck** | Buy it | The deck pulses while you drag and glows on hover. The card shrinks as it flies in. |
-| Drag an item or trinket onto its **slot panel** | Buy it | Same, with the Items or Trinkets panel |
-| Tap anything | Inspect popup, with action buttons (Play / Buy / Use / Upgrade) | — |
+| Drag an item or trinket onto its **slot panel** | Buy it (a trinket you own: upgrade it) | Same, with the Items or Trinkets panel |
+| Drag one of your **trinkets onto the market** | Sell it (free action) | The market panel pulses, glows gold on hover; the dragged tile shows the coins you'd get (+N) |
+| Tap anything | Inspect popup, with action buttons (Play / Buy / Upgrade / Use) | — |
 | Tap the deck | Deck viewer (the draw pile is sorted so it doesn't reveal the order), hand, played cards, discard | — |
 | Tap the intent bubble | The next 4 intents, and actions left | — |
-| Upgrade → "Choose card" → tap a hand card | Enhance it | Hand cards get a gold highlight |
+| Upgrade (enhancement) → "Choose card" → tap a hand card | Enhance it | Hand cards get a gold highlight |
 | A card asks you to pick cards **in your hand** | Tap cards to pick them, then **Confirm** (single picks confirm on tap) | Candidates stay bright, others dim; picked cards lift and glow gold. A bar above the hand shows the verb + icon and the count. |
 | Any other choice (deck / discard / market / trinkets / "X OR Y") | A picker popup: tap to pick, **Confirm** or **Skip** | Shows the source card, the verb + icon, cards grouped by pile. It can't be closed without answering. |
 | Hover (desktop) | The hand card lifts; market tiles grow slightly | — |

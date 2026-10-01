@@ -23,11 +23,11 @@ func apply(ctx: EffectContext) -> void:
 
 
 func describe() -> String:
-	var n := "a card" if amount == 1 else "%d cards" % amount
+	var n := Icons.n(amount, "🂠")
 	match source:
-		Source.BOTTOM: return "%sDraw %s from the bottom of your deck" % [_who(), n]
-		Source.DISCARD_CHOOSE: return "%sDraw %s from the discard pile" % [_who(), n]
-	return "%sDraw %d 🂠" % [_who(), amount]
+		Source.BOTTOM: return "%s%s from the bottom of your deck" % [_who(), n]
+		Source.DISCARD_CHOOSE: return "%s%s from the discard pile" % [_who(), n]
+	return "%s%s" % [_who(), n]
 
 
 func ai_score() -> float:

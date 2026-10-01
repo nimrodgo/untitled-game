@@ -48,13 +48,17 @@ const DEFAULT_BUY_DESTINATION := Zone.DRAW_SHUFFLE
 const DISCARD_HAND_AT_ROUND_END := true
 ## Trinkets: usable once per turn (= once per round).
 const TRINKET_LIMIT := TrinketLimit.PER_TURN
+## You can own at most this many trinkets. Buying the same trinket again
+## upgrades it instead; sell one to make room for a new one.
+const MAX_TRINKETS := 3
 
 ## Which purchases use up your one action for the turn.
 const CARD_BUY_IS_ACTION := true
 const ITEM_BUY_IS_ACTION := true
 const TRINKET_BUY_IS_ACTION := true
-const TRINKET_UPGRADE_IS_ACTION := true
 const ENHANCEMENT_BUY_IS_ACTION := true
+## Selling a trinket (drag it onto the market) is a free action.
+const TRINKET_SELL_IS_ACTION := false
 
 ## The enemy answers each of your actions with its next intent, until it has
 ## used EnemyData.actions_per_round for this round.

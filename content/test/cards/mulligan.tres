@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://rijgaf0q2xk7"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_cj48i"]
-[ext_resource type="Script" path="res://scripts/data/effects/discard_cards_effect.gd" id="2_y5xsa"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_t7kp1"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_cj48i"]
+[ext_resource type="Script" uid="uid://0lmn2ygf8v1j" path="res://scripts/data/effects/discard_cards_effect.gd" id="2_y5xsa"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_t7kp1"]
 
 [sub_resource type="Resource" id="Resource_6g3k3"]
 script = ExtResource("2_y5xsa")
@@ -15,4 +15,3 @@ id = &"mulligan"
 display_name = "Mulligan"
 on_play = Array[ExtResource("1_cj48i")]([SubResource("Resource_6g3k3")])
 on_play_text = "Discard your hand ⤵. Draw that many 🂠"
-tags = PackedStringArray()

@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://cc8xutmabvi5"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_tbxdx"]
-[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_7obv3"]
-[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="3_a46l6"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_i0w8d"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_tbxdx"]
+[ext_resource type="Script" uid="uid://8karyx1sco5o" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_7obv3"]
+[ext_resource type="Script" uid="uid://4udkm66plln6" path="res://scripts/data/effects/trash_cards_effect.gd" id="3_a46l6"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="4_i0w8d"]
 
 [sub_resource type="Resource" id="Resource_rk1if"]
 script = ExtResource("2_7obv3")
@@ -20,5 +20,4 @@ script = ExtResource("4_i0w8d")
 id = &"dig"
 display_name = "Dig"
 on_play = Array[ExtResource("1_tbxdx")]([SubResource("Resource_rk1if"), SubResource("Resource_2x5j1")])
-on_play_text = "Draw 1 🂠 from the discard pile and remove 🗑 this"
-tags = PackedStringArray()
+on_play_text = "🂠 from the discard pile and 🗑 this"

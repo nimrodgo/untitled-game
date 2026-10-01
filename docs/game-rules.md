@@ -41,8 +41,8 @@ flowchart TD
 | Free (the enemy doesn't respond) | Normal (the enemy responds if it has pips left) |
 |---|---|
 | Play an **instant** (⚡) card | Play a non-instant card |
-| Use a **trinket** (once per turn each) | Buy a card, item, trinket or upgrade |
-| | Upgrade a trinket |
+| Use a **trinket** (once per turn each) | Buy a card, item, trinket (or its upgrade) or upgrade (enhancement) |
+| **Sell** a trinket | |
 
 - Which purchases count as actions is set by the `*_IS_ACTION` flags in `GameRules` (all `true` right now).
 - An **extra action** effect (`ExtraActionEffect`) skips the enemy's response to that action.
@@ -77,6 +77,13 @@ flowchart TD
 **Play a card:** it leaves your hand → its on-play effects resolve (including any enhancement effects) → it goes **in play** → `CARD_PLAYED` / `OPPONENT_CARD_PLAYED` fire → the enemy may respond, unless the card is instant.
 
 **Upgrade (enhancement):** pay, then pick a card **in your hand**. The upgrade attaches to that card instance: it adds on-play effects and/or makes the card instant, and the card's name gets a `+`.
+
+## Trinkets: buy, upgrade, sell
+
+- You can own at most **3 trinkets** (`GameRules.MAX_TRINKETS`). The Trinkets panel always shows 3 frames; the free ones are empty.
+- The market has **2 trinket slots** and **1 item slot** in the test encounter. Trinket slots are **rerolled every round** from the whole pool, and trinkets you own (and can still upgrade) are **twice as likely**. A trinket you own at its top level never appears.
+- **Buying a trinket you already own upgrades it** (no second copy). It costs the **next level's `upgrade_cost`**, and the market tile shows that next level in purple. A **new** trinket costs its base cost and needs a free slot, so with 3 trinkets it's greyed out.
+- **Selling:** drag a trinket onto the market. You get **half of everything you paid for it** (purchase + upgrades), rounded down. It's a **free action** (`TRINKET_SELL_IS_ACTION = false`) and frees the slot.
 
 ## Choices
 
@@ -123,7 +130,9 @@ Curses are cards with `curse = true`, usually **unplayable**, and shown in dark 
 | `DEFAULT_BUY_DESTINATION` | `DRAW_SHUFFLE` | Where bought cards go |
 | `DISCARD_HAND_AT_ROUND_END` | true | Whether you keep unplayed cards between rounds |
 | `TRINKET_LIMIT` | `PER_TURN` | `PER_ACTION` would reset trinkets after every action |
-| `CARD/ITEM/TRINKET_BUY_IS_ACTION`, `TRINKET_UPGRADE_IS_ACTION`, `ENHANCEMENT_BUY_IS_ACTION` | all true | Whether each purchase uses an action (and lets the enemy respond) |
+| `CARD/ITEM/TRINKET_BUY_IS_ACTION`, `ENHANCEMENT_BUY_IS_ACTION` | all true | Whether each purchase uses an action (and lets the enemy respond). Buying a trinket duplicate (an upgrade) counts as a trinket buy. |
+| `TRINKET_SELL_IS_ACTION` | false | Selling a trinket is free |
+| `MAX_TRINKETS` | 3 | Trinket slots you can own |
 | `ENEMY_STEP_DELAY` | 0.6 s | UI pause before the enemy's intent resolves |
 
 Per-encounter settings (rounds, target, slots, pools, seed) are in `EncounterData`. Per-enemy settings (`actions_per_round`) are in `EnemyData`. See [content-design.md](content-design.md).

@@ -69,7 +69,7 @@ static func make(title: String, cost: int, body: String, bg: Color = Palette.CAR
 		top.add_child(coin)
 
 	if tag != "":
-		vb.add_child(_label(tag, int(13 * k), Palette.KELP))
+		vb.add_child(Icons.rich_label(tag, int(13 * k), Palette.KELP))
 
 	var body_l := Icons.rich_label(body, int(16 * k), Palette.FOAM.darkened(0.08))
 	body_l.size_flags_vertical = Control.SIZE_EXPAND_FILL

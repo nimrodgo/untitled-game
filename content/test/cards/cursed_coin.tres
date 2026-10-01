@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://cs2obkqdr5fsy"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_u3tay"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_u3tay"]
 [ext_resource type="Resource" path="res://content/test/curses/barnacle.tres" id="2_qjpqx"]
-[ext_resource type="Script" path="res://scripts/data/effects/add_card_effect.gd" id="3_mcfc1"]
-[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="4_osgvh"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="5_ufcs7"]
+[ext_resource type="Script" uid="uid://bs8xb6e8kjq6f" path="res://scripts/data/effects/add_card_effect.gd" id="3_mcfc1"]
+[ext_resource type="Script" uid="uid://dow1kbluxxx0s" path="res://scripts/data/effects/gain_coins_effect.gd" id="4_osgvh"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="5_ufcs7"]
 
 [sub_resource type="Resource" id="Resource_dqhr8"]
 script = ExtResource("3_mcfc1")
@@ -20,5 +20,4 @@ id = &"cursed_coin"
 display_name = "Cursed Coin"
 cost = 0
 on_play = Array[ExtResource("1_u3tay")]([SubResource("Resource_dqhr8"), SubResource("Resource_ko7nx")])
-on_play_text = "Gain Barnacle and 2 🪙"
-tags = PackedStringArray()
+on_play_text = "Gain Barnacle and 🪙🪙"

@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://rc4d8b8fvmn6"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_a4if2"]
-[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_7fbkh"]
-[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="3_xrrux"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_b7khv"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_a4if2"]
+[ext_resource type="Script" uid="uid://8karyx1sco5o" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_7fbkh"]
+[ext_resource type="Script" uid="uid://4udkm66plln6" path="res://scripts/data/effects/trash_cards_effect.gd" id="3_xrrux"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="4_b7khv"]
 
 [sub_resource type="Resource" id="Resource_88kkb"]
 script = ExtResource("2_7fbkh")
@@ -19,5 +19,4 @@ script = ExtResource("4_b7khv")
 id = &"prune"
 display_name = "Prune"
 on_play = Array[ExtResource("1_a4if2")]([SubResource("Resource_88kkb"), SubResource("Resource_s644p")])
-on_play_text = "Draw 2 🂠. Remove 1 🗑 in hand"
-tags = PackedStringArray()
+on_play_text = "🂠🂠. 🗑 from hand"

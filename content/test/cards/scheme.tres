@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://c8fhvf00i8eqo"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_3jvgk"]
-[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_qpxbo"]
-[ext_resource type="Script" path="res://scripts/data/effects/move_cards_effect.gd" id="3_pjaqw"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_vaoqi"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_3jvgk"]
+[ext_resource type="Script" uid="uid://8karyx1sco5o" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_qpxbo"]
+[ext_resource type="Script" uid="uid://i1fb3hpm2bp2" path="res://scripts/data/effects/move_cards_effect.gd" id="3_pjaqw"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="4_vaoqi"]
 
 [sub_resource type="Resource" id="Resource_pwrlg"]
 script = ExtResource("2_qpxbo")
@@ -20,5 +20,4 @@ script = ExtResource("4_vaoqi")
 id = &"scheme"
 display_name = "Scheme"
 on_play = Array[ExtResource("1_3jvgk")]([SubResource("Resource_pwrlg"), SubResource("Resource_vcpoe")])
-on_play_text = "Draw 3 🂠. Put a card in your hand on top of the draw pile"
-tags = PackedStringArray()
+on_play_text = "🂠🂠🂠. Put a card in your hand on top of the draw pile"

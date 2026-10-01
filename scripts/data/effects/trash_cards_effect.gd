@@ -64,13 +64,13 @@ func describe() -> String:
 		What.ALL_OTHER_HAND: t = "%s all other cards %s in hand" % [verb, icon]
 		What.DRAW_PILE: t = "%s your deck %s" % [verb, icon]
 		_:
-			t = "%s %d %s%s" % [verb, amount, icon, " curse" if curses_only else ""]
+			t = "%s%s" % [Icons.n(amount, icon), " curse" if curses_only else ""]
 			if piles == GameRules.PILE_HAND:
 				t += " in hand"
 	if coins_per_card > 0:
-		t += ". Gain %d 🪙 for each" % coins_per_card
+		t += ". +%d🪙 for each" % coins_per_card
 	if gain_cost_as_coins:
-		t += ". Gain 🪙 equal to its cost"
+		t += ". +🪙 equal to its cost"
 	return t
 
 

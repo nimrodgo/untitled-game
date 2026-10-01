@@ -11,10 +11,29 @@ script = ExtResource("3_ydh2x")
 [sub_resource type="Resource" id="Resource_0m0jb"]
 script = ExtResource("1_croky")
 effects = Array[ExtResource("2_vq3q8")]([SubResource("Resource_h26x5")])
-text = "⚡Gain 1 🪙"
+text = "⚡🪙"
+
+[sub_resource type="Resource" id="Resource_c2"]
+script = ExtResource("3_ydh2x")
+amount = 2
+
+[sub_resource type="Resource" id="Resource_lv2"]
+script = ExtResource("1_croky")
+effects = Array[ExtResource("2_vq3q8")]([SubResource("Resource_c2")])
+text = "⚡🪙🪙"
+
+[sub_resource type="Resource" id="Resource_c3"]
+script = ExtResource("3_ydh2x")
+amount = 3
+
+[sub_resource type="Resource" id="Resource_lv3"]
+script = ExtResource("1_croky")
+upgrade_cost = 4
+effects = Array[ExtResource("2_vq3q8")]([SubResource("Resource_c3")])
+text = "⚡🪙🪙🪙"
 
 [resource]
 script = ExtResource("4_qvlun")
 id = &"coin_trinket"
 display_name = "Coin Trinket"
-levels = Array[ExtResource("1_croky")]([SubResource("Resource_0m0jb")])
+levels = Array[ExtResource("1_croky")]([SubResource("Resource_0m0jb"), SubResource("Resource_lv2"), SubResource("Resource_lv3")])

@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://bnhydtaxti4va"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_nwem0"]
-[ext_resource type="Script" path="res://scripts/data/effects/buy_card_effect.gd" id="2_51e0g"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_7l1bp"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_nwem0"]
+[ext_resource type="Script" uid="uid://dkswjgn5ega1g" path="res://scripts/data/effects/buy_card_effect.gd" id="2_51e0g"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_7l1bp"]
 
 [sub_resource type="Resource" id="Resource_4e02g"]
 script = ExtResource("2_51e0g")
@@ -14,4 +14,3 @@ id = &"salvage"
 display_name = "Salvage"
 on_play = Array[ExtResource("1_nwem0")]([SubResource("Resource_4e02g")])
 on_play_text = "Buy a card you removed 🗑 this encounter"
-tags = PackedStringArray()

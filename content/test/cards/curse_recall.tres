@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://4i1f7rpcb7t6"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_tpo0i"]
-[ext_resource type="Script" path="res://scripts/data/effects/move_cards_effect.gd" id="2_rmlja"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_qfwe6"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_tpo0i"]
+[ext_resource type="Script" uid="uid://i1fb3hpm2bp2" path="res://scripts/data/effects/move_cards_effect.gd" id="2_rmlja"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_qfwe6"]
 
 [sub_resource type="Resource" id="Resource_gj73b"]
 script = ExtResource("2_rmlja")
@@ -14,4 +14,3 @@ id = &"curse_recall"
 display_name = "Curse Recall"
 on_play = Array[ExtResource("1_tpo0i")]([SubResource("Resource_gj73b")])
 on_play_text = "Return all curses from the discard pile to your hand"
-tags = PackedStringArray()

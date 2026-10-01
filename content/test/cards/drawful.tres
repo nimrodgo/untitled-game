@@ -18,5 +18,5 @@ display_name = "Draw Synergy"
 cost = 3
 on_play = Array[ExtResource("1_diwtx")]([SubResource("Resource_bstj1")])
 on_buy = Array[ExtResource("1_diwtx")]([SubResource("Resource_bwtpk")])
-on_play_text = "Gain 1 🪙 for every card drawn this turn ([i]{cards_drawn_this_turn}[/i])"
-on_buy_text = "Draw 1 🂠"
+on_play_text = "🪙 for every card drawn this turn ([i]{cards_drawn_this_turn}[/i])"
+on_buy_text = "🂠"

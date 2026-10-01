@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="TrinketData" format=3]
+[gd_resource type="Resource" script_class="TrinketData" format=3 uid="uid://cyur1vnai1mab"]
 
-[ext_resource type="Script" path="res://scripts/data/trinket_level.gd" id="1_cnwei"]
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_262yt"]
+[ext_resource type="Script" uid="uid://dvhdcguit2rs0" path="res://scripts/data/trinket_level.gd" id="1_cnwei"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="2_262yt"]
 [ext_resource type="Resource" path="res://content/test/curses/dead_weight.tres" id="3_rxtlt"]
-[ext_resource type="Script" path="res://scripts/data/effects/add_card_effect.gd" id="4_0ilhc"]
-[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="5_3wn32"]
-[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="6_jjeqw"]
+[ext_resource type="Script" uid="uid://bs8xb6e8kjq6f" path="res://scripts/data/effects/add_card_effect.gd" id="4_0ilhc"]
+[ext_resource type="Script" uid="uid://4udkm66plln6" path="res://scripts/data/effects/trash_cards_effect.gd" id="5_3wn32"]
+[ext_resource type="Script" uid="uid://bldvg83fphc0b" path="res://scripts/data/trinket_data.gd" id="6_jjeqw"]
 
 [sub_resource type="Resource" id="Resource_wjiuu"]
 script = ExtResource("4_0ilhc")
@@ -20,7 +20,7 @@ amount = 2
 script = ExtResource("1_cnwei")
 upgrade_cost = 0
 effects = Array[ExtResource("2_262yt")]([SubResource("Resource_wjiuu"), SubResource("Resource_ja54k")])
-text = "⚡Shuffle 1 Dead Weight into your deck. Remove 2 🗑"
+text = "⚡Shuffle 1 Dead Weight into your deck. 🗑🗑"
 
 [sub_resource type="Resource" id="Resource_p4x7n"]
 script = ExtResource("4_0ilhc")
@@ -34,7 +34,7 @@ amount = 3
 [sub_resource type="Resource" id="Resource_1vul8"]
 script = ExtResource("1_cnwei")
 effects = Array[ExtResource("2_262yt")]([SubResource("Resource_p4x7n"), SubResource("Resource_noxg2")])
-text = "⚡Shuffle 1 Dead Weight into your deck. Remove 3 🗑"
+text = "⚡Shuffle 1 Dead Weight into your deck. 🗑🗑🗑"
 
 [sub_resource type="Resource" id="Resource_2t04g"]
 script = ExtResource("4_0ilhc")
@@ -50,7 +50,7 @@ amount = 4
 script = ExtResource("1_cnwei")
 upgrade_cost = 4
 effects = Array[ExtResource("2_262yt")]([SubResource("Resource_2t04g"), SubResource("Resource_waaos")])
-text = "⚡Shuffle 2 Dead Weights into your deck. Remove 4 🗑"
+text = "⚡Shuffle 2 Dead Weights into your deck. 🗑🗑🗑🗑"
 
 [resource]
 script = ExtResource("6_jjeqw")

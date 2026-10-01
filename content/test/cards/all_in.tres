@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://cukxwtr71616k"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_u4nku"]
-[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_per_stat_effect.gd" id="2_q4b77"]
-[ext_resource type="Script" path="res://scripts/data/effects/conditional_effect.gd" id="3_5qbqm"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="4_xsyre"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_u4nku"]
+[ext_resource type="Script" uid="uid://b4wv12i516tlr" path="res://scripts/data/effects/gain_coins_per_stat_effect.gd" id="2_q4b77"]
+[ext_resource type="Script" uid="uid://dqyvj85nnpldg" path="res://scripts/data/effects/conditional_effect.gd" id="3_5qbqm"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="4_xsyre"]
 
 [sub_resource type="Resource" id="Resource_qjhlu"]
 script = ExtResource("2_q4b77")
@@ -21,4 +21,3 @@ display_name = "All In"
 cost = 3
 on_play = Array[ExtResource("1_u4nku")]([SubResource("Resource_407uy")])
 on_play_text = "Double your 🪙 if your deck is empty"
-tags = PackedStringArray()

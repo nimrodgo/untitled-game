@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="ItemData" format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://olqfw038ity6"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_utcus"]
-[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_c44vg"]
-[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="3_4go5s"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_utcus"]
+[ext_resource type="Script" uid="uid://dow1kbluxxx0s" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_c44vg"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="3_4go5s"]
 
 [sub_resource type="Resource" id="Resource_fa46h"]
 script = ExtResource("2_c44vg")
@@ -15,4 +15,4 @@ display_name = "Scrap Dealer"
 cost = 4
 trigger = 16
 effects = Array[ExtResource("1_utcus")]([SubResource("Resource_fa46h")])
-description = "When you remove 🗑 a card, gain 2 🪙"
+description = "When you 🗑 a card, +2🪙"

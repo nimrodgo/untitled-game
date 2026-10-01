@@ -6,7 +6,7 @@ extends DropTarget
 signal tapped
 
 var _count_label: Label
-var _sub_label: Label
+var _sub_label: RichTextLabel
 var _backs: Array[Panel] = []
 var _pressed := false
 var _press_pos := Vector2.ZERO
@@ -44,8 +44,8 @@ func _init() -> void:
 	_count_label.add_theme_color_override("font_outline_color", Palette.ABYSS)
 	_count_label.add_theme_constant_override("outline_size", 8)
 	holder.add_child(_count_label)
-	_sub_label = CardView._label("", 13, Palette.MUTED)
-	_sub_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_sub_label = Icons.rich_label("", 13, Palette.MUTED)
+	_sub_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_sub_label.position = Vector2(0, 108)
 	_sub_label.size = Vector2(90, 20)
 	holder.add_child(_sub_label)
@@ -53,7 +53,8 @@ func _init() -> void:
 
 func set_counts(draw_count: int, discard: int) -> void:
 	_count_label.text = str(draw_count)
-	_sub_label.text = "discard %d" % discard
+	_sub_label.clear()
+	Icons.append(_sub_label, "[center]⤵ %d[/center]" % discard, 15)
 	for i in _backs.size():
 		_backs[i].visible = draw_count > i or i == 0
 
