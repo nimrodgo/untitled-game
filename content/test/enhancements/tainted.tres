@@ -13,6 +13,6 @@ make_instant = false
 extra_on_play = Array[ExtResource("1_fhbhv")]([])
 on_discard = Array[ExtResource("1_fhbhv")]([])
 retain = false
-destroy_on_play = false
+destroy_on_apply = false
 counts_as_curse = true
 description = "This card is considered a curse"

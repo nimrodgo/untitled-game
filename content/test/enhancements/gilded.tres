@@ -18,6 +18,6 @@ make_instant = false
 extra_on_play = Array[ExtResource("1_5er63")]([SubResource("Resource_did8f")])
 on_discard = Array[ExtResource("1_5er63")]([])
 retain = false
-destroy_on_play = false
+destroy_on_apply = false
 counts_as_curse = false
 description = ""

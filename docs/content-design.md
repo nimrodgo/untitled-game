@@ -56,7 +56,7 @@ If you write custom text, the auto "INSTANT" tag is hidden. Put ⚡ in the text 
 | `extra_on_play` | Effects added after the card's own on-play effects |
 | `on_discard` | Effects when an effect discards the card (not the end-of-round cleanup) |
 | `retain` | The card stays in hand at the end of every turn |
-| `destroy_on_play` | After resolving, the card is destroyed (permanently) instead of going in play |
+| `destroy_on_apply` | Buying it destroys the chosen card (permanently) on the spot; nothing is attached |
 | `counts_as_curse` | The card counts as a curse (curse triggers, curse filters) |
 | `description` | Shown on the shop tile and added to the card's text. Auto-generated if empty |
 

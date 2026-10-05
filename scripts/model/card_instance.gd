@@ -45,14 +45,6 @@ func is_retained() -> bool:
 	return false
 
 
-## Destroyed right after it resolves instead of going to the discard pile.
-func destroys_on_play() -> bool:
-	for e in enhancements:
-		if e.destroy_on_play:
-			return true
-	return false
-
-
 func get_on_discard() -> Array[Effect]:
 	var out: Array[Effect] = []
 	out.append_array(data.on_discard)

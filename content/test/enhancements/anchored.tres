@@ -13,6 +13,6 @@ make_instant = false
 extra_on_play = Array[ExtResource("1_dk56r")]([])
 on_discard = Array[ExtResource("1_dk56r")]([])
 retain = true
-destroy_on_play = false
+destroy_on_apply = false
 counts_as_curse = false
 description = "This card is 📌 while in your hand"

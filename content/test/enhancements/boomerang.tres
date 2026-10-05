@@ -17,6 +17,6 @@ make_instant = false
 extra_on_play = Array[ExtResource("1_pmek0")]([])
 on_discard = Array[ExtResource("1_pmek0")]([SubResource("Resource_3es4n")])
 retain = false
-destroy_on_play = false
+destroy_on_apply = false
 counts_as_curse = false
 description = "When this is ⤵, 🂠 it"
