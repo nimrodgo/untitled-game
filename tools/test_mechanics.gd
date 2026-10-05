@@ -15,6 +15,8 @@ func _init() -> void:
 	_smoke_every_card(data)
 	_smoke_every_item_and_trinket(data)
 	_rules(data)
+	_encounter_rules()
+	_enhancement_rules()
 	print("\n%d checks, %d failed" % [checks, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -39,8 +41,8 @@ func _trinket(id: String) -> TrinketData:
 
 ## A started encounter with a known deck; the enemy never acts (0 actions)
 ## unless `enemy_acts`.
-func _enc(deck: Array, auto := true, enemy_acts := false) -> Encounter:
-	var data: EncounterData = load(ENC).duplicate()
+func _enc(deck: Array, auto := true, enemy_acts := false, path := ENC) -> Encounter:
+	var data: EncounterData = load(path).duplicate()
 	data.rng_seed = 12345
 	if not enemy_acts:
 		var ed: EnemyData = data.enemy.duplicate()
@@ -96,7 +98,7 @@ func _consistent(e: Encounter, what: String) -> void:
 # -------------------------------------------------------------------- smoke
 
 func _smoke_every_card(data: EncounterData) -> void:
-	for cd in data.card_pool:
+	for cd in data.get_card_pool():
 		var e := _enc(["example2", "example2", "example1", "dead_weight", "leaky_purse", "example1", "example2", "barnacle"])
 		e.player.coins = 20
 		var t := TrinketInstance.new(_trinket("coin_trinket"))
@@ -122,7 +124,7 @@ func _smoke_every_card(data: EncounterData) -> void:
 
 
 func _smoke_every_item_and_trinket(data: EncounterData) -> void:
-	for it in data.item_pool:
+	for it in data.get_item_pool():
 		var e := _enc(["example2", "dead_weight", "example1", "sift", "driftwood", "prune", "spring", "example2", "hold", "study"])
 		e.player.items.append(ItemInstance.new(it))
 		var steps := 0
@@ -134,7 +136,7 @@ func _smoke_every_item_and_trinket(data: EncounterData) -> void:
 			steps += 1
 		_check(e.is_over, "item %s: encounter finishes" % it.id)
 		_consistent(e, "item %s" % it.id)
-	for td in data.trinket_pool:
+	for td in data.get_trinket_pool():
 		for lv in td.levels.size():
 			var e := _enc(["example2", "dead_weight", "example1", "example1", "example2", "example2", "example1"])
 			var t := TrinketInstance.new(td)
@@ -367,13 +369,12 @@ func _rules(_data: EncounterData) -> void:
 	_trinket_shop_rules()
 
 
-## Trinkets: 2 in the shop, max 3 owned, buy a duplicate to upgrade, sell for
+## Trinkets: 1 in the shop, max 3 owned, buy a duplicate to upgrade, sell for
 ## half of everything paid (free action), maxed ones leave the shop.
 func _trinket_shop_rules() -> void:
 	var e := _enc(["example1", "example1", "example1", "example1", "example1"], true, true)
-	_check(e.shop.trinkets.size() == 2 and e.shop.items.size() == 1, "shop: 2 trinket slots, 1 item slot")
-	_check(e.shop.trinkets[0] != null and e.shop.trinkets[1] != null and e.shop.trinkets[0] != e.shop.trinkets[1],
-		"shop: two different trinkets")
+	_check(e.shop.trinkets.size() == 1 and e.shop.items.size() == 1, "shop: 1 trinket slot, 1 item slot")
+	_check(e.shop.trinkets[0] != null, "shop: the trinket slot is filled")
 	e.player.coins = 50
 	# Buy a new one (Forge: 3 levels) into slot 0.
 	e.shop.trinkets[0] = _trinket("forge")
@@ -384,13 +385,13 @@ func _trinket_shop_rules() -> void:
 	while e.active == e.enemy:
 		e.enemy_act()
 	# Put the same trinket back in the shop: buying it upgrades yours.
-	e.shop.trinkets[1] = td
+	e.shop.trinkets[0] = td
 	var up := e.trinket_buy_cost(td)
 	_check(up == td.levels[1].upgrade_cost, "duplicate costs the next upgrade cost (%d)" % up)
 	var before := e.player.coins
 	e.player.trinkets[0].used = true
 	_check(not e.can_use_trinket(0), "a used trinket can't be used again")
-	_check(e.buy_trinket(1), "buy the duplicate")
+	_check(e.buy_trinket(0), "buy the duplicate")
 	_check(not e.player.trinkets[0].used, "upgrading refreshes a used trinket")
 	_check(e.player.trinkets.size() == 1 and e.player.trinkets[0].level == 1 and e.player.coins == before - up,
 		"duplicate upgraded the owned trinket (level %d)" % e.player.trinkets[0].level)
@@ -399,8 +400,8 @@ func _trinket_shop_rules() -> void:
 		e.enemy_act()
 	# Max level: no longer offered, can't be bought.
 	e.player.trinkets[0].level = td.levels.size() - 1
-	e.shop.trinkets[1] = td
-	_check(not e.can_buy_trinket(1), "max-level duplicate can't be bought")
+	e.shop.trinkets[0] = td
+	_check(not e.can_buy_trinket(0), "max-level duplicate can't be bought")
 	var seen_max := false
 	for i in 40:
 		e.shop.restock_trinkets()
@@ -416,23 +417,24 @@ func _trinket_shop_rules() -> void:
 		for t in e.shop.trinkets:
 			if t == td: owned_seen += 1
 			elif t != null: other_seen += 1
-	var pool_n := e.data.trinket_pool.size()
+	var pool_n := e.data.get_trinket_pool().size()
 	_check(float(owned_seen) > float(other_seen) / float(pool_n - 1) * 1.4, "owned trinkets are favoured (%d vs %.0f avg)" % [owned_seen, float(other_seen) / float(pool_n - 1)])
 
 	# Three slots max: a fourth NEW trinket can't be bought.
 	e = _enc(["example1", "example1", "example1", "example1", "example1"], true, true)
 	e.player.coins = 99
 	for i in 3:
-		var t := TrinketInstance.new(e.data.trinket_pool[i])
+		var t := TrinketInstance.new(e.data.get_trinket_pool()[i])
 		e.player.trinkets.append(t)
 	var fresh := -1
 	for s in e.shop.trinkets.size():
-		e.shop.trinkets[s] = e.data.trinket_pool[5 + s]
+		e.shop.trinkets[s] = e.data.get_trinket_pool()[5 + s]
 		fresh = s
 	_check(not e.can_buy_trinket(fresh), "full slots: can't buy a new trinket")
 	# ...but an upgrade of an owned one is fine.
-	e.shop.trinkets[0] = e.data.trinket_pool[1]
+	e.shop.trinkets[0] = e.data.get_trinket_pool()[1]
 	_check(e.can_buy_trinket(0), "full slots: upgrading an owned trinket is allowed")
+	e.shop.trinkets[0] = e.data.get_trinket_pool()[5 + 0]
 
 	# Selling: half of everything paid, rounded down, free action, frees a slot.
 	var t0: TrinketInstance = e.player.trinkets[1]
@@ -452,3 +454,342 @@ func _count_id(arr: Array, id: String) -> int:
 		if c.data.id == StringName(id):
 			n += 1
 	return n
+
+
+# ------------------------------------------------------- the 5 encounters
+
+const ENC_DIR := "res://content/test/encounters/%s.tres"
+const THEMES := {
+	"hags_hex": [CardSets.Id.TRIM, CardSets.Id.CURSE_SYNERGY],
+	"ink_cloud": [CardSets.Id.DRAW, CardSets.Id.DISCARD],
+	"toll_booth": [CardSets.Id.MARKET, CardSets.Id.DRAW],
+	"loan_shark": [CardSets.Id.CURSE_SYNERGY, CardSets.Id.MARKET],
+	"clutter": [CardSets.Id.DISCARD, CardSets.Id.TRIM],
+}
+const DECK5 := ["example1", "example1", "example1", "example1", "example1"]
+
+
+## An encounter whose enemy is about to resolve intent `idx`; resolves it.
+func _enemy_does(e: Encounter, intent_name: String) -> void:
+	while e.current_intent().display_name != intent_name:
+		e.enemy.intent_index += 1
+	e.active = e.enemy
+	e.enemy_act()
+
+
+func _encounter_rules() -> void:
+	for file in THEMES:
+		var path: String = ENC_DIR % file
+		var data: EncounterData = load(path)
+		var allowed: Array = THEMES[file].duplicate()
+		allowed.append(CardSets.Id.UTILITY)
+		allowed.append(CardSets.Id.COINS)
+		var only_allowed := true
+		var seen := {}
+		for pool in [data.get_card_pool(), data.get_item_pool(), data.get_trinket_pool()]:
+			for r in pool:
+				seen[r.card_set] = true
+				if not allowed.has(r.card_set):
+					only_allowed = false
+		_check(only_allowed, "%s: sells only its 2 sets + Utility + Coins" % file)
+		var all_present := true
+		for s in allowed:
+			all_present = all_present and seen.has(s)
+		_check(all_present, "%s: every one of its 4 sets is for sale" % file)
+		_check(data.trinket_slots == 1 and data.item_slots == 1, "%s: 1 trinket slot, 1 item slot" % file)
+		_check(data.enemy != null and data.enemy.intents.size() == 3, "%s: enemy with 3 intents" % file)
+		# A bot plays it end to end without hanging.
+		var lo: LoadoutData = load(LO)
+		var finished := true
+		for i in 3:
+			var enc := Encounter.new(data, lo)
+			enc.auto_chooser = SimBot.choose
+			enc.start()
+			var steps := 0
+			while not enc.is_over and steps < 2000:
+				if enc.active == enc.enemy:
+					enc.enemy_act()
+				else:
+					SimBot.take_turn(enc)
+				steps += 1
+			finished = finished and enc.is_over
+		_check(finished, "%s: a bot plays it to the end" % file)
+
+	# card_sets fills the pools; a manual pool adds on top (and raises odds).
+	var plain := EncounterData.new()
+	_check(plain.get_card_pool().is_empty(), "no card_sets and no pool: nothing to sell")
+	plain.card_sets.assign([CardSets.Id.DRAW])
+	var base_n := plain.get_card_pool().size()
+	var only_ok := true
+	for c in plain.get_card_pool():
+		only_ok = only_ok and [CardSets.Id.DRAW, CardSets.Id.UTILITY, CardSets.Id.COINS].has(c.card_set)
+	_check(base_n > 0 and only_ok, "card_sets [Draw]: sells Draw + Utility + Coins only (%d cards)" % base_n)
+	plain.card_pool.assign([_card("hex"), _card("hex")])
+	_check(plain.get_card_pool().size() == base_n + 2, "a manual pool is added on top of the sets")
+
+	# A. Sea Hag
+	var e := _enc(DECK5, true, true, ENC_DIR % "hags_hex")
+	var deck_n := e.player.draw_pile.size()
+	_enemy_does(e, "Hex")
+	_check(_count_id(e.player.draw_pile, "leaky_purse") == 1 and e.player.draw_pile.size() == deck_n + 1,
+		"Sea Hag: Hex shuffles Leaky Purse into YOUR deck")
+	e.active = e.enemy
+	_enemy_does(e, "Foul Brew")
+	var curses := 0
+	for c in e.player.draw_pile:
+		if c.data.curse:
+			curses += 1
+	_check(curses == 2 and _count_id(e.player.draw_pile, "barnacle") == 0,
+		"Sea Hag: Foul Brew adds a random curse, never the permanent Barnacle")
+	var coins := e.player.coins
+	e.active = e.enemy
+	_enemy_does(e, "Tithe")
+	_check(e.player.coins == coins - 1, "Sea Hag: Tithe, you lose 1")
+
+	# B. Cuttlefish
+	e = _enc(DECK5, true, true, ENC_DIR % "ink_cloud")
+	var hand_n := e.player.hand.size()
+	_enemy_does(e, "Ink Spray")
+	_check(e.player.hand.size() == hand_n - 1 and e.player.discard.size() == 1, "Cuttlefish: Ink Spray discards 1 at random")
+	e.active = e.enemy
+	_check(not e.player.draw_locked, "Cuttlefish: draws are open before Murk")
+	_enemy_does(e, "Murk")
+	_check(e.player.draw_locked and not e.enemy.draw_locked, "Cuttlefish: Murk locks YOUR draws")
+	hand_n = e.player.hand.size()
+	e.draw_cards(e.player, 2, false, false)
+	_check(e.player.hand.size() == hand_n, "Cuttlefish: no cards drawn while locked")
+	e.active = e.enemy
+	e.player.coins = 5
+	_enemy_does(e, "Pinch")
+	_check(e.player.coins == 4 and e.enemy.coins == 1, "Cuttlefish: Pinch steals 1")
+
+	# C. Barracuda: Toll on buys (once a round), snatches.
+	e = _enc(DECK5, true, true, ENC_DIR % "toll_booth")
+	e.player.coins = 40
+	_check(e.enemy.items.size() == 1 and e.enemy.items[0].data.id == &"toll", "Barracuda owns the Toll")
+	var s1 := _first_card_slot(e)
+	var cost1: int = e.shop.cards[s1].cost
+	var before := e.player.coins
+	e.buy_card(s1)
+	_check(e.player.coins == before - cost1 - 1, "Barracuda: the first buy of the round costs 1 extra")
+	while e.active == e.enemy:
+		e.enemy_act()
+	var s2 := _first_card_slot(e)
+	var cost2: int = e.shop.cards[s2].cost
+	before = e.player.coins
+	e.buy_card(s2)
+	_check(e.player.coins == before - cost2, "Barracuda: the Toll is once per round")
+	e = _enc(DECK5, true, true, ENC_DIR % "toll_booth")
+	var filled := _filled_cards(e)
+	var cheapest := 99
+	var priciest := -1
+	for cd in e.shop.cards:
+		if cd != null:
+			cheapest = mini(cheapest, cd.cost)
+			priciest = maxi(priciest, cd.cost)
+	_enemy_does(e, "Snatch")
+	_check(_filled_cards(e) == filled - 1, "Barracuda: Snatch removes a market card")
+	var left_min := 99
+	for cd in e.shop.cards:
+		if cd != null:
+			left_min = mini(left_min, cd.cost)
+	_check(left_min >= cheapest, "Barracuda: Snatch took a cheapest card")
+	e.active = e.enemy
+	_enemy_does(e, "Grab")
+	_check(_filled_cards(e) == filled - 2, "Barracuda: Grab removes another market card")
+
+	# D. Loan Shark
+	e = _enc(DECK5, true, true, ENC_DIR % "loan_shark")
+	_enemy_does(e, "Loan")
+	_check(e.player.draw_pile.back().data.id == &"leaky_purse", "Loan Shark: Loan puts Leaky Purse on top of your deck")
+	e.active = e.enemy
+	coins = e.player.coins
+	_enemy_does(e, "Interest")
+	_check(e.player.coins == coins - 2, "Loan Shark: Interest, you lose 2")
+	e.active = e.enemy
+	filled = _filled_cards(e)
+	_enemy_does(e, "Repo")
+	_check(_filled_cards(e) == filled - 1, "Loan Shark: Repo removes a market card")
+
+	# E. Hagfish
+	e = _enc(DECK5, true, true, ENC_DIR % "clutter")
+	hand_n = e.player.hand.size()
+	_enemy_does(e, "Slime")
+	_check(e.player.hand.size() == hand_n + 1 and _count_id(e.player.hand, "dead_weight") == 1,
+		"Hagfish: Slime adds a Dead Weight to your HAND")
+	e.active = e.enemy
+	hand_n = e.player.hand.size()
+	_enemy_does(e, "Squeeze")
+	_check(e.player.hand.size() == hand_n - 1, "Hagfish: Squeeze discards 1 at random")
+
+
+func _first_card_slot(e: Encounter) -> int:
+	for i in e.shop.cards.size():
+		if e.shop.cards[i] != null:
+			return i
+	return -1
+
+
+func _filled_cards(e: Encounter) -> int:
+	var n := 0
+	for cd in e.shop.cards:
+		if cd != null:
+			n += 1
+	return n
+
+
+# ------------------------------------------------------------ enhancements
+
+func _enh(id: String) -> EnhancementData:
+	return load("res://content/test/enhancements/%s.tres" % id)
+
+
+## A card from `deck`'s data with enhancement `enh_id` in the hand.
+func _give_enh(e: Encounter, card_id: String, enh_id: String) -> CardInstance:
+	var c := _give(e, card_id)
+	c.enhancements.append(_enh(enh_id))
+	return c
+
+
+func _all_count(e: Encounter, id: String) -> int:
+	var n := 0
+	for pile in [e.player.hand, e.player.draw_pile, e.player.discard, e.player.in_play]:
+		n += _count_id(pile, id)
+	return n
+
+
+func _enhancement_rules() -> void:
+	# One enhancement per sold set, each in its own set.
+	var sets := {}
+	for en in ContentLibrary.enhancements():
+		sets[en.card_set] = en.display_name
+	for s in [CardSets.Id.COINS, CardSets.Id.DRAW, CardSets.Id.DISCARD, CardSets.Id.TRIM,
+			CardSets.Id.RETAIN, CardSets.Id.UTILITY, CardSets.Id.MARKET, CardSets.Id.CURSE_SYNERGY]:
+		_check(sets.has(s), "enhancement for set %s exists" % CardSets.display_name(s))
+
+	# Coins: +2 coins on play.
+	var e := _enc(DECK5)
+	var c := _give(e, "example1")
+	var before := e.player.coins
+	e.play_card(c)
+	var plain := e.player.coins - before
+	e = _enc(DECK5)
+	c = _give_enh(e, "example1", "gilded")
+	before = e.player.coins
+	e.play_card(c)
+	_check(e.player.coins - before == plain + 2, "Gilded: +2 coins on play (%d vs %d)" % [e.player.coins - before, plain])
+	_check(c.play_text().contains("+2"), "Gilded: card text shows the extra coins")
+
+	# Draw: one extra card on play.
+	e = _enc(DECK5 + DECK5)
+	c = _give(e, "example1")
+	var pile := e.player.draw_pile.size()
+	e.play_card(c)
+	var plain_drawn := pile - e.player.draw_pile.size()
+	e = _enc(DECK5 + DECK5)
+	c = _give_enh(e, "example1", "insight")
+	pile = e.player.draw_pile.size()
+	e.play_card(c)
+	_check(pile - e.player.draw_pile.size() == plain_drawn + 1, "Insight: draws 1 extra card on play")
+
+	# Discard: when discarded, it comes back to your hand.
+	e = _enc(DECK5 + DECK5)
+	c = _give_enh(e, "example1", "boomerang")
+	e.discard_cards(e.player, [c])
+	_check(e.player.hand.has(c) and not e.player.discard.has(c), "Boomerang: a discarded card returns to hand")
+	_consistent(e, "Boomerang")
+	var plain_c := _give(e, "example1")
+	e.discard_cards(e.player, [plain_c])
+	_check(e.player.discard.has(plain_c), "Boomerang: only the enhanced card returns")
+	e.player.draw_locked = true
+	e.discard_cards(e.player, [c])
+	_check(e.player.discard.has(c), "Boomerang: stays discarded while draws are locked")
+	# End-of-round cleanup is not a discard.
+	e = _enc(DECK5 + DECK5, false)
+	c = _give_enh(e, "example1", "boomerang")
+	e.pass_turn()
+	_check(e.player.discard.has(c) or e.player.hand.has(c) == false, "Boomerang: end-of-round cleanup still discards it")
+
+	# Trim: destroyed right after it resolves.
+	e = _enc(DECK5 + DECK5)
+	c = _give_enh(e, "example1", "fleeting")
+	e.play_card(c)
+	_check(e.player.destroyed.has(c) and not e.player.in_play.has(c) and not e.player.discard.has(c),
+		"Fleeting: destroyed instead of going in play")
+	_consistent(e, "Fleeting")
+	e = _enc(DECK5 + DECK5)
+	c = _give(e, "example1")
+	e.play_card(c)
+	_check(e.player.in_play.has(c) and e.player.destroyed.is_empty(), "plain card goes in play, nothing destroyed")
+
+	# Retain: stays in hand at the end of the turn, a plain card does not.
+	e = _enc(DECK5 + DECK5, false)
+	c = _give_enh(e, "example1", "anchored")
+	var other := _give(e, "example1")
+	e.pass_turn()
+	_check(e.player.hand.has(c), "Anchored: retained at the end of the turn")
+	_check(not e.player.hand.has(other), "Anchored: plain card is not retained")
+	_check(c.is_retained() and not c.retain, "Anchored: retained by the enhancement, not the flag")
+
+	# Utility: instant, so playing it doesn't end the turn.
+	e = _enc(DECK5 + DECK5, false)
+	c = _give_enh(e, "example1", "hasty")
+	var round_before := e.round_num
+	e.play_card(c)
+	_check(c.is_instant() and e.is_player_turn() and e.round_num == round_before, "Hasty: playing it is a free action")
+
+	# Market: playing it adds a plain copy to the deck.
+	e = _enc(DECK5 + DECK5)
+	c = _give_enh(e, "example1", "franchise")
+	var total := _all_count(e, "example1")
+	e.play_card(c)
+	var after := _all_count(e, "example1")
+	_check(after == total + 1, "Franchise: a copy is added to the deck (%d -> %d)" % [total, after])
+	var enhanced := 0
+	for zone in [e.player.hand, e.player.draw_pile, e.player.discard, e.player.in_play]:
+		for k in zone:
+			if not k.enhancements.is_empty():
+				enhanced += 1
+	_check(enhanced == 1, "Franchise: only the original is enhanced, the copy is plain (no snowball)")
+
+	# Curse Synergy: counts as a curse.
+	e = _enc(DECK5 + DECK5)
+	c = _give_enh(e, "example1", "tainted")
+	_check(c.is_curse() and not c.data.curse, "Tainted: counts as a curse")
+	e.player.items.append(ItemInstance.new(_item("cursed_luck")))
+	before = e.player.coins
+	e.player.hand.erase(c)
+	e.player.discard.append(c)
+	e.draw_specific(e.player, c)
+	_check(e.player.coins > before, "Tainted: drawing it triggers 'when you draw a curse'")
+	_check(not _give(e, "example1").is_curse(), "plain card is not a curse")
+
+	# Shop: 1 enhancement slot per themed encounter, only from its sets (+ Utility, Coins).
+	for file in THEMES:
+		var data: EncounterData = load(ENC_DIR % file)
+		var allowed: Array = THEMES[file].duplicate()
+		allowed.append(CardSets.Id.UTILITY)
+		allowed.append(CardSets.Id.COINS)
+		var pool := data.get_enhancement_pool()
+		var ok := pool.size() == 4
+		for en in pool:
+			ok = ok and allowed.has(en.card_set)
+		_check(ok, "%s: sells the enhancements of its 4 sets" % file)
+		_check(data.enhancement_slots == 1, "%s: 1 enhancement slot" % file)
+		e = _enc(DECK5, true, false, ENC_DIR % file)
+		_check(e.shop.enhancements.size() == 1 and e.shop.enhancements[0] != null, "%s: enhancement slot is filled" % file)
+		var seen := {}
+		for i in 40:
+			e.shop.restock()
+			seen[e.shop.enhancements[0].id] = true
+		_check(seen.size() == 4, "%s: the slot rerolls through all 4 enhancements (saw %d)" % [file, seen.size()])
+
+	# Buying: pay, pick a card in hand, it is attached.
+	e = _enc(DECK5, true, false, ENC_DIR % "toll_booth")
+	e.shop.enhancements[0] = _enh("gilded")
+	c = e.player.hand[0]
+	var coins := e.player.coins
+	_check(e.can_buy_enhancement(0, c), "can buy an enhancement with a card in hand")
+	_check(e.buy_enhancement(0, c), "buy_enhancement succeeds")
+	_check(c.enhancements.size() == 1 and e.player.coins == coins - 3, "bought: attached, 3 coins paid")
+	_check(e.shop.enhancements[0] == null, "bought: slot is empty until the next round")

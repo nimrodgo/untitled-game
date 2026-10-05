@@ -33,6 +33,10 @@ const _INFO := {
 }
 
 
+## Sold in every encounter that lists its card sets (see EncounterData.card_sets).
+const ALWAYS_SOLD: Array[Id] = [Id.UTILITY, Id.COINS]
+
+
 static func display_name(id: Id) -> String:
 	return _INFO[id][0]
 

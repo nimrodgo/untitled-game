@@ -10,6 +10,9 @@ extends Control
 ## - Tap anything to inspect it (popup with the same actions as buttons).
 
 @export var encounter_data: EncounterData
+## If not empty, each run picks one of these at random (encounter_data is the
+## fallback). "Play again" reloads the scene, so it rolls again.
+@export var encounter_pool: Array[EncounterData] = []
 @export var loadout: LoadoutData
 
 
@@ -76,8 +79,10 @@ func _ready() -> void:
 	_enemy_timer.timeout.connect(_on_enemy_timer)
 	add_child(_enemy_timer)
 
+	if not encounter_pool.is_empty():
+		encounter_data = encounter_pool.pick_random()
 	if encounter_data == null or loadout == null:
-		push_error("Assign encounter_data and loadout on the Main node.")
+		push_error("Assign encounter_pool (or encounter_data) and loadout on the Main node.")
 		return
 	enc = Encounter.new(encounter_data, loadout)
 	enc.logged.connect(func(t: String): _log_text += t + "\n")
@@ -397,10 +402,11 @@ func _fill_shop() -> void:
 			if ed == null:
 				row.add_child(_empty_slot(gear_tile)); continue
 			var s := slot
-			var v := CardView.make(ed.display_name, ed.cost, ed.get_description(), Palette.CARD_ENH, gear_tile)
+			var tint := CardSets.color(ed.card_set).lerp(Palette.CARD_ENH, 0.5)
+			var v := CardView.make(ed.display_name, ed.cost, ed.get_description(), tint, gear_tile)
 			v.set_enabled(enc.can_buy_enhancement(s))
 			v.tapped.connect(func(): _show_popup(
-				CardView.make(ed.display_name, ed.cost, ed.get_description(), Palette.CARD_ENH, CardView.LARGE, "UPGRADE"), ed.description, [
+				CardView.make(ed.display_name, ed.cost, ed.get_description(), tint, CardView.LARGE, "UPGRADE"), ed.description, [
 				{"label": "Choose card (%d)" % ed.cost, "enabled": enc.can_buy_enhancement(s),
 					"cb": func(): pending_enh_slot = s; _refresh()}]))
 			row.add_child(v)

@@ -9,7 +9,7 @@ extends Effect
 
 func apply(ctx: EffectContext) -> void:
 	var picks: Array = await ctx.encounter.choose_cards(ctx.owner, GameRules.PILE_HAND, amount, "Retain", ctx,
-		optional, func(c: CardInstance): return not c.retain, ctx.card)
+		optional, func(c: CardInstance): return not c.is_retained(), ctx.card)
 	for c in picks:
 		c.retain = true
 		ctx.encounter.log_line("  %s retain %s." % [ctx.owner.display_name, c.get_name()])

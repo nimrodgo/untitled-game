@@ -76,12 +76,12 @@ flowchart TD
 
 **Play a card:** it leaves your hand → its on-play effects resolve (including any enhancement effects) → it goes **in play** → `CARD_PLAYED` / `OPPONENT_CARD_PLAYED` fire → the enemy may respond, unless the card is instant.
 
-**Upgrade (enhancement):** pay, then pick a card **in your hand**. The upgrade attaches to that card instance: it adds on-play effects and/or makes the card instant, and the card's name gets a `+`.
+**Upgrade (enhancement):** pay, then pick a card **in your hand**. The upgrade attaches to that card instance: it can add on-play effects, make the card instant, retain it, destroy it when played, return it when discarded or make it count as a curse, and the card's name gets a `+`.
 
 ## Trinkets: buy, upgrade, sell
 
 - You can own at most **3 trinkets** (`GameRules.MAX_TRINKETS`). The Trinkets panel always shows 3 frames; the free ones are empty.
-- The market has **2 trinket slots** and **1 item slot** in the test encounter. Trinket slots are **rerolled every round** from the whole pool, and trinkets you own (and can still upgrade) are **twice as likely**. A trinket you own at its top level never appears.
+- The market has **1 trinket slot** and **1 item slot** (the default for every encounter). Trinket slots are **rerolled every round** from the whole pool, and trinkets you own (and can still upgrade) are **twice as likely**. A trinket you own at its top level never appears.
 - **Buying a trinket you already own upgrades it** (no second copy). It costs the **next level's `upgrade_cost`**, and the market tile shows that next level in purple. **An upgrade also refreshes the trinket** (a used one can be used again this turn). A **new** trinket costs its base cost and needs a free slot, so with 3 trinkets it's greyed out.
 - **Selling:** drag a trinket onto the market. You get **half of everything you paid for it** (purchase + upgrades), rounded down. It's a **free action** (`TRINKET_SELL_IS_ACTION = false`) and frees the slot.
 

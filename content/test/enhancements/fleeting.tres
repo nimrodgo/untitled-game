@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnhancementData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_eiyhi"]
+[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="2_l8i7o"]
+
+[resource]
+script = ExtResource("2_l8i7o")
+id = &"fleeting"
+display_name = "Fleeting"
+cost = 3
+card_set = 5
+make_instant = false
+extra_on_play = Array[ExtResource("1_eiyhi")]([])
+on_discard = Array[ExtResource("1_eiyhi")]([])
+retain = false
+destroy_on_play = true
+counts_as_curse = false
+description = "This card is immediately 🔥"

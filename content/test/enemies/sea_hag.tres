@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_intent.gd" id="1_ru4f7"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_ngq76"]
+[ext_resource type="Resource" path="res://content/test/curses/leaky_purse.tres" id="3_obdww"]
+[ext_resource type="Script" path="res://scripts/data/effects/add_card_effect.gd" id="4_t8tdf"]
+[ext_resource type="Script" path="res://scripts/data/effects/lose_coins_effect.gd" id="5_08sqi"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="6_45qyk"]
+[ext_resource type="Resource" path="res://content/test/curses/dead_weight.tres" id="7_e8fx1"]
+[ext_resource type="Resource" path="res://content/test/curses/driftwood.tres" id="8_uifrx"]
+[ext_resource type="Script" path="res://scripts/data/effects/add_random_curse_effect.gd" id="9_yd0xp"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="10_cfnne"]
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="11_86p16"]
+
+[sub_resource type="Resource" id="Resource_njlf4"]
+script = ExtResource("4_t8tdf")
+card = ExtResource("3_obdww")
+target = 1
+
+[sub_resource type="Resource" id="Resource_hxtj6"]
+script = ExtResource("1_ru4f7")
+display_name = "Hex"
+kind = 3
+effects = Array[ExtResource("2_ngq76")]([SubResource("Resource_njlf4")])
+description = "Shuffle Leaky Purse into your deck"
+
+[sub_resource type="Resource" id="Resource_qv847"]
+script = ExtResource("5_08sqi")
+target = 1
+
+[sub_resource type="Resource" id="Resource_jtg0p"]
+script = ExtResource("1_ru4f7")
+display_name = "Tithe"
+effects = Array[ExtResource("2_ngq76")]([SubResource("Resource_qv847")])
+description = "You lose 1 🪙"
+
+[sub_resource type="Resource" id="Resource_chv3v"]
+script = ExtResource("9_yd0xp")
+curses = Array[ExtResource("6_45qyk")]([ExtResource("7_e8fx1"), ExtResource("8_uifrx"), ExtResource("3_obdww")])
+target = 1
+
+[sub_resource type="Resource" id="Resource_gln6d"]
+script = ExtResource("1_ru4f7")
+display_name = "Foul Brew"
+kind = 3
+effects = Array[ExtResource("2_ngq76")]([SubResource("Resource_chv3v")])
+description = "Shuffle a random curse into your deck"
+
+[resource]
+script = ExtResource("11_86p16")
+display_name = "Sea Hag"
+intents = Array[ExtResource("1_ru4f7")]([SubResource("Resource_hxtj6"), SubResource("Resource_jtg0p"), SubResource("Resource_gln6d")])
+color = Color(0.5568628, 0.41960785, 0.7490196, 1)

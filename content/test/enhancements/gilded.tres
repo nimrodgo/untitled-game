@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnhancementData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_5er63"]
+[ext_resource type="Script" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_tv0wk"]
+[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="3_36h74"]
+
+[sub_resource type="Resource" id="Resource_did8f"]
+script = ExtResource("2_tv0wk")
+amount = 2
+
+[resource]
+script = ExtResource("3_36h74")
+id = &"gilded"
+display_name = "Gilded"
+cost = 3
+card_set = 2
+make_instant = false
+extra_on_play = Array[ExtResource("1_5er63")]([SubResource("Resource_did8f")])
+on_discard = Array[ExtResource("1_5er63")]([])
+retain = false
+destroy_on_play = false
+counts_as_curse = false
+description = ""

@@ -504,8 +504,9 @@ func discard_cards(p: PlayerState, cards: Array) -> void:
 		p.discard.append(c)
 		log_line("  %s discard %s." % [p.display_name, _card_name(c)])
 		var ctx := _ctx(p, c)
-		if not c.data.on_discard.is_empty():
-			await _run(c.data.on_discard, ctx)
+		var on_discard: Array[Effect] = c.get_on_discard()
+		if not on_discard.is_empty():
+			await _run(on_discard, ctx)
 		await _fire(GameRules.Trigger.CARD_DISCARDED, p, _ctx(p, c))
 
 
@@ -655,7 +656,10 @@ func _resolve_play(p: PlayerState, card: CardInstance, first: bool) -> void:
 	await _run(card.get_on_play(), ctx)
 	p.played_log.append(card)
 	if first and _pile_of(p, card) == 0 and not p.removed.has(card) and not p.destroyed.has(card):
-		p.in_play.append(card)
+		if card.destroys_on_play():
+			await trash_card(p, card, true)
+		else:
+			p.in_play.append(card)
 	await _fire(GameRules.Trigger.CARD_PLAYED, p, ctx)
 	var o := opponent_of(p)
 	await _fire(GameRules.Trigger.OPPONENT_CARD_PLAYED, o, _ctx(o, card))
@@ -765,7 +769,7 @@ func _end_round() -> void:
 	if GameRules.DISCARD_HAND_AT_ROUND_END:
 		var keep: Array[CardInstance] = []
 		for c in player.hand:
-			if c.retain:
+			if c.is_retained():
 				keep.append(c)
 			else:
 				player.discard.append(c)

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_cco8p"]
+[ext_resource type="Script" path="res://scripts/data/effects/lose_coins_effect.gd" id="2_fxys2"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="3_qsjq6"]
+
+[sub_resource type="Resource" id="Resource_r4ddp"]
+script = ExtResource("2_fxys2")
+target = 1
+
+[resource]
+script = ExtResource("3_qsjq6")
+id = &"toll"
+display_name = "Toll"
+cost = 0
+trigger = 8
+effects = Array[ExtResource("1_cco8p")]([SubResource("Resource_r4ddp")])
+limit_per_round = 1
+description = "When you buy a card, you lose 1 🪙 (once per round)"

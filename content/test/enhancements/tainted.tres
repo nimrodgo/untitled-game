@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnhancementData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_fhbhv"]
+[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="2_2xhqp"]
+
+[resource]
+script = ExtResource("2_2xhqp")
+id = &"tainted"
+display_name = "Tainted"
+cost = 3
+card_set = 9
+make_instant = false
+extra_on_play = Array[ExtResource("1_fhbhv")]([])
+on_discard = Array[ExtResource("1_fhbhv")]([])
+retain = false
+destroy_on_play = false
+counts_as_curse = true
+description = "This card is considered a curse"

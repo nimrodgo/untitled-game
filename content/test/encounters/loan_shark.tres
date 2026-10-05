@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="1_3m8g3"]
+[ext_resource type="Resource" path="res://content/test/enemies/loan_shark.tres" id="2_8sk66"]
+[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="3_g7a4u"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="4_6vapm"]
+[ext_resource type="Script" path="res://scripts/data/encounter_data.gd" id="5_fkmuc"]
+[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="6_8djx2"]
+
+[resource]
+script = ExtResource("5_fkmuc")
+display_name = "Loan Shark"
+coin_target = 10
+enemy = ExtResource("2_8sk66")
+card_sets = Array[int]([9, 8])
+card_slots = 3
+enhancement_slots = 1

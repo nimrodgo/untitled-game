@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_intent.gd" id="1_bx61u"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_hxko8"]
+[ext_resource type="Resource" path="res://content/test/curses/leaky_purse.tres" id="3_0vssv"]
+[ext_resource type="Script" path="res://scripts/data/effects/add_card_effect.gd" id="4_s8eyl"]
+[ext_resource type="Script" path="res://scripts/data/effects/lose_coins_effect.gd" id="5_luphb"]
+[ext_resource type="Script" path="res://scripts/data/effects/snatch_shop_card_effect.gd" id="6_ejgby"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="7_yqv34"]
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="8_csfvc"]
+
+[sub_resource type="Resource" id="Resource_tgojs"]
+script = ExtResource("4_s8eyl")
+card = ExtResource("3_0vssv")
+zone = 1
+target = 1
+
+[sub_resource type="Resource" id="Resource_nvw63"]
+script = ExtResource("1_bx61u")
+display_name = "Loan"
+kind = 3
+effects = Array[ExtResource("2_hxko8")]([SubResource("Resource_tgojs")])
+description = "Leaky Purse on top of your deck (drawn next)"
+
+[sub_resource type="Resource" id="Resource_sirdh"]
+script = ExtResource("5_luphb")
+amount = 2
+target = 1
+
+[sub_resource type="Resource" id="Resource_8cj8y"]
+script = ExtResource("1_bx61u")
+display_name = "Interest"
+effects = Array[ExtResource("2_hxko8")]([SubResource("Resource_sirdh")])
+description = "You lose 2 🪙"
+
+[sub_resource type="Resource" id="Resource_b5yed"]
+script = ExtResource("6_ejgby")
+
+[sub_resource type="Resource" id="Resource_86sdq"]
+script = ExtResource("1_bx61u")
+display_name = "Repo"
+kind = 2
+effects = Array[ExtResource("2_hxko8")]([SubResource("Resource_b5yed")])
+description = "Remove the priciest market card"
+
+[resource]
+script = ExtResource("8_csfvc")
+display_name = "Loan Shark"
+intents = Array[ExtResource("1_bx61u")]([SubResource("Resource_nvw63"), SubResource("Resource_8cj8y"), SubResource("Resource_86sdq")])
+color = Color(0.7529412, 0.3137255, 0.3019608, 1)

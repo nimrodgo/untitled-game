@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_intent.gd" id="1_xpr6u"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_67f5a"]
+[ext_resource type="Script" path="res://scripts/data/effects/discard_random_effect.gd" id="3_7fl0m"]
+[ext_resource type="Script" path="res://scripts/data/effects/steal_coins_effect.gd" id="4_aikjv"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_lock_effect.gd" id="5_hdlly"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="6_qvadr"]
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="7_uc53m"]
+
+[sub_resource type="Resource" id="Resource_0qdi3"]
+script = ExtResource("3_7fl0m")
+target = 1
+
+[sub_resource type="Resource" id="Resource_n1ki4"]
+script = ExtResource("1_xpr6u")
+display_name = "Ink Spray"
+effects = Array[ExtResource("2_67f5a")]([SubResource("Resource_0qdi3")])
+description = "You ⤵ a card at random"
+
+[sub_resource type="Resource" id="Resource_cj80v"]
+script = ExtResource("4_aikjv")
+
+[sub_resource type="Resource" id="Resource_sefjr"]
+script = ExtResource("1_xpr6u")
+display_name = "Pinch"
+kind = 1
+effects = Array[ExtResource("2_67f5a")]([SubResource("Resource_cj80v")])
+description = "Steal 1 🪙"
+
+[sub_resource type="Resource" id="Resource_rhjct"]
+script = ExtResource("5_hdlly")
+target = 1
+
+[sub_resource type="Resource" id="Resource_qpjxu"]
+script = ExtResource("1_xpr6u")
+display_name = "Murk"
+kind = 5
+effects = Array[ExtResource("2_67f5a")]([SubResource("Resource_rhjct")])
+description = "You can't draw additional cards this turn"
+
+[resource]
+script = ExtResource("7_uc53m")
+display_name = "Cuttlefish"
+intents = Array[ExtResource("1_xpr6u")]([SubResource("Resource_n1ki4"), SubResource("Resource_sefjr"), SubResource("Resource_qpjxu")])
+color = Color(0.43529412, 0.65882355, 0.8627451, 1)
