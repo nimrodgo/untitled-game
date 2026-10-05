@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_intent.gd" id="1_15ur7"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_r6s6c"]
+[ext_resource type="Resource" path="res://content/test/curses/dead_weight.tres" id="3_vn6ba"]
+[ext_resource type="Script" path="res://scripts/data/effects/add_card_effect.gd" id="4_au4yu"]
+[ext_resource type="Script" path="res://scripts/data/effects/discard_random_effect.gd" id="5_tmhll"]
+[ext_resource type="Script" path="res://scripts/data/effects/steal_coins_effect.gd" id="6_qpxy6"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="7_sdup2"]
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="8_werk6"]
+
+[sub_resource type="Resource" id="Resource_hbvt0"]
+script = ExtResource("4_au4yu")
+card = ExtResource("3_vn6ba")
+zone = 0
+target = 1
+
+[sub_resource type="Resource" id="Resource_15im6"]
+script = ExtResource("1_15ur7")
+display_name = "Slime"
+kind = 3
+effects = Array[ExtResource("2_r6s6c")]([SubResource("Resource_hbvt0")])
+description = "Add a Dead Weight to your hand"
+
+[sub_resource type="Resource" id="Resource_48ikm"]
+script = ExtResource("5_tmhll")
+target = 1
+
+[sub_resource type="Resource" id="Resource_quv2k"]
+script = ExtResource("1_15ur7")
+display_name = "Squeeze"
+effects = Array[ExtResource("2_r6s6c")]([SubResource("Resource_48ikm")])
+description = "You ⤵ a card at random"
+
+[sub_resource type="Resource" id="Resource_yhe0i"]
+script = ExtResource("6_qpxy6")
+
+[sub_resource type="Resource" id="Resource_082dt"]
+script = ExtResource("1_15ur7")
+display_name = "Pinch"
+kind = 1
+effects = Array[ExtResource("2_r6s6c")]([SubResource("Resource_yhe0i")])
+description = "Steal 1 🪙"
+
+[resource]
+script = ExtResource("8_werk6")
+display_name = "Hagfish"
+intents = Array[ExtResource("1_15ur7")]([SubResource("Resource_15im6"), SubResource("Resource_quv2k"), SubResource("Resource_082dt")])
+color = Color(0.627451, 0.64705884, 0.54901963, 1)

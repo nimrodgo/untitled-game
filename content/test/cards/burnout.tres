@@ -17,6 +17,7 @@ amount = 5
 [resource]
 script = ExtResource("4_bdirx")
 id = &"burnout"
+card_set = 3
 display_name = "Burnout"
 cost = 2
 instant = true

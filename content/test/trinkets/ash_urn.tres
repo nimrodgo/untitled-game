@@ -51,6 +51,7 @@ text = "⚡Shuffle 2 Barnacles into your deck. 🔥🔥🔥"
 [resource]
 script = ExtResource("6_bohki")
 id = &"ash_urn"
+card_set = 9
 display_name = "Ash Urn"
 cost = 3
 levels = Array[ExtResource("1_ntubv")]([SubResource("Resource_2n75i"), SubResource("Resource_1vqiq"), SubResource("Resource_onvrw")])

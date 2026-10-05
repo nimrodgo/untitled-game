@@ -151,7 +151,18 @@ func can_buy_card(slot: int) -> bool:
 	if not is_player_turn() or slot < 0 or slot >= shop.cards.size():
 		return false
 	var c: CardData = shop.cards[slot]
-	return c != null and player.coins >= c.cost
+	return c != null and player.coins >= card_price(player, c.cost)
+
+
+## What buying a card with base cost `base` costs `p` right now (items such as
+## Needful override it). The lowest override wins.
+func card_price(p: PlayerState, base: int) -> int:
+	var price := base
+	for it in p.items:
+		var o: int = it.data.card_price_override
+		if o >= 0 and o < price:
+			price = o
+	return price
 
 
 func can_buy_item(slot: int) -> bool:
@@ -493,8 +504,9 @@ func discard_cards(p: PlayerState, cards: Array) -> void:
 		p.discard.append(c)
 		log_line("  %s discard %s." % [p.display_name, _card_name(c)])
 		var ctx := _ctx(p, c)
-		if not c.data.on_discard.is_empty():
-			await _run(c.data.on_discard, ctx)
+		var on_discard: Array[Effect] = c.get_on_discard()
+		if not on_discard.is_empty():
+			await _run(on_discard, ctx)
 		await _fire(GameRules.Trigger.CARD_DISCARDED, p, _ctx(p, c))
 
 
@@ -644,7 +656,10 @@ func _resolve_play(p: PlayerState, card: CardInstance, first: bool) -> void:
 	await _run(card.get_on_play(), ctx)
 	p.played_log.append(card)
 	if first and _pile_of(p, card) == 0 and not p.removed.has(card) and not p.destroyed.has(card):
-		p.in_play.append(card)
+		if card.destroys_on_play():
+			await trash_card(p, card, true)
+		else:
+			p.in_play.append(card)
 	await _fire(GameRules.Trigger.CARD_PLAYED, p, ctx)
 	var o := opponent_of(p)
 	await _fire(GameRules.Trigger.OPPONENT_CARD_PLAYED, o, _ctx(o, card))
@@ -654,7 +669,7 @@ func _buy_from_market(slot: int) -> void:
 	_busy += 1
 	_begin_action()
 	var cd: CardData = shop.take_card(slot)
-	await buy_instance(player, CardInstance.new(cd), cd.cost)
+	await buy_instance(player, CardInstance.new(cd), card_price(player, cd.cost))
 	_busy -= 1
 	await _finish_action_if(GameRules.CARD_BUY_IS_ACTION, _act_extra)
 
@@ -754,7 +769,7 @@ func _end_round() -> void:
 	if GameRules.DISCARD_HAND_AT_ROUND_END:
 		var keep: Array[CardInstance] = []
 		for c in player.hand:
-			if c.retain:
+			if c.is_retained():
 				keep.append(c)
 			else:
 				player.discard.append(c)

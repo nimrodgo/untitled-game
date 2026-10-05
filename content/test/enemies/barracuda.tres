@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_intent.gd" id="1_6uksu"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_3kidt"]
+[ext_resource type="Script" path="res://scripts/data/effects/snatch_shop_card_effect.gd" id="3_hw8yt"]
+[ext_resource type="Script" path="res://scripts/data/effects/steal_coins_effect.gd" id="4_bxyjc"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="5_2uqvd"]
+[ext_resource type="Resource" path="res://content/test/enemy_items/toll.tres" id="6_2wn2l"]
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="7_o5cb1"]
+
+[sub_resource type="Resource" id="Resource_6adii"]
+script = ExtResource("3_hw8yt")
+mode = 0
+
+[sub_resource type="Resource" id="Resource_25376"]
+script = ExtResource("1_6uksu")
+display_name = "Snatch"
+kind = 2
+effects = Array[ExtResource("2_3kidt")]([SubResource("Resource_6adii")])
+description = "Remove the cheapest market card"
+
+[sub_resource type="Resource" id="Resource_femfc"]
+script = ExtResource("4_bxyjc")
+
+[sub_resource type="Resource" id="Resource_ty106"]
+script = ExtResource("1_6uksu")
+display_name = "Pinch"
+kind = 1
+effects = Array[ExtResource("2_3kidt")]([SubResource("Resource_femfc")])
+description = "Steal 1 🪙"
+
+[sub_resource type="Resource" id="Resource_cvo1w"]
+script = ExtResource("3_hw8yt")
+
+[sub_resource type="Resource" id="Resource_oei35"]
+script = ExtResource("1_6uksu")
+display_name = "Grab"
+kind = 2
+effects = Array[ExtResource("2_3kidt")]([SubResource("Resource_cvo1w")])
+description = "Remove the priciest market card"
+
+[resource]
+script = ExtResource("7_o5cb1")
+display_name = "Barracuda"
+intents = Array[ExtResource("1_6uksu")]([SubResource("Resource_25376"), SubResource("Resource_ty106"), SubResource("Resource_oei35")])
+items = Array[ExtResource("5_2uqvd")]([ExtResource("6_2wn2l")])
+color = Color(0.49803922, 0.54901963, 0.5529412, 1)

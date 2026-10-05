@@ -14,6 +14,7 @@ script = ExtResource("3_i6ltj")
 [resource]
 script = ExtResource("4_tqo8e")
 id = &"tinker"
+card_set = 7
 display_name = "Tinker"
 on_play = Array[ExtResource("1_u8owc")]([SubResource("Resource_dxenn"), SubResource("Resource_7xbf8")])
 on_play_text = "↺ a trinket. 🂠"

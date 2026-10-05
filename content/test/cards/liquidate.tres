@@ -13,6 +13,7 @@ coins_per_card = 3
 [resource]
 script = ExtResource("3_3eu7q")
 id = &"liquidate"
+card_set = 5
 display_name = "Liquidate"
 cost = 2
 on_play = Array[ExtResource("1_jt6pp")]([SubResource("Resource_gdv25")])

@@ -6,6 +6,7 @@
 [resource]
 script = ExtResource("2_faf21")
 id = &"barnacle"
+card_set = 1
 display_name = "Barnacle"
 cost = 0
 playable = false

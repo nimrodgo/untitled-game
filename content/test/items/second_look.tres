@@ -10,6 +10,7 @@ script = ExtResource("2_djrv1")
 [resource]
 script = ExtResource("3_h7pjt")
 id = &"second_look"
+card_set = 4
 display_name = "Second Look"
 trigger = 13
 effects = Array[ExtResource("1_oukbh")]([SubResource("Resource_gqer6")])

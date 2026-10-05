@@ -10,6 +10,9 @@ extends Control
 ## - Tap anything to inspect it (popup with the same actions as buttons).
 
 @export var encounter_data: EncounterData
+## If not empty, each run picks one of these at random (encounter_data is the
+## fallback). "Play again" reloads the scene, so it rolls again.
+@export var encounter_pool: Array[EncounterData] = []
 @export var loadout: LoadoutData
 
 
@@ -76,8 +79,10 @@ func _ready() -> void:
 	_enemy_timer.timeout.connect(_on_enemy_timer)
 	add_child(_enemy_timer)
 
+	if not encounter_pool.is_empty():
+		encounter_data = encounter_pool.pick_random()
 	if encounter_data == null or loadout == null:
-		push_error("Assign encounter_data and loadout on the Main node.")
+		push_error("Assign encounter_pool (or encounter_data) and loadout on the Main node.")
 		return
 	enc = Encounter.new(encounter_data, loadout)
 	enc.logged.connect(func(t: String): _log_text += t + "\n")
@@ -218,7 +223,7 @@ func _refresh() -> void:
 	_clear(_enemy_chips)
 	for it in enc.enemy.items:
 		var item: ItemInstance = it
-		_enemy_chips.add_child(_chip(item.data.display_name, Palette.CARD_ITEM, false,
+		_enemy_chips.add_child(_chip(item.data.display_name, CardSets.color(item.data.card_set), false,
 			func(): _show_popup(_item_view(item.data, false), "", [], "Enemy item")))
 
 	# Market.
@@ -230,7 +235,7 @@ func _refresh() -> void:
 		var t := me.trinkets[i]
 		var idx := i
 		var usable := enc.can_use_trinket(idx)
-		var chip := _chip(t.get_name(), Palette.CARD_TRINKET, usable, func(): _show_trinket_popup(idx))
+		var chip := _chip(t.get_name(), CardSets.color(t.data.card_set), usable, func(): _show_trinket_popup(idx))
 		chip.modulate = Color.WHITE if usable else Color(0.7, 0.7, 0.7)
 		chip.gui_input.connect(_on_trinket_chip_input.bind(chip, idx))
 		_trinkets_box.add_child(chip)
@@ -240,7 +245,7 @@ func _refresh() -> void:
 	_clear(_items_box)
 	for it in me.items:
 		var item: ItemInstance = it
-		_items_box.add_child(_chip(item.data.display_name, Palette.CARD_ITEM, false,
+		_items_box.add_child(_chip(item.data.display_name, CardSets.color(item.data.card_set), false,
 			func(): _show_popup(_item_view(item.data, false), "", [], "Passive — always on")))
 	if me.items.is_empty():
 		_items_box.add_child(_empty_gear_slot())
@@ -353,7 +358,7 @@ func _fill_shop() -> void:
 			var make := func(): return _card_data_view(cd, card_tile)
 			_attach_buy_drag(v, func(): return enc.buy_card(s), _pile, make)
 			v.tapped.connect(func(): _show_popup(_card_data_view(cd, CardView.LARGE), cd.flavor_text, [
-				{"label": "%d" % cd.cost, "icon": "🛍", "enabled": enc.can_buy_card(s),
+				{"label": "%d" % enc.card_price(enc.player, cd.cost), "icon": "🛍", "enabled": enc.can_buy_card(s),
 					"cb": func(): _buy_with_fx(func(): return enc.buy_card(s), make.call(), _pile)}]))
 			row.add_child(v)
 
@@ -397,10 +402,11 @@ func _fill_shop() -> void:
 			if ed == null:
 				row.add_child(_empty_slot(gear_tile)); continue
 			var s := slot
-			var v := CardView.make(ed.display_name, ed.cost, ed.get_description(), Palette.CARD_ENH, gear_tile)
+			var tint := CardSets.color(ed.card_set).lerp(Palette.CARD_ENH, 0.5)
+			var v := CardView.make(ed.display_name, ed.cost, ed.get_description(), tint, gear_tile)
 			v.set_enabled(enc.can_buy_enhancement(s))
 			v.tapped.connect(func(): _show_popup(
-				CardView.make(ed.display_name, ed.cost, ed.get_description(), Palette.CARD_ENH, CardView.LARGE, "UPGRADE"), ed.description, [
+				CardView.make(ed.display_name, ed.cost, ed.get_description(), tint, CardView.LARGE, "UPGRADE"), ed.description, [
 				{"label": "Choose card (%d)" % ed.cost, "enabled": enc.can_buy_enhancement(s),
 					"cb": func(): pending_enh_slot = s; _refresh()}]))
 			row.add_child(v)
@@ -763,7 +769,7 @@ func _picker_view(req: ChoiceRequest, item: Variant) -> CardView:
 			return _trinket_data_view(enc.shop.trinkets[item], CardView.SMALL)
 		ChoiceRequest.Kind.TRINKET:
 			var t: TrinketInstance = enc.player.trinkets[item]
-			return CardView.make(t.get_name(), -1, t.get_text(), Palette.CARD_TRINKET, CardView.SMALL)
+			return CardView.make(t.get_name(), -1, t.get_text(), CardSets.color(t.data.card_set), CardView.SMALL)
 	return _card_instance_view(item, CardView.SMALL)
 
 
@@ -776,8 +782,9 @@ func _card_data_view(cd: CardData, sz: Vector2) -> CardView:
 
 
 func _card_data_view_raw(cd: CardData, sz: Vector2) -> CardView:
-	return CardView.make(cd.display_name, cd.cost, cd.get_play_text(_vars()), Palette.CARD_CURSE if cd.curse else Palette.CARD, sz,
-		"⚡" if cd.instant and not cd.has_custom_text() else "", "", cd.get_buy_text(_vars()))
+	var price := enc.card_price(enc.player, cd.cost) if enc else cd.cost
+	return CardView.make(cd.display_name, price, cd.get_play_text(_vars()), CardSets.color(cd.card_set), sz,
+		"⚡" if cd.instant and not cd.has_custom_text() else "", "", cd.get_buy_text(_vars()), cd.cost)
 
 
 func _card_instance_view(c: CardInstance, sz: Vector2) -> CardView:
@@ -790,7 +797,7 @@ func _card_instance_view_raw(c: CardInstance, sz: Vector2) -> CardView:
 	var footer := ""
 	for e in c.enhancements:
 		footer += "+ " + e.display_name + "  "
-	return CardView.make(c.get_name(), c.get_cost(), c.play_text(_vars()), Palette.CARD_CURSE if c.is_curse() else Palette.CARD, sz,
+	return CardView.make(c.get_name(), c.get_cost(), c.play_text(_vars()), CardSets.color(c.data.card_set), sz,
 		"⚡" if c.is_instant() and not c.data.has_custom_text() else "", footer.strip_edges(), c.buy_text(_vars()))
 
 
@@ -799,7 +806,7 @@ func _vars() -> Dictionary:
 
 
 func _item_view(it: ItemData, show_cost: bool, sz: Vector2 = CardView.SMALL) -> CardView:
-	var v := CardView.make(it.display_name, it.cost if show_cost else -1, it.get_description(), Palette.CARD_ITEM, sz,
+	var v := CardView.make(it.display_name, it.cost if show_cost else -1, it.get_description(), CardSets.color(it.card_set), sz,
 		"ITEM" if sz == CardView.LARGE else "")
 	_attach_hover(v, it.get_description(), _mentioned_in(it.effects))
 	return v
@@ -810,7 +817,7 @@ func _trinket_data_view(td: TrinketData, sz: Vector2) -> CardView:
 	var desc := td.levels[0].get_text() if not td.levels.is_empty() else ""
 	if td.description != "":
 		desc = td.description + "\n" + desc
-	var v := CardView.make(td.display_name, td.cost, desc, Palette.CARD_TRINKET, sz,
+	var v := CardView.make(td.display_name, td.cost, desc, CardSets.color(td.card_set), sz,
 		"TRINKET" if sz == CardView.LARGE else "")
 	var fx: Array = []
 	for lv in td.levels:
@@ -830,7 +837,7 @@ func _shop_trinket_view(td: TrinketData, sz: Vector2) -> CardView:
 	if td.description != "":
 		desc = td.description + "\n" + desc
 	return CardView.make("%s (Lv %d)" % [td.display_name, owned.level + 2], owned.upgrade_cost(), desc,
-		Palette.CARD_TRINKET.lerp(Palette.CARD_ENH, 0.5), sz, "UPGRADE" if sz == CardView.LARGE else "")
+		CardSets.color(td.card_set).lerp(Palette.CARD_ENH, 0.5), sz, "UPGRADE" if sz == CardView.LARGE else "")
 
 
 ## Drag one of your trinkets onto the market to sell it (tap = inspect).
@@ -856,7 +863,7 @@ func _on_trinket_chip_input(e: InputEvent, chip: Button, idx: int) -> void:
 		if _sell_drag["ghost"] == null and enc.can_sell_trinket(idx) \
 				and e.global_position.distance_to(_sell_drag["press"]) > HandView.DRAG_START:
 			var t := enc.player.trinkets[idx]
-			var ghost := CardView.make(t.get_name(), -1, "+%d 🪙" % t.sell_value(), Palette.CARD_TRINKET,
+			var ghost := CardView.make(t.get_name(), -1, "+%d 🪙" % t.sell_value(), CardSets.color(t.data.card_set),
 				CardView.SMALL)
 			ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			ghost.hoverable = false
@@ -880,7 +887,7 @@ func _on_trinket_chip_input(e: InputEvent, chip: Button, idx: int) -> void:
 func _show_trinket_popup(idx: int) -> void:
 	var t := enc.player.trinkets[idx]
 	var actions := [{"label": "Use", "enabled": enc.can_use_trinket(idx), "cb": func(): enc.use_trinket(idx)}]
-	_show_popup(CardView.make(t.get_name(), -1, t.get_description(), Palette.CARD_TRINKET, CardView.LARGE,
+	_show_popup(CardView.make(t.get_name(), -1, t.get_description(), CardSets.color(t.data.card_set), CardView.LARGE,
 		"TRINKET" + (" · used" if t.used else "")), "", actions,
 		"")
 

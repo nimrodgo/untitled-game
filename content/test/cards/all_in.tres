@@ -17,6 +17,7 @@ effects = Array[ExtResource("1_u4nku")]([SubResource("Resource_qjhlu")])
 [resource]
 script = ExtResource("4_xsyre")
 id = &"all_in"
+card_set = 2
 display_name = "All In"
 cost = 3
 on_play = Array[ExtResource("1_u4nku")]([SubResource("Resource_407uy")])

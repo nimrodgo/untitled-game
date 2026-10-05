@@ -13,6 +13,7 @@ as_cost = true
 [resource]
 script = ExtResource("3_3rs5d")
 id = &"driftwood"
+card_set = 1
 display_name = "Driftwood"
 cost = 0
 on_play = Array[ExtResource("1_lt1bq")]([SubResource("Resource_evg4k")])

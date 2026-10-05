@@ -10,7 +10,8 @@ script = ExtResource("2_kxya4")
 [resource]
 script = ExtResource("3_y2xac")
 id = &"rush_order"
+card_set = 8
 display_name = "Rush Order"
 instant = true
 on_play = Array[ExtResource("1_3fu4m")]([SubResource("Resource_hjdat")])
-on_play_text = "⚡The next card you buy is drawn immediately"
+on_play_text = "⚡The next card you buy is 🂠 immediately"

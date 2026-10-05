@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_g3il5"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="2_tev7c"]
+[ext_resource type="Resource" path="res://content/test/curses/dead_weight.tres" id="3_f0358"]
+[ext_resource type="Resource" path="res://content/test/curses/barnacle.tres" id="4_fv8j4"]
+[ext_resource type="Resource" path="res://content/test/curses/driftwood.tres" id="5_qjfph"]
+[ext_resource type="Resource" path="res://content/test/curses/leaky_purse.tres" id="6_1octo"]
+[ext_resource type="Script" path="res://scripts/data/effects/add_random_curse_effect.gd" id="7_awu7w"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="8_rqu7c"]
+
+[sub_resource type="Resource" id="Resource_md6ye"]
+script = ExtResource("7_awu7w")
+curses = Array[ExtResource("2_tev7c")]([ExtResource("3_f0358"), ExtResource("4_fv8j4"), ExtResource("5_qjfph"), ExtResource("6_1octo")])
+
+[resource]
+script = ExtResource("8_rqu7c")
+id = &"needful"
+display_name = "Needful"
+cost = 5
+effects = Array[ExtResource("1_g3il5")]([SubResource("Resource_md6ye")])
+description = "One never pays here - not with money"
+card_price_override = 0
+card_set = 9

@@ -14,6 +14,7 @@ amount = 2
 [resource]
 script = ExtResource("3_li4kx")
 id = &"example1"
+card_set = 3
 display_name = "This is a card"
 on_play = Array[ExtResource("1_iw18t")]([SubResource("Resource_5n5gp")])
 on_buy = Array[ExtResource("1_iw18t")]([SubResource("Resource_gy235")])

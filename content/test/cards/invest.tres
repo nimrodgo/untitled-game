@@ -16,6 +16,7 @@ amount = 3
 [resource]
 script = ExtResource("4_ksba6")
 id = &"invest"
+card_set = 3
 display_name = "Invest"
 on_play = Array[ExtResource("1_8516y")]([SubResource("Resource_unhhe"), SubResource("Resource_5wips")])
 on_play_text = "Pay 🪙🪙 ➡ 🂠🂠🂠"

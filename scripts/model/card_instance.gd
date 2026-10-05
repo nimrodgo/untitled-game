@@ -27,7 +27,38 @@ func is_instant() -> bool:
 
 
 func is_curse() -> bool:
-	return data.curse
+	if data.curse:
+		return true
+	for e in enhancements:
+		if e.counts_as_curse:
+			return true
+	return false
+
+
+## Kept in hand at the end of the turn (picked by an effect, or an enhancement).
+func is_retained() -> bool:
+	if retain:
+		return true
+	for e in enhancements:
+		if e.retain:
+			return true
+	return false
+
+
+## Destroyed right after it resolves instead of going to the discard pile.
+func destroys_on_play() -> bool:
+	for e in enhancements:
+		if e.destroy_on_play:
+			return true
+	return false
+
+
+func get_on_discard() -> Array[Effect]:
+	var out: Array[Effect] = []
+	out.append_array(data.on_discard)
+	for e in enhancements:
+		out.append_array(e.on_discard)
+	return out
 
 
 ## Unplayable curses can't be played at all (from the hand or otherwise).
@@ -54,8 +85,9 @@ func get_name() -> String:
 func play_text(vars: Dictionary = {}) -> String:
 	var t := data.get_play_text(vars)
 	for e in enhancements:
-		if not e.extra_on_play.is_empty():
-			t += (". " if t != "" else "") + Effect.describe_list(e.extra_on_play)
+		var et := e.card_text()
+		if et != "":
+			t += (". " if t != "" else "") + et
 	return t
 
 

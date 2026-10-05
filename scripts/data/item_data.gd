@@ -13,6 +13,11 @@ extends Resource
 @export var limit_per_round: int = 0
 @export_multiline var description: String = ""
 @export var icon: Texture2D
+## Passive: while you own this, every market card costs this much (-1 = off).
+## The market shows the normal price struck through next to the new one.
+@export var card_price_override: int = -1
+## Which set this belongs to (see CardSets). One set per card/item/trinket.
+@export var card_set: CardSets.Id = CardSets.Id.NONE
 
 
 func get_description() -> String:

@@ -17,6 +17,7 @@ card = ExtResource("3_t6t46")
 [resource]
 script = ExtResource("5_116md")
 id = &"risky_draw"
+card_set = 9
 display_name = "Risky Draw"
 cost = 0
 on_play = Array[ExtResource("1_cnjvh")]([SubResource("Resource_p2syd"), SubResource("Resource_qanq8")])

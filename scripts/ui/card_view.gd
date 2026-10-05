@@ -34,7 +34,7 @@ var _press_pos := Vector2.ZERO
 ## `body` is the main text (for cards: the on-play effect). `buy_text`, if
 ## given, is shown in a separate gold "on buy" strip at the bottom of the card.
 static func make(title: String, cost: int, body: String, bg: Color = Palette.CARD,
-		min_size: Vector2 = SMALL, tag := "", footer := "", buy_text := "") -> CardView:
+		min_size: Vector2 = SMALL, tag := "", footer := "", buy_text := "", old_cost := -1) -> CardView:
 	var v := CardView.new()
 	v._bg = bg
 	v.custom_minimum_size = min_size
@@ -57,6 +57,14 @@ static func make(title: String, cost: int, body: String, bg: Color = Palette.CAR
 	name_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	top.add_child(name_l)
 	if cost >= 0:
+		if old_cost > cost:
+			# Discount: the normal price, struck through, next to the new one.
+			var old_l := Icons.rich_label("[s]%d[/s]" % old_cost, int(22 * k), Palette.CORAL)
+			old_l.fit_content = true
+			old_l.autowrap_mode = TextServer.AUTOWRAP_OFF
+			old_l.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+			old_l.custom_minimum_size.x = 14 * k
+			top.add_child(old_l)
 		var cost_l := _label("%d" % cost, int(22 * k), Palette.ABYSS)
 		cost_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cost_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

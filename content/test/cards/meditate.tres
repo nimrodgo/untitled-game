@@ -26,6 +26,7 @@ effects = Array[ExtResource("1_4bcxb")]([SubResource("Resource_lnw5y"), SubResou
 [resource]
 script = ExtResource("6_0tvi2")
 id = &"meditate"
+card_set = 7
 display_name = "Meditate"
 cost = 0
 on_play = Array[ExtResource("1_4bcxb")]([SubResource("Resource_g7bvs"), SubResource("Resource_2vvr3")])

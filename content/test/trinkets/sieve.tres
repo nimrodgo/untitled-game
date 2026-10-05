@@ -46,5 +46,6 @@ text = "⚡🂠🂠🂠⤵"
 [resource]
 script = ExtResource("5_vi5uu")
 id = &"sieve"
+card_set = 4
 display_name = "Sieve"
 levels = Array[ExtResource("1_fvu3o")]([SubResource("Resource_2c5xc"), SubResource("Resource_34x3f"), SubResource("Resource_i12kd")])

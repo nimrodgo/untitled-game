@@ -32,6 +32,8 @@ extends Resource
 @export var permanent: bool = false
 @export_group("")
 
+## Which set this belongs to (see CardSets). One set per card/item/trinket.
+@export var card_set: CardSets.Id = CardSets.Id.NONE
 @export var art: Texture2D
 @export var tags: PackedStringArray = []
 

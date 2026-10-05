@@ -11,6 +11,7 @@ amount = 2
 [resource]
 script = ExtResource("2_0q16h")
 id = &"leaky_purse"
+card_set = 1
 display_name = "Leaky Purse"
 cost = 0
 playable = false

@@ -12,6 +12,7 @@ zone = 1
 [resource]
 script = ExtResource("3_w7h2o")
 id = &"free_sample"
+card_set = 8
 display_name = "Free Sample"
 cost = 3
 on_play = Array[ExtResource("1_ps2q2")]([SubResource("Resource_a4k5q")])

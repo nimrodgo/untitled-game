@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnhancementData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_uc3g0"]
+[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="2_2dlc2"]
+
+[resource]
+script = ExtResource("2_2dlc2")
+id = &"hasty"
+display_name = "Hasty"
+cost = 3
+card_set = 7
+make_instant = true
+extra_on_play = Array[ExtResource("1_uc3g0")]([])
+on_discard = Array[ExtResource("1_uc3g0")]([])
+retain = false
+destroy_on_play = false
+counts_as_curse = false
+description = "This card effect is ⚡"

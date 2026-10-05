@@ -52,5 +52,6 @@ text = "⚡Gain Barnacle and 6🪙"
 [resource]
 script = ExtResource("6_0ar5r")
 id = &"cursed_idol"
+card_set = 9
 display_name = "Cursed Idol"
 levels = Array[ExtResource("1_mvuqc")]([SubResource("Resource_rkwke"), SubResource("Resource_4kh4r"), SubResource("Resource_ntuuk")])

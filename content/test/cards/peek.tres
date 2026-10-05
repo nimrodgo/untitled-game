@@ -14,6 +14,7 @@ script = ExtResource("3_c0nxy")
 [resource]
 script = ExtResource("4_chvfa")
 id = &"peek"
+card_set = 4
 display_name = "Peek"
 cost = 0
 on_play = Array[ExtResource("1_lou63")]([SubResource("Resource_lm1yh"), SubResource("Resource_7mitd")])

@@ -8,6 +8,7 @@ All of them run with `godot --headless --path . --script res://tools/<name>.gd -
 |---|---|---|
 | `simulate.gd` | `[encounter.tres] [loadout.tres] [runs]` (test encounter, test loadout, 200) | A greedy `SimBot` plays the player side N times. It prints the win %, average final coins and enemy actions per encounter. |
 | `build_test_content.gd` | — | Rewrites everything in `content/test/` from code |
+| `build_encounters.gd` | — | Rebuilds the 5 themed encounters + their enemies. Each encounter lists its `card_sets`; the pools are not saved, they are resolved at runtime, so moving a piece to another set needs no re-run. |
 | `test_mechanics.gd` | — | Rules tests: plays every card, item and trinket level, then checks specific rules (costs, choices, retain, pass, extra turn, curses, items). Prints FAILs and a summary; exit code 1 on failure. |
 | `serve_web.gd` | `[port]` (8443) | A tiny HTTPS static server for `build/web`, using a self-signed certificate |
 

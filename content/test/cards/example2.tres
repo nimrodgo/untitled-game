@@ -13,6 +13,7 @@ script = ExtResource("2_6pumn")
 [resource]
 script = ExtResource("3_lu33p")
 id = &"example2"
+card_set = 2
 display_name = "This is another card"
 cost = 0
 instant = true
