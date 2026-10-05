@@ -16,4 +16,4 @@ display_name = "Grindstone"
 cost = 5
 trigger = 15
 effects = Array[ExtResource("1_jaqoh")]([SubResource("Resource_70jlp")])
-description = "When you ⤵, +2🪙"
+description = "When you ⤵, 🪙🪙"

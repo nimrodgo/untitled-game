@@ -15,4 +15,4 @@ display_name = "Big Hands"
 cost = 5
 trigger = 12
 effects = Array[ExtResource("1_8nqfo")]([SubResource("Resource_rg714")])
-description = "Draw an additional 🂠 at the start of the turn"
+description = "🂠 at the start of the turn"
