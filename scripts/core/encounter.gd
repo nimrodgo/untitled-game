@@ -291,12 +291,7 @@ func sell_trinket(idx: int) -> bool:
 func buy_enhancement(slot: int, card: CardInstance) -> bool:
 	if card == null or not can_buy_enhancement(slot, card):
 		return false
-	var e := shop.take_enhancement(slot)
-	player.coins -= e.cost
-	card.enhancements.append(e)
-	log_line("You enhance %s with %s." % [_card_name(card), e.display_name])
-	_begin_action()
-	_finish_action_if(GameRules.ENHANCEMENT_BUY_IS_ACTION, false)
+	_buy_enhancement(slot, card)
 	return true
 
 
@@ -655,10 +650,7 @@ func _resolve_play(p: PlayerState, card: CardInstance, first: bool) -> void:
 	await _run(card.get_on_play(), ctx)
 	p.played_log.append(card)
 	if first and _pile_of(p, card) == 0 and not p.removed.has(card) and not p.destroyed.has(card):
-		if card.destroys_on_play():
-			await trash_card(p, card, true)
-		else:
-			p.in_play.append(card)
+		p.in_play.append(card)
 	await _fire(GameRules.Trigger.CARD_PLAYED, p, ctx)
 	var o := opponent_of(p)
 	await _fire(GameRules.Trigger.OPPONENT_CARD_PLAYED, o, _ctx(o, card))
@@ -671,6 +663,21 @@ func _buy_from_market(slot: int) -> void:
 	await buy_instance(player, CardInstance.new(cd), card_price(player, cd.cost))
 	_busy -= 1
 	await _finish_action_if(GameRules.CARD_BUY_IS_ACTION, _act_extra)
+
+
+func _buy_enhancement(slot: int, card: CardInstance) -> void:
+	_busy += 1
+	_begin_action()
+	var e := shop.take_enhancement(slot)
+	player.coins -= e.cost
+	if e.destroy_on_apply:
+		log_line("You use %s on %s." % [e.display_name, _card_name(card)])
+		await trash_card(player, card, true)
+	else:
+		card.enhancements.append(e)
+		log_line("You enhance %s with %s." % [_card_name(card), e.display_name])
+	_busy -= 1
+	await _finish_action_if(GameRules.ENHANCEMENT_BUY_IS_ACTION, false)
 
 
 func _buy_item(slot: int) -> void:

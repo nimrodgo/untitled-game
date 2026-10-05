@@ -14,8 +14,9 @@ extends Resource
 @export var on_discard: Array[Effect] = []
 ## The card stays in your hand at the end of every turn.
 @export var retain: bool = false
-## After its effects resolve, the card is destroyed (permanently) instead of going to the discard pile.
-@export var destroy_on_play: bool = false
+## Buying it destroys the chosen card (permanently) on the spot; the enhancement
+## is not attached to anything.
+@export var destroy_on_apply: bool = false
 ## The card counts as a curse for everything that looks at curses.
 @export var counts_as_curse: bool = false
 ## Text for the shop tile and appended to the card. Leave empty to auto-generate.
@@ -34,8 +35,8 @@ func get_description() -> String:
 		parts.append("When discarded: " + Effect.describe_list(on_discard))
 	if retain:
 		parts.append("Retained")
-	if destroy_on_play:
-		parts.append("Destroyed when played")
+	if destroy_on_apply:
+		parts.append("Destroys the card immediately")
 	if counts_as_curse:
 		parts.append("Counts as a curse")
 	return ". ".join(parts)
@@ -46,6 +47,6 @@ func card_text() -> String:
 	if description != "":
 		return description
 	if extra_on_play.is_empty() and on_discard.is_empty() and not retain \
-			and not destroy_on_play and not counts_as_curse:
+			and not destroy_on_apply and not counts_as_curse:
 		return ""   # make_instant only: the card already shows the instant icon
 	return get_description()

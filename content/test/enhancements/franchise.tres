@@ -17,6 +17,6 @@ make_instant = false
 extra_on_play = Array[ExtResource("1_eb8kf")]([SubResource("Resource_4hurc")])
 on_discard = Array[ExtResource("1_eb8kf")]([])
 retain = false
-destroy_on_play = false
+destroy_on_apply = false
 counts_as_curse = false
 description = "When you play this card, add a copy to your deck"

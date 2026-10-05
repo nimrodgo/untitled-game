@@ -710,13 +710,21 @@ func _enhancement_rules() -> void:
 	e.pass_turn()
 	_check(e.player.discard.has(c) or e.player.hand.has(c) == false, "Boomerang: end-of-round cleanup still discards it")
 
-	# Trim: destroyed right after it resolves.
-	e = _enc(DECK5 + DECK5)
-	c = _give_enh(e, "example1", "fleeting")
-	e.play_card(c)
-	_check(e.player.destroyed.has(c) and not e.player.in_play.has(c) and not e.player.discard.has(c),
-		"Fleeting: destroyed instead of going in play")
+	# Trim: buying it destroys the chosen card immediately (not when played).
+	e = _enc(DECK5 + DECK5, true, false, ENC_DIR % "clutter")
+	e.shop.enhancements[0] = _enh("fleeting")
+	c = e.player.hand[0]
+	var keep_c: CardInstance = e.player.hand[1]
+	var coins_before := e.player.coins
+	_check(e.can_buy_enhancement(0, c), "Fleeting: can be bought with a card in hand")
+	_check(e.buy_enhancement(0, c), "Fleeting: buy_enhancement succeeds")
+	_check(e.player.destroyed.has(c) and not e.player.hand.has(c), "Fleeting: the card is destroyed the moment you buy it")
+	_check(c.enhancements.is_empty() and e.player.hand.has(keep_c), "Fleeting: nothing is attached, other cards untouched")
+	_check(e.player.coins == coins_before - 3, "Fleeting: pays 3 coins")
+	_check(e.shop.enhancements[0] == null, "Fleeting: the slot is empty until the next round")
 	_consistent(e, "Fleeting")
+	_check(e.is_player_turn() or e.active == e.enemy or e.round_num > 1, "Fleeting: the purchase resolves (turn not stuck)")
+	# A plain play never destroys anything.
 	e = _enc(DECK5 + DECK5)
 	c = _give(e, "example1")
 	e.play_card(c)

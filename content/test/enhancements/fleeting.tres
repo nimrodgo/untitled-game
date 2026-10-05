@@ -13,6 +13,6 @@ make_instant = false
 extra_on_play = Array[ExtResource("1_eiyhi")]([])
 on_discard = Array[ExtResource("1_eiyhi")]([])
 retain = false
-destroy_on_play = true
+destroy_on_apply = true
 counts_as_curse = false
 description = "This card is immediately 🔥"

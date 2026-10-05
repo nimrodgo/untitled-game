@@ -30,9 +30,9 @@ func _init() -> void:
 	e.description = "When this is ⤵, 🂠 it"
 	_save(e)
 
-	# Trim: This card is immediately 🔥
+	# Trim: This card is immediately 🔥 (the moment you buy it, not when played)
 	e = _make("fleeting", "Fleeting", CardSets.Id.TRIM)
-	e.destroy_on_play = true
+	e.destroy_on_apply = true
 	e.description = "This card is immediately 🔥"
 	_save(e)
 
