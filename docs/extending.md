@@ -39,6 +39,12 @@
 2. Update it wherever it changes.
 3. Expose it in `Encounter.text_vars()` for `{name}` in text. `GainCoinsPerStatEffect` can use any `PlayerState` field automatically.
 
+## Add a new card set
+
+1. Append the id to `CardSets.Id` and an entry to `_INFO` (name, color) in `scripts/data/card_sets.gd`. **Only append**: the numbers are stored in `.tres` files.
+2. Set `card_set` on the new pieces (`.tres` files, or the `SETS` map in `tools/build_test_content.gd`).
+3. List the set in an encounter's `card_sets`. Nothing else: `ContentLibrary` finds the pieces by scanning `content/test/`.
+
 ## Add a new purchasable category
 
 This touches everything, in this order: a new Data resource → `EncounterData` pool and slots → `ShopState` (bag, `setup`, `restock`, `take_*`) → `Encounter` (`can_buy_*`, `buy_*`, and an `*_IS_ACTION` rule) → the `_fill_shop()` group plus a drop target.
@@ -60,15 +66,16 @@ godot --headless --path . --script res://tools/simulate.gd -- res://content/test
 | Run layer | No map, gold, persistent deck or loadout from the run yet. `gold_reward`, `CardData.art`, `tags` and `EnemyData.portrait` are unused. |
 | Doc drift | `ItemData`'s header comment says items are bought "as a free action", but `ITEM_BUY_IS_ACTION = true`. |
 | Item text | `ENEMY_ACTED` has no phrase in `ItemData.get_description()`. Write a custom description for items with that trigger. |
-| Unused fields | `PlayerState.passed` and `can_shop_items` are set but never read. |
 | Extra action | Ignored for trinket, trinket-upgrade and enhancement purchases (see [effects-reference.md](effects-reference.md#where-context-output-effects-work)). |
 | Instant + enemy | Instant cards never trigger an enemy response, even with `ExtraActionEffect`. |
 | Copies | `PlayCopyEffect` / replays resolve the original card's effects with that card as "this card", so copying "🔥 this ➡ …" destroys the original. |
 | Curses | `permanent` is only a flag until the run layer exists. |
 | Enemy choices | Enemies never get choices; effects that ask the player something are meant for the player's side. |
 | `StealCoinsEffect` | Ignores `target`. It always takes from the opponent. |
-| Test content | Regenerating it overwrites hand edits in `content/test/`. |
-| Balance | With the idea cards in the pool the bot wins about 55% at target 10. It plays many new cards badly. |
+| Test content | `tools/build_test_content.gd` is out of sync with the hand-edited `.tres` files, so regenerating overwrites those edits (see [tools-and-deploy.md](tools-and-deploy.md#headless-tools-tools)). Prefer editing the `.tres` files directly. |
+| Enhancements | Only a card **in your hand** can be enhanced; there is no picker for the deck or discard pile. Prices (3) and names are placeholders. Fleeting ("immediately 🔥") is implemented as destroy-after-play, which is still to be confirmed. |
+| Card sets | Retain has only 2 pieces. Market and Draw have no trinkets, Coins has no item. Toll Booth only sells the Coin Trinket, so Borrowed Power (Utility) is dead there. |
+| Balance | The greedy bot wins about 55% at target 10 on the TEST Encounter. On the themed encounters it wins roughly 16–24% (Hag's Hex, Loan Shark) to 64–86% (Ink Cloud, Toll Booth, Clutter). It undervalues curse synergy, so treat these as a floor; the targets are untuned. |
 | UI | Everything is built in code with placeholder colors and no art. Emoji rely on the `Icons` SVG set. |
 
 ## Next candidates

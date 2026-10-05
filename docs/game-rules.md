@@ -60,10 +60,14 @@ flowchart TD
 
 | Row | Starting stock | Restock (start of each round after the first) |
 |---|---|---|
-| Cards | `card_slots` random picks from `card_pool` (duplicates make a card more likely) | **Every** card slot is rerolled |
-| Items / Trinkets / Upgrades | Drawn from a shuffled "bag" of each pool (no repeats) | Only **empty** slots refill, from what's left in the bag |
+| Cards | `card_slots` random picks from the card pool (duplicates make a card more likely) | **Every** card slot is rerolled |
+| Items | Drawn from a shuffled "bag" of the item pool (no repeats) | Only **empty** slots refill, from what's left in the bag |
+| Trinkets | A weighted pick from the trinket pool (no repeats on screen) | **Every** slot is rerolled |
+| Upgrades (enhancements) | A pick from the enhancement pool (no repeats on screen) | **Every** slot is rerolled |
 
 - Buying **doesn't refill** the slot during the round. The legacy flag `refill_card_slots` changes that.
+- **What the pools contain:** an encounter lists its `card_sets`; it sells every card, item, trinket and enhancement of those sets **plus Utility and Coins** (`CardSets.ALWAYS_SOLD`). The manual `*_pool` fields are extras on top (see [content-design.md](content-design.md#card-sets)).
+- **Price overrides:** an owned item with `card_price_override` (Needful: 0) sets the price of **every** market card (the lowest override wins). The tile shows the normal price struck through.
 - If you can't afford something, it's shown dimmed and you can't drag it.
 
 ## Buying and playing, in order

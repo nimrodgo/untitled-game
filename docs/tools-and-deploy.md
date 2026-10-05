@@ -7,8 +7,9 @@ All of them run with `godot --headless --path . --script res://tools/<name>.gd -
 | Tool | Args (defaults) | What it does |
 |---|---|---|
 | `simulate.gd` | `[encounter.tres] [loadout.tres] [runs]` (test encounter, test loadout, 200) | A greedy `SimBot` plays the player side N times. It prints the win %, average final coins and enemy actions per encounter. |
-| `build_test_content.gd` | — | Rewrites everything in `content/test/` from code |
-| `build_encounters.gd` | — | Rebuilds the 5 themed encounters + their enemies. Each encounter lists its `card_sets`; the pools are not saved, they are resolved at runtime, so moving a piece to another set needs no re-run. |
+| `build_test_content.gd` | — | Rewrites the cards, items, trinkets, curses, TEST enemy / encounter and loadout in `content/test/` from code, and applies the card-set map (`SETS`). **Careful:** several `.tres` texts were edited by hand afterwards (Rush Order, Cursed Luck, Furnace, Incinerator, Rebate, Scrap Dealer), and the script still has the old wording, so re-running it overwrites those edits and drops the `uid`s of the hand-made originals. Restore them from git afterwards, or sync the script first. |
+| `build_enhancements.gd` | — | Rewrites `content/test/enhancements/` (one enhancement per card set). Safe to re-run: it only touches that folder. |
+| `build_encounters.gd` | — | Rebuilds the 5 themed encounters + their enemies and the Toll passive. Each encounter lists its `card_sets` (and `enhancement_slots = 1`); the pools are not saved, they are resolved at runtime, so moving a piece to another set needs no re-run. Safe to re-run (it doesn't touch cards). |
 | `test_mechanics.gd` | — | Rules tests: plays every card, item and trinket level, then checks specific rules (costs, choices, retain, pass, extra turn, curses, items). Prints FAILs and a summary; exit code 1 on failure. |
 | `serve_web.gd` | `[port]` (8443) | A tiny HTTPS static server for `build/web`, using a self-signed certificate |
 

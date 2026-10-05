@@ -36,8 +36,9 @@ Each effect implements these methods:
 | `DiscardRandomEffect` | `amount`=1 | Discards random cards from the target's hand (enemy intents: set `target = OPPONENT`) |
 | `DiscardFromDeckEffect` | `look`=1 | Look at the top N cards of your deck; discard any of them (in order, optional) |
 | `OfferRedrawEffect` | — | For a `CARD_DRAWN` item: you may discard the card just drawn to draw another. Declining, or the start-of-turn draw, doesn't use up the item. |
-| `DrawLockEffect` | — | You can't draw additional cards this turn |
+| `DrawLockEffect` | — | The **target** can't draw additional cards this turn (an enemy intent with `target = OPPONENT` locks *your* draws) |
 | `NextTurnDrawEffect` | `amount`=1 | Draw N extra at the start of your next turn |
+| `DrawThisCardEffect` | — | Draws the card this effect belongs to into your hand from wherever it is (e.g. the discard pile). Nothing while draws are locked. Used by the Boomerang enhancement. Text "🂠 this card". |
 
 ### Remove, destroy, move
 
@@ -47,6 +48,8 @@ Each effect implements these methods:
 | `MoveCardsEffect` | `from_piles`, `to_zone`, `curses_only`, `amount`=0 | Move cards between piles (no triggers). `amount=0` = all matching cards; otherwise you choose. |
 | `TransformCardsEffect` | `into` | Choose any number of cards in your hand; each becomes `into` (upgrades are lost) |
 | `AddCardEffect` | `card`, `amount`=1, `zone`=DRAW_SHUFFLE | Creates new copies of a card (curses: "Shuffle C3 into your deck", "Gain C2") |
+| `AddRandomCurseEffect` | `curses`, `amount`=1, `zone`=DRAW_SHUFFLE | Adds `amount` curses picked at random from `curses` (with the encounter's rng). Used by Needful. |
+| `AddCopyOfThisCardEffect` | `zone`=DRAW_SHUFFLE | Adds a copy of the card this effect belongs to. The copy is the plain card (no enhancements), so copies can't snowball. Used by the Franchise enhancement. |
 
 `piles` / `from_piles` are flags: Hand, Deck (draw pile), Discard. "Remove / destroy" default to all three, "discard" is from the hand unless stated otherwise.
 

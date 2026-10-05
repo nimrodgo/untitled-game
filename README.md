@@ -1,81 +1,49 @@
 # Card Sharks — prototype
 
-Aquatic roguelike deckbuilder where every encounter is a shop. Current slice:
-one encounter, full rules engine, landscape (phone-friendly) placeholder UI, TEST content.
+Aquatic roguelike deckbuilder where **every encounter is a shop**. You don't fight with damage: you race to
+reach a coin target while an enemy steals, taxes and snatches from the market.
 
-## Encounter rules (as implemented)
-- An encounter lasts `rounds` rounds (default 3). Win = at least `coin_target` coins after the last round.
-- Each round is **your turn**: draw up to 5, then take actions one at a time until you **Pass**.
-  - Free: play Instant (⚡) cards, use each trinket (once per round).
-  - Actions: play a non-instant card, buy a card / item / trinket / upgrade, upgrade a trinket.
-- The **enemy** doesn't play cards. It follows a scripted intent cycle (like Slay the Spire) and answers
-  your actions with its next intent — at most `actions_per_round` times per round (pips on its panel).
-  After that you act freely. It can have passive items; it never buys items or trinkets.
-- The **market** doesn't refill when you buy; it restocks at the start of each round
-  (new cards; sold-out item/trinket slots refill from their pools).
-- Bought cards resolve their **on-buy** effects, then get shuffled into your deck.
-- Played cards stay "in play" until the round ends, then go to discard.
-- "This turn" in card text = this round (the opening hand doesn't count as drawn).
+Current slice: a full rules engine, a landscape (phone-friendly) placeholder UI, TEST content grouped into
+8 card sets, and 5 themed encounters (one is picked at random on every launch). No run layer yet.
+Godot **4.6.3**, GDScript, GL Compatibility.
 
-Tunables live in `scripts/core/game_rules.gd`; per-enemy action count in its EnemyData.
+**Playtest:** https://nimrodgo.github.io/untitled-game/ (rebuilt on every push to `main`).
+
+## Quick start
+1. Open this folder in Godot 4.6.3 and press **F5**.
+2. Drag a card out of your hand to play it. Drag a market card onto your deck to buy it.
+3. Have at least 10 coins after round 3.
 
 ## Controls
-- **Play:** drag a card out of your hand and let go — it glows gold once releasing would play it.
+- **Play:** drag a card out of your hand and let go. It glows gold once releasing would play it.
 - **Buy a card:** drag it from the market onto your deck (bottom right).
 - **Buy an item / trinket:** drag it onto your Items / Trinkets slots (left). Valid targets pulse while you drag.
-- **Market:** everything for sale is on screen at once — cards on the top row, items / trinkets (/ upgrades) below.
-- **Card layout:** the main text is what the card does when played; the gold strip with the bag icon
-  at the bottom is what it does when bought.
+- **Upgrade (enhancement):** tap the upgrade tile, pay, then tap a card in your hand.
 - **Inspect:** tap anything (cards, market tiles, gear, the enemy's intent, your deck) for details and buttons.
-- **Your cards:** tap the deck to see your deck, hand, played cards and discard.
-- Coin changes pop up next to the coin counters; the enemy's intent pulses when it acts.
-- Landscape only; on a phone held upright the game asks you to rotate.
+- **Card layout:** the main text is what the card does when played; the gold strip with the bag icon at the
+  bottom is what it does when bought.
+- Landscape only; on a phone held upright the game asks you to rotate. On the web, tap **Fullscreen**, or
+  install it as an app (Chrome: in-game **Install** button or menu ⋮ → Add to Home screen).
 
-## Playtest from anywhere (GitHub Pages)
-Every push to `main` builds the Web version and publishes it to
-`https://<your-user>.github.io/<repo>/` via `.github/workflows/deploy-web.yml`.
-The Web export template is bundled in `export_templates/`, so the build needs no downloads besides Godot.
+## Documentation
+Everything else lives in [`docs/`](docs/README.md):
 
-One-time setup:
-1. Create a new **public** repository on github.com (Pages on private repos needs a paid plan).
-   Don't add a README/.gitignore there — the project already has them.
-2. Push this folder to it. Easiest: GitHub Desktop → File → Add local repository → pick this folder →
-   "create a repository" → Publish. Or from a terminal in this folder:
-   ```
-   git init -b main
-   git add .
-   git commit -m "Card Sharks prototype"
-   git remote add origin https://github.com/<your-user>/<repo>.git
-   git push -u origin main
-   ```
-3. On GitHub: repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-   Then **Actions → "Deploy web build to GitHub Pages" → Run workflow** (only needed the first time;
-   afterwards every push redeploys automatically, ~2 minutes).
-4. Open the link on your phone, turn it sideways, and tap **Fullscreen** (locks landscape on Android).
-5. **Install it as an app:** in Chrome on Android tap the in-game **Install** button (appears once Chrome
-   offers it) or Chrome menu ⋮ → **Add to Home screen / Install app**. It then opens fullscreen and
-   landscape from its own icon, and works offline after the first load. (iPhone: Safari → Share →
-   Add to Home Screen.)
+| Doc | Contents |
+|---|---|
+| [game-rules.md](docs/game-rules.md) | How an encounter plays out: rounds, actions, enemy, market, win condition, tunables |
+| [architecture.md](docs/architecture.md) | Code layers, classes, signals |
+| [content-design.md](docs/content-design.md) | Making cards, items, trinkets, enhancements, enemies, encounters; card sets |
+| [effects-reference.md](docs/effects-reference.md) | Every effect primitive, trigger, zone and text placeholder |
+| [ui.md](docs/ui.md) | Screen layout, drag and drop, card visuals |
+| [tools-and-deploy.md](docs/tools-and-deploy.md) | Simulator, content generators, tests, phone playtest, GitHub Pages deploy |
+| [extending.md](docs/extending.md) | Adding mechanics, known gaps |
 
-Same-Wi-Fi alternative without GitHub: `playtest_mobile.bat` exports and serves the build over HTTPS
-from your PC (`tools/serve_web.gd`); accept the self-signed certificate warning on the phone.
+Ideas for future cards and items are in [`design/ideas.md`](design/ideas.md).
 
-## Where things are
-- `scripts/data/` — Resource types you design with: CardData, ItemData, TrinketData (+TrinketLevel),
-  EnhancementData, EnemyData (+EnemyIntent), EncounterData, LoadoutData.
-- `scripts/data/effects/` — effect primitives (gain/lose/steal coins, draw, discard, buy destination,
-  extra action, snatch market card, add card). New mechanics = new Effect subclass.
-- `scripts/core/encounter.gd` — rules engine (UI-agnostic).
-- `scripts/ui/` — code-built mobile UI (`encounter_screen.gd`, `hand_view.gd` = drag/fan, `card_view.gd`).
-- `scripts/sim/sim_bot.gd` — greedy player bot, used only by the simulator.
-- `content/test/` — current test content (Nimrod's cards), generated by `tools/build_test_content.gd`.
-
-## Designing content
-In the editor: FileSystem → right-click a folder → New Resource → CardData (etc.). Add effects in the
-inspector arrays. Enemies: create an EnemyData and add EnemyIntent entries to `intents` (they loop in order).
-Point an EncounterData at your enemy and pools, and set it on the Main node in `scenes/main.tscn`.
-
-## Tools (headless)
-- `godot --headless --script res://tools/simulate.gd -- <encounter.tres> <loadout.tres> <runs>`
-  Greedy bot vs the scripted enemy N times; prints win rate / avg coins / enemy actions.
-- `godot --headless --script res://tools/build_test_content.gd` regenerates the test content.
+## Headless tools (from the project folder)
+```
+godot --headless --path . --script res://tools/test_mechanics.gd      # rules tests
+godot --headless --path . --script res://tools/simulate.gd -- <encounter.tres> <loadout.tres> <runs>
+```
+See [tools-and-deploy.md](docs/tools-and-deploy.md) for all tools, including the content generators
+(read the warning there before re-running `build_test_content.gd`).

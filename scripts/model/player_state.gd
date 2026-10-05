@@ -16,9 +16,7 @@ var removed: Array[CardInstance] = []
 var destroyed: Array[CardInstance] = []
 var items: Array[ItemInstance] = []
 var trinkets: Array[TrinketInstance] = []
-var passed := false
 var intent_index := 0   ## Enemy only.
-var can_shop_items := true   ## Enemies can never buy items/trinkets.
 var cards_bought := 0
 ## Stats usable by effects (GainCoinsPerStatEffect) and card text ({name}).
 ## "Turn" = your whole round; the opening hand doesn't count as drawn.

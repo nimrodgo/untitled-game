@@ -21,6 +21,7 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 
 - The Trinkets panel always shows **3 frames** (the trinket limit): owned trinkets fill them, the rest are empty dashed "+" slots. A market trinket you can't fit is greyed out. A market trinket you **already own** is shown as its **next level**, tinted purple, at the upgrade price.
 - Market tiles **resize to fit the screen**. Cards take about 58% of the market's height when there's a gear row. `_fill_shop()` does the math.
+- Tile color is the piece's **set color** (`CardSets.color`); upgrade tiles blend it with purple. A discounted market card (Needful) shows its normal price in red, struck through, next to the new price.
 - If the screen is in portrait, a **"Please rotate"** overlay covers everything (`_check_orientation`).
 - **Fullscreen** on the web also tries `screen.orientation.lock('landscape')`.
 

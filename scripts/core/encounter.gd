@@ -74,7 +74,6 @@ func _init(encounter_data: EncounterData, loadout: LoadoutData) -> void:
 
 	var ed: EnemyData = data.enemy
 	enemy = PlayerState.new(ed.display_name if ed else "Enemy", true)
-	enemy.can_shop_items = false
 	if ed:
 		enemy.coins = ed.starting_coins
 		enemy.intent_index = ed.start_intent
@@ -707,7 +706,6 @@ func _pass() -> void:
 	if is_over:
 		return
 	_act_pass = false
-	player.passed = true
 	log_line("You pass.")
 	await _end_round()
 
@@ -718,7 +716,6 @@ func _start_round() -> void:
 	_busy += 1
 	round_num += 1
 	log_line("\n[b]— Round %d / %d —[/b]" % [round_num, total_rounds()])
-	player.passed = false
 	player.buys_this_round = 0
 	player.draw_locked = false
 	player.played_log.clear()

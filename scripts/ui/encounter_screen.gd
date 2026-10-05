@@ -389,7 +389,6 @@ func _fill_shop() -> void:
 			v.set_enabled(enc.can_buy_trinket(s))
 			var make := func(): return _shop_trinket_view(td, gear_tile)
 			_attach_buy_drag(v, func(): return enc.buy_trinket(s), _trinkets_panel, make)
-			var upgrading := enc.owned_trinket(td) != null
 			v.tapped.connect(func(): _show_popup(_shop_trinket_view(td, CardView.LARGE), "", [
 				{"label": "%d" % enc.trinket_buy_cost(td), "icon": "🛍", "enabled": enc.can_buy_trinket(s),
 					"cb": func(): _buy_with_fx(func(): return enc.buy_trinket(s), make.call(), _trinkets_panel)}]))
