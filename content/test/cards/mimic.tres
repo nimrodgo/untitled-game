@@ -10,6 +10,7 @@ script = ExtResource("2_wj8gg")
 [resource]
 script = ExtResource("3_hv2nf")
 id = &"mimic"
+card_set = 7
 display_name = "Mimic"
 cost = 2
 on_play = Array[ExtResource("1_440nw")]([SubResource("Resource_qhyba")])

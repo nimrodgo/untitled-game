@@ -16,6 +16,7 @@ amount = 2
 [resource]
 script = ExtResource("3_2567r")
 id = &"ember"
+card_set = 5
 display_name = "Ember"
 on_play = Array[ExtResource("1_hm6me")]([SubResource("Resource_5wm56")])
 on_play_text = "🪙🪙. When this is 🔥, 🂠🂠"

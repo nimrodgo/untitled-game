@@ -15,6 +15,7 @@ amount = 2
 [resource]
 script = ExtResource("4_7julw")
 id = &"clearance"
+card_set = 8
 display_name = "Clearance"
 cost = 2
 instant = true

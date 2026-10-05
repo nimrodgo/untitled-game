@@ -11,6 +11,7 @@ play_then_destroy = true
 [resource]
 script = ExtResource("3_rt135")
 id = &"impulse_buy"
+card_set = 8
 display_name = "Impulse Buy"
 cost = 2
 on_play = Array[ExtResource("1_2mht2")]([SubResource("Resource_vmg64")])

@@ -31,6 +31,7 @@ options = Array[ExtResource("2_qrun0")]([SubResource("Resource_7cp2b"), SubResou
 [resource]
 script = ExtResource("5_kucm3")
 id = &"purge"
+card_set = 5
 display_name = "Purge"
 cost = 2
 on_play = Array[ExtResource("1_7jqd5")]([SubResource("Resource_bxe20")])

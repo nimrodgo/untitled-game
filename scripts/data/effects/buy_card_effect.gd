@@ -14,8 +14,8 @@ enum Source { MARKET, REMOVED, DESTROYED }
 @export var play_then_destroy: bool = false
 
 
-func _cost(_ctx: EffectContext, cost: int) -> int:
-	return 0 if free else cost
+func _cost(ctx: EffectContext, cost: int) -> int:
+	return 0 if free else ctx.encounter.card_price(ctx.owner, cost)
 
 
 func apply(ctx: EffectContext) -> void:

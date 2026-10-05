@@ -21,6 +21,7 @@ amount = 5
 [resource]
 script = ExtResource("4_j8mhd")
 id = &"scorched_earth"
+card_set = 5
 display_name = "Scorched Earth"
 on_play = Array[ExtResource("1_23qyq")]([SubResource("Resource_j5aoa"), SubResource("Resource_oq20i"), SubResource("Resource_1plnt")])
 on_play_text = "🔥 this card and your deck. 🪙🪙🪙🪙🪙"

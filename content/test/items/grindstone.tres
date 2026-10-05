@@ -11,6 +11,7 @@ amount = 2
 [resource]
 script = ExtResource("3_dsrbd")
 id = &"grindstone"
+card_set = 4
 display_name = "Grindstone"
 cost = 5
 trigger = 15

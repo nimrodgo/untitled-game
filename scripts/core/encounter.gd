@@ -151,7 +151,18 @@ func can_buy_card(slot: int) -> bool:
 	if not is_player_turn() or slot < 0 or slot >= shop.cards.size():
 		return false
 	var c: CardData = shop.cards[slot]
-	return c != null and player.coins >= c.cost
+	return c != null and player.coins >= card_price(player, c.cost)
+
+
+## What buying a card with base cost `base` costs `p` right now (items such as
+## Needful override it). The lowest override wins.
+func card_price(p: PlayerState, base: int) -> int:
+	var price := base
+	for it in p.items:
+		var o: int = it.data.card_price_override
+		if o >= 0 and o < price:
+			price = o
+	return price
 
 
 func can_buy_item(slot: int) -> bool:
@@ -654,7 +665,7 @@ func _buy_from_market(slot: int) -> void:
 	_busy += 1
 	_begin_action()
 	var cd: CardData = shop.take_card(slot)
-	await buy_instance(player, CardInstance.new(cd), cd.cost)
+	await buy_instance(player, CardInstance.new(cd), card_price(player, cd.cost))
 	_busy -= 1
 	await _finish_action_if(GameRules.CARD_BUY_IS_ACTION, _act_extra)
 

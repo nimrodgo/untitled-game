@@ -16,6 +16,7 @@ amount = 2
 [resource]
 script = ExtResource("4_hxep2")
 id = &"sift"
+card_set = 4
 display_name = "Sift"
 on_play = Array[ExtResource("1_pv8pl")]([SubResource("Resource_kgb4f"), SubResource("Resource_2iqx8")])
 on_play_text = "🂠🂠⤵⤵"

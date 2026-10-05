@@ -11,6 +11,7 @@ source = 1
 [resource]
 script = ExtResource("3_7l1bp")
 id = &"salvage"
+card_set = 5
 display_name = "Salvage"
 on_play = Array[ExtResource("1_nwem0")]([SubResource("Resource_4e02g")])
 on_play_text = "Buy a card you removed 🗑 this encounter"

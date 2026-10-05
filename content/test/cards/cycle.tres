@@ -16,6 +16,7 @@ amount = 2
 [resource]
 script = ExtResource("4_q4p4f")
 id = &"cycle"
+card_set = 4
 display_name = "Cycle"
 on_play = Array[ExtResource("1_8f72b")]([SubResource("Resource_dl4so"), SubResource("Resource_fm583")])
 on_play_text = "⤵ ➡ 🂠🂠"

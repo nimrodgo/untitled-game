@@ -55,6 +55,7 @@ text = "⚡Shuffle 2 Dead Weights into your deck. 🗑🗑🗑🗑"
 [resource]
 script = ExtResource("6_jjeqw")
 id = &"dust_pan"
+card_set = 9
 display_name = "Dust Pan"
 cost = 3
 levels = Array[ExtResource("1_cnwei")]([SubResource("Resource_qju17"), SubResource("Resource_1vul8"), SubResource("Resource_a7nm7")])

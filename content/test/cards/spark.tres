@@ -17,6 +17,7 @@ all = true
 [resource]
 script = ExtResource("4_apmpy")
 id = &"spark"
+card_set = 7
 display_name = "Spark"
 instant = true
 on_play = Array[ExtResource("1_is0jr")]([SubResource("Resource_rwcic"), SubResource("Resource_6tukv")])

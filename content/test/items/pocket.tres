@@ -11,6 +11,7 @@ optional = true
 [resource]
 script = ExtResource("3_gno31")
 id = &"pocket"
+card_set = 6
 display_name = "Pocket"
 cost = 4
 trigger = 10

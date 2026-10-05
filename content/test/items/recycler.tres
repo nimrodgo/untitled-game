@@ -10,6 +10,7 @@ script = ExtResource("2_1jg8j")
 [resource]
 script = ExtResource("3_xbky0")
 id = &"recycler"
+card_set = 5
 display_name = "Recycler"
 cost = 4
 trigger = 18

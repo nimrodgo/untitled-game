@@ -10,6 +10,7 @@ script = ExtResource("2_j58ua")
 [resource]
 script = ExtResource("3_5hgsr")
 id = &"curse_ward"
+card_set = 9
 display_name = "Curse Ward"
 trigger = 14
 effects = Array[ExtResource("1_bof7m")]([SubResource("Resource_nb1o4")])

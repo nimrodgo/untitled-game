@@ -10,6 +10,7 @@ script = ExtResource("2_ygr7p")
 [resource]
 script = ExtResource("3_wi3lq")
 id = &"big_hands"
+card_set = 3
 display_name = "Big Hands"
 cost = 5
 trigger = 12

@@ -272,6 +272,25 @@ func _rules(_data: EncounterData) -> void:
 	before = e.player.coins
 	e.play_card(_give(e, "sift"))
 	_check(e.player.coins == before + 4, "Grindstone: +2 per discard")
+	e = _enc(["example1", "example1", "example1", "example1", "example1"])
+	e.player.items.append(ItemInstance.new(_item("shredder")))
+	e.play_card(_give(e, "sift"))
+	_check(e.player.removed.size() == 2, "Shredder: both discarded cards are removed")
+	e = _enc(["example1", "example1", "example1", "example1", "example1"], true, true)
+	e.shop.cards[0] = _card("all_in")
+	var base_price: int = e.shop.cards[0].cost
+	_check(e.card_price(e.player, base_price) == base_price, "no discount without Needful")
+	e.player.items.append(ItemInstance.new(_item("needful")))
+	_check(e.card_price(e.player, base_price) == 0, "Needful: market cards cost 0")
+	e.player.coins = 0
+	_check(e.can_buy_card(0), "Needful: buy with 0 coins")
+	e.buy_card(0)
+	var curse_n := 0
+	for pile in [e.player.draw_pile, e.player.hand, e.player.discard]:
+		for cc in pile:
+			if cc.is_curse():
+				curse_n += 1
+	_check(e.player.coins == 0 and curse_n == 1, "Needful: free buy adds exactly one random curse (%d)" % curse_n)
 	e = _enc(["example2", "example2", "example2", "example2", "example2"])
 	e.player.items.append(ItemInstance.new(_item("furnace")))
 	c = _in_hand(e, "example2")

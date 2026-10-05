@@ -17,6 +17,7 @@ amount = 2
 [resource]
 script = ExtResource("5_mojaw")
 id = &"cursed_cache"
+card_set = 9
 display_name = "Cursed Cache"
 cost = 0
 on_play = Array[ExtResource("1_np5qb")]([SubResource("Resource_e723f"), SubResource("Resource_t721j")])

@@ -12,6 +12,7 @@ gain_cost_as_coins = true
 [resource]
 script = ExtResource("3_qh11t")
 id = &"pawn"
+card_set = 5
 display_name = "Pawn"
 on_play = Array[ExtResource("1_7fgqu")]([SubResource("Resource_e5hfx")])
 on_play_text = "🔥 from hand. Gain 🪙 equal to its cost"

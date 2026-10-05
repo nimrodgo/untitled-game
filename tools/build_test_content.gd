@@ -252,6 +252,16 @@ func _init() -> void:
 		_item("echo_chamber", "Echo Chamber", 6, T.CARD_PLAYED, [extra_play], 0, 1,
 			"The first card you play each turn is played an extra time"),
 	]
+	idea_items.append(_item("shredder", "Shredder", 4, T.CARD_DISCARDED, [_trash_self(false)], 0, 0,
+		"When you ⤵, 🗑 it"))
+	# "One never pays here - not with money": every market card is free, but each buy adds a random curse.
+	var random_curse := AddRandomCurseEffect.new()
+	random_curse.curses.assign([dead_weight, barnacle, driftwood, leaky_purse])
+	var bargain := _item("needful", "Needful", 5, T.CARD_BOUGHT, [random_curse], 0, 0,
+		"One never pays here - not with money")
+	bargain.card_price_override = 0
+	_save(bargain, "items/needful.tres")
+	idea_items.append(bargain)
 
 	# --- Trinkets ------------------------------------------------------------------
 	var coin_trinket := _trinket("coin_trinket", "Coin Trinket", 4, [
@@ -412,7 +422,87 @@ func _if(cond: ConditionalEffect.Condition, fx: Array) -> ConditionalEffect:
 	var e := ConditionalEffect.new(); e.condition = cond; e.effects.assign(fx); return e
 
 
+## Which set each piece of content belongs to (see scripts/data/card_sets.gd).
+const SETS := {
+	"dead_weight": CardSets.Id.CURSES,
+	"barnacle": CardSets.Id.CURSES,
+	"driftwood": CardSets.Id.CURSES,
+	"leaky_purse": CardSets.Id.CURSES,
+	"example2": CardSets.Id.COINS,
+	"all_in": CardSets.Id.COINS,
+	"snowball": CardSets.Id.COINS,
+	"tidy_up": CardSets.Id.UTILITY,
+	"patience": CardSets.Id.COINS,
+	"rebate": CardSets.Id.MARKET,
+	"shredder": CardSets.Id.DISCARD,
+	"needful": CardSets.Id.CURSE_SYNERGY,
+	"coin_trinket": CardSets.Id.COINS,
+	"example1": CardSets.Id.DRAW,
+	"binge": CardSets.Id.DRAW,
+	"drawful": CardSets.Id.DRAW,
+	"invest": CardSets.Id.DRAW,
+	"scheme": CardSets.Id.DRAW,
+	"undertow": CardSets.Id.DRAW,
+	"rest": CardSets.Id.DRAW,
+	"autopilot": CardSets.Id.UTILITY,
+	"dig": CardSets.Id.UTILITY,
+	"burnout": CardSets.Id.DRAW,
+	"big_hands": CardSets.Id.DRAW,
+	"cycle": CardSets.Id.DISCARD,
+	"sift": CardSets.Id.DISCARD,
+	"study": CardSets.Id.DISCARD,
+	"mulligan": CardSets.Id.DISCARD,
+	"spring": CardSets.Id.DISCARD,
+	"peek": CardSets.Id.DISCARD,
+	"grindstone": CardSets.Id.DISCARD,
+	"second_look": CardSets.Id.DISCARD,
+	"sieve": CardSets.Id.DISCARD,
+	"spyglass": CardSets.Id.DISCARD,
+	"scorched_earth": CardSets.Id.TRIM,
+	"pawn": CardSets.Id.TRIM,
+	"ember": CardSets.Id.TRIM,
+	"purge": CardSets.Id.TRIM,
+	"prune": CardSets.Id.TRIM,
+	"liquidate": CardSets.Id.TRIM,
+	"furnace": CardSets.Id.TRIM,
+	"incinerator": CardSets.Id.TRIM,
+	"scrap_dealer": CardSets.Id.TRIM,
+	"recycler": CardSets.Id.TRIM,
+	"forge": CardSets.Id.TRIM,
+	"hold": CardSets.Id.RETAIN,
+	"pocket": CardSets.Id.RETAIN,
+	"echo": CardSets.Id.UTILITY,
+	"mimic": CardSets.Id.UTILITY,
+	"necromancy": CardSets.Id.TRIM,
+	"borrowed_power": CardSets.Id.UTILITY,
+	"spark": CardSets.Id.UTILITY,
+	"tinker": CardSets.Id.UTILITY,
+	"meditate": CardSets.Id.UTILITY,
+	"echo_chamber": CardSets.Id.UTILITY,
+	"clearance": CardSets.Id.MARKET,
+	"free_sample": CardSets.Id.MARKET,
+	"impulse_buy": CardSets.Id.MARKET,
+	"rush_order": CardSets.Id.MARKET,
+	"phoenix": CardSets.Id.TRIM,
+	"salvage": CardSets.Id.TRIM,
+	"express_delivery": CardSets.Id.MARKET,
+	"cursed_cache": CardSets.Id.CURSE_SYNERGY,
+	"cursed_coin": CardSets.Id.CURSE_SYNERGY,
+	"risky_draw": CardSets.Id.CURSE_SYNERGY,
+	"hex": CardSets.Id.CURSE_SYNERGY,
+	"curse_recall": CardSets.Id.CURSE_SYNERGY,
+	"sweep": CardSets.Id.CURSE_SYNERGY,
+	"curse_ward": CardSets.Id.CURSE_SYNERGY,
+	"cursed_luck": CardSets.Id.CURSE_SYNERGY,
+	"cursed_idol": CardSets.Id.CURSE_SYNERGY,
+	"ash_urn": CardSets.Id.CURSE_SYNERGY,
+	"dust_pan": CardSets.Id.CURSE_SYNERGY
+}
+
+
 func _save(res: Resource, rel: String) -> void:
+	if "card_set" in res and SETS.has(String(res.id)):
+		res.card_set = SETS[String(res.id)]
 	var path := DIR + rel
 	var err := ResourceSaver.save(res, path)
 	if err != OK:

@@ -11,6 +11,7 @@ mode = 1
 [resource]
 script = ExtResource("3_heqlf")
 id = &"echo_chamber"
+card_set = 7
 display_name = "Echo Chamber"
 cost = 6
 trigger = 5

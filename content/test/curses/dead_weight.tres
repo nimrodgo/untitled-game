@@ -6,6 +6,7 @@
 [resource]
 script = ExtResource("2_ex7k7")
 id = &"dead_weight"
+card_set = 1
 display_name = "Dead Weight"
 cost = 0
 playable = false

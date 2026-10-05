@@ -11,6 +11,7 @@ source = 1
 [resource]
 script = ExtResource("3_5j3kv")
 id = &"undertow"
+card_set = 3
 display_name = "Undertow"
 on_play = Array[ExtResource("1_4srl4")]([SubResource("Resource_t27sq")])
 on_play_text = "🂠 from the bottom of your deck"
