@@ -272,7 +272,7 @@ func _refresh() -> void:
 	_hand.modulate = Color.WHITE if my_turn or enc.is_over or picking_in_hand else Color(0.6, 0.62, 0.7)
 
 	_hand.spawn_point = _pile.target_center()   # the pile moves when the window resizes
-	_pile.set_counts(me.draw_pile.size(), me.discard.size() + me.in_play.size())
+	_pile.set_counts(me.draw_pile.size(), me.discard.size())
 	_pass_btn.disabled = not my_turn or pending_enh_slot >= 0
 	_pass_btn.text = "Pass" if enc.round_num < enc.total_rounds() else "Finish"
 	_table_hint.visible = pending_enh_slot >= 0 and _choice == null
@@ -541,7 +541,7 @@ func _show_deck_viewer() -> void:
 	var draw_sorted := me.draw_pile.duplicate()
 	draw_sorted.sort_custom(func(a, b): return a.get_name() < b.get_name())
 	var sections := [["Deck", draw_sorted, "(not in draw order)"], ["Hand", me.hand, ""],
-			["Played this round", me.in_play, ""], ["Discard", me.discard, ""]]
+			["Discard", me.discard, ""]]
 	if not me.removed.is_empty():
 		sections.append(["Removed 🗑", me.removed, "(this encounter)"])
 	if not me.destroyed.is_empty():

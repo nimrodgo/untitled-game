@@ -629,7 +629,7 @@ func _play_from_hand(card: CardInstance) -> void:
 
 
 ## Play a card that is in no pile yet: resolve it (plus pending replays),
-## then it goes in play unless its effects moved it somewhere else.
+## then it goes to the discard pile unless its effects moved it somewhere else.
 func _play(p: PlayerState, card: CardInstance, _from_hand: bool) -> void:
 	var replays := p.replay_next
 	p.replay_next = 0
@@ -646,7 +646,7 @@ func _resolve_play(p: PlayerState, card: CardInstance, first: bool) -> void:
 	await _run(card.get_on_play(), ctx)
 	p.played_log.append(card)
 	if first and _pile_of(p, card) == 0 and not p.removed.has(card) and not p.destroyed.has(card):
-		p.in_play.append(card)
+		p.discard.append(card)
 	await _fire(GameRules.Trigger.CARD_PLAYED, p, ctx)
 	var o := opponent_of(p)
 	await _fire(GameRules.Trigger.OPPONENT_CARD_PLAYED, o, _ctx(o, card))
@@ -764,8 +764,6 @@ func _end_round() -> void:
 		if not c.data.on_turn_end_in_hand.is_empty() and player.hand.has(c):
 			var ctx := _ctx(player, c)
 			await _run(c.data.on_turn_end_in_hand, ctx)
-	player.discard.append_array(player.in_play)
-	player.in_play.clear()
 	if GameRules.DISCARD_HAND_AT_ROUND_END:
 		var keep: Array[CardInstance] = []
 		for c in player.hand:
@@ -870,17 +868,16 @@ func _absorb(ctx: EffectContext) -> void:
 		_act_pass = _act_pass or ctx.pass_after
 
 
-## Which of p's piles holds c (GameRules.PILE_*; in play = 8; 0 = none).
+## Which of p's piles holds c (GameRules.PILE_*; 0 = none).
 func _pile_of(p: PlayerState, c: CardInstance) -> int:
 	if p.hand.has(c): return GameRules.PILE_HAND
 	if p.draw_pile.has(c): return GameRules.PILE_DRAW
 	if p.discard.has(c): return GameRules.PILE_DISCARD
-	if p.in_play.has(c): return 8
 	return 0
 
 
 func _take_from_piles(p: PlayerState, c: CardInstance) -> bool:
-	for pile in [p.hand, p.draw_pile, p.discard, p.in_play, p.removed, p.destroyed]:
+	for pile in [p.hand, p.draw_pile, p.discard, p.removed, p.destroyed]:
 		if pile.has(c):
 			pile.erase(c)
 			return true
