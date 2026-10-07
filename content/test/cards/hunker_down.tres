@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_eff"]
+[ext_resource type="Script" uid="uid://dtw8gorwismdf" path="res://scripts/data/effects/pass_effect.gd" id="2_pass"]
+[ext_resource type="Script" uid="uid://7ispvwv44rfb" path="res://scripts/data/effects/retain_cards_effect.gd" id="3_ret"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="4_card"]
+
+[sub_resource type="Resource" id="Resource_pass"]
+script = ExtResource("2_pass")
+
+[sub_resource type="Resource" id="Resource_ret"]
+script = ExtResource("3_ret")
+all_hand = true
+
+[resource]
+script = ExtResource("4_card")
+id = &"hunker_down"
+card_set = 6
+display_name = "Hunker Down"
+cost = 2
+on_play = Array[ExtResource("1_eff")]([SubResource("Resource_pass"), SubResource("Resource_ret")])
+on_play_text = "Pass. 📌 your hand this turn"
+on_buy_text = "TBD"

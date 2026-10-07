@@ -18,6 +18,7 @@ func _init() -> void:
 	_encounter_rules()
 	_enhancement_rules()
 	_deck_cycle_rules()
+	_shop_content_rules()
 	print("\n%d checks, %d failed" % [checks, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -887,3 +888,110 @@ func _one_enhancement_rules() -> void:
 	# Trim's enhancement only destroys, so it still works on an enhanced card.
 	e.shop.enhancements[0] = _enh("fleeting")
 	_check(e.can_buy_enhancement(0, c), "Trim enhancement can destroy an already-enhanced card")
+
+
+func _curses_owned(e: Encounter) -> int:
+	var n := 0
+	for pile in [e.player.draw_pile, e.player.hand, e.player.discard]:
+		for cc in pile:
+			if cc.is_curse():
+				n += 1
+	return n
+
+
+func _wait_enemy(e: Encounter) -> void:
+	while e.active == e.enemy:
+		e.enemy_act()
+
+
+func _shop_content_rules() -> void:
+	# Needful: the whole shop is free, and every purchase adds a curse.
+	var e := _enc(["example1", "example1", "example1", "example1", "example1"], true, true)
+	e.player.items.append(ItemInstance.new(_item("needful")))
+	e.player.coins = 0
+	e.shop.items[0] = _item("rebate")
+	_check(e.item_price(e.shop.items[0]) == 0 and e.can_buy_item(0), "Needful: items cost 0")
+	e.buy_item(0)
+	_check(e.player.coins == 0 and _curses_owned(e) == 1, "Needful: buying an item adds a curse")
+	_wait_enemy(e)
+	e.shop.trinkets[0] = _trinket("forge")
+	_check(e.trinket_buy_cost(e.shop.trinkets[0]) == 0 and e.buy_trinket(0), "Needful: trinkets cost 0")
+	_check(e.player.coins == 0 and _curses_owned(e) == 2 and e.player.trinkets[0].paid == 0,
+		"Needful: buying a trinket adds a curse, nothing paid")
+	_wait_enemy(e)
+	e.shop.trinkets[0] = _trinket("forge")
+	_check(e.trinket_buy_cost(e.shop.trinkets[0]) == 0 and e.buy_trinket(0), "Needful: trinket upgrades cost 0")
+	_check(e.player.trinkets[0].level == 1 and _curses_owned(e) == 3, "Needful: upgrading adds a curse")
+	_wait_enemy(e)
+	# Buying Needful itself doesn't curse you.
+	e = _enc(["example1", "example1", "example1", "example1", "example1"], true, true)
+	e.shop.items[0] = _item("needful")
+	e.player.coins = 10
+	e.buy_item(0)
+	_check(e.player.coins == 5 and _curses_owned(e) == 0, "Needful: buying it costs 5 and adds no curse")
+	# Enhancements are free too.
+	e = _enc(["example1", "example1", "example1", "example1", "example1"])
+	e.player.items.append(ItemInstance.new(_item("needful")))
+	e.player.coins = 0
+	e.shop.enhancements.append(_enh("gilded"))
+	var slot := e.shop.enhancements.size() - 1
+	var target := e.player.hand[0]
+	_check(e.buy_enhancement(slot, target), "Needful: enhancement for 0")
+	_check(target.enhancement != null and _curses_owned(e) == 1, "Needful: buying an enhancement adds a curse")
+
+	# Top Shelf: you may put a bought card on top of the deck.
+	e = _enc(["example1", "example1", "example1", "example1", "example1", "example2", "example2"])
+	e.player.items.append(ItemInstance.new(_item("top_shelf")))
+	e.shop.cards[0] = _card("spark")
+	e.buy_card(0)
+	_check(e.player.draw_pile.back().data.id == &"spark", "Top Shelf: accepted -> top of the deck")
+	e = _enc(["example1", "example1", "example1", "example1", "example1", "example2", "example2"], false)
+	e.player.items.append(ItemInstance.new(_item("top_shelf")))
+	e.shop.cards[0] = _card("spark")
+	e.buy_card(0)
+	_check(e.pending_choice != null and e.pending_choice.kind == ChoiceRequest.Kind.OPTIONS, "Top Shelf: asks")
+	e.submit_choice([1])
+	_check(e.player.draw_pile[0].data.id == &"spark", "Top Shelf: declined -> bottom of the deck")
+
+	# Stockroom: the bought slot restocks.
+	e = _enc(["example1", "example1", "example1", "example1", "example1"])
+	e.buy_card(0)
+	_check(e.shop.cards[0] == null, "without Stockroom the bought slot stays empty")
+	e = _enc(["example1", "example1", "example1", "example1", "example1"])
+	e.player.items.append(ItemInstance.new(_item("stockroom")))
+	e.buy_card(0)
+	_check(e.shop.cards[0] != null, "Stockroom: the bought slot restocks")
+
+	# Hunker Down: pass, keep the whole hand.
+	e = _enc(["example1", "example2", "example1", "example2", "example1", "example2", "example2", "example2"])
+	var hd := _give(e, "hunker_down")
+	var kept := e.player.hand.duplicate()
+	kept.erase(hd)
+	_check(e.play_card(hd), "Hunker Down: playable")
+	_check(e.round_num == 2, "Hunker Down: passes")
+	var all_kept := true
+	for c in kept:
+		all_kept = all_kept and e.player.hand.has(c)
+	_check(all_kept, "Hunker Down: whole hand retained")
+
+	# {gain}: Snowball and Liquidate show their current coin gain.
+	e = _enc(["example1", "example1", "example1", "example1", "example1"])
+	var sb := _give(e, "snowball")
+	_check(e.card_text_vars(sb.data, sb)["gain"] == 2, "Snowball shows 2")
+	e.play_card(sb)
+	_wait_enemy(e)
+	_check(e.card_text_vars(sb.data)["gain"] == 4, "Snowball shows 4 after one play")
+	_check(sb.play_text(e.card_text_vars(sb.data, sb)).begins_with("🪙🪙🪙🪙 and"), "Snowball text shows 4 coin icons")
+	e.player.card_bonus[&"snowball"] = 5
+	_check(sb.play_text(e.card_text_vars(sb.data, sb)).begins_with("7🪙 and"), "Snowball text shows 7🪙 past 5")
+	var lq := _give(e, "liquidate")
+	_check(e.card_text_vars(lq.data, lq)["gain"] == 3 * (e.player.hand.size() - 1), "Liquidate shows 3 x other cards")
+
+	# Every non-curse card has an on-buy text.
+	var missing: Array = []
+	for f in DirAccess.get_files_at("res://content/test/cards"):
+		if f.ends_with(".tres"):
+			var cd: CardData = load("res://content/test/cards/" + f)
+			if cd.get_buy_text() == "":
+				missing.append(cd.id)
+	_check(missing.is_empty(), "every card has an on-buy text %s" % str(missing))

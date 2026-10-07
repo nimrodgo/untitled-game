@@ -374,7 +374,7 @@ func _fill_shop() -> void:
 			var make := func(): return _item_view(it, true, gear_tile)
 			_attach_buy_drag(v, func(): return enc.buy_item(s), _items_panel, make)
 			v.tapped.connect(func(): _show_popup(_item_view(it, true, CardView.LARGE), "", [
-				{"label": "%d" % it.cost, "icon": "🛍", "enabled": enc.can_buy_item(s),
+				{"label": "%d" % enc.item_price(it), "icon": "🛍", "enabled": enc.can_buy_item(s),
 					"cb": func(): _buy_with_fx(func(): return enc.buy_item(s), make.call(), _items_panel)}]))
 			row.add_child(v)
 
@@ -402,11 +402,12 @@ func _fill_shop() -> void:
 				row.add_child(_empty_slot(gear_tile)); continue
 			var s := slot
 			var tint := CardSets.color(ed.card_set).lerp(Palette.CARD_ENH, 0.5)
-			var v := CardView.make(ed.display_name, ed.cost, ed.get_description(), tint, gear_tile, "", "", "", -1, ed.icon)
+			var e_price := enc.enhancement_price(ed)
+			var v := CardView.make(ed.display_name, e_price, ed.get_description(), tint, gear_tile, "", "", "", ed.cost, ed.icon)
 			v.set_enabled(enc.can_buy_enhancement(s))
 			v.tapped.connect(func(): _show_popup(
-				CardView.make(ed.display_name, ed.cost, ed.get_description(), tint, CardView.LARGE, "UPGRADE", "", "", -1, ed.icon), ed.description, [
-				{"label": "Choose card (%d)" % ed.cost, "enabled": enc.can_buy_enhancement(s),
+				CardView.make(ed.display_name, e_price, ed.get_description(), tint, CardView.LARGE, "UPGRADE", "", "", ed.cost, ed.icon), ed.description, [
+				{"label": "Choose card (%d)" % e_price, "enabled": enc.can_buy_enhancement(s),
 					"cb": func(): pending_enh_slot = s; _refresh()}]))
 			row.add_child(v)
 
@@ -776,36 +777,42 @@ func _picker_view(req: ChoiceRequest, item: Variant) -> CardView:
 
 func _card_data_view(cd: CardData, sz: Vector2) -> CardView:
 	var v := _card_data_view_raw(cd, sz)
-	_attach_hover(v, cd.get_play_text(_vars()) + " " + cd.get_buy_text(_vars()), _mentioned(cd))
+	var vars := _card_vars(cd)
+	_attach_hover(v, cd.get_play_text(vars) + " " + cd.get_buy_text(vars), _mentioned(cd))
 	return v
 
 
 func _card_data_view_raw(cd: CardData, sz: Vector2) -> CardView:
 	var price := enc.card_price(enc.player, cd.cost) if enc else cd.cost
-	return CardView.make(cd.display_name, price, cd.get_play_text(_vars()), CardSets.color(cd.card_set), sz,
-		"⚡" if cd.instant and not cd.has_custom_text() else "", "", cd.get_buy_text(_vars()), cd.cost)
+	var vars := _card_vars(cd)
+	return CardView.make(cd.display_name, price, cd.get_play_text(vars), CardSets.color(cd.card_set), sz,
+		"⚡" if cd.instant and not cd.has_custom_text() else "", "", cd.get_buy_text(vars), cd.cost)
 
 
 func _card_instance_view(c: CardInstance, sz: Vector2) -> CardView:
 	var v := _card_instance_view_raw(c, sz)
-	_attach_hover(v, c.play_text(_vars()) + " " + c.buy_text(_vars()), _mentioned(c.data), c.enhancement)
+	var vars := _card_vars(c.data, c)
+	_attach_hover(v, c.play_text(vars) + " " + c.buy_text(vars), _mentioned(c.data), c.enhancement)
 	return v
 
 
 func _card_instance_view_raw(c: CardInstance, sz: Vector2) -> CardView:
 	# An enhancement shows as a corner badge; it never changes the card's text.
-	return CardView.make(c.get_name(), c.get_cost(), c.play_text(_vars()), CardSets.color(c.data.card_set), sz,
-		"⚡" if c.is_instant() and not c.data.has_custom_text() else "", "", c.buy_text(_vars()), -1,
+	var vars := _card_vars(c.data, c)
+	return CardView.make(c.get_name(), c.get_cost(), c.play_text(vars), CardSets.color(c.data.card_set), sz,
+		"⚡" if c.is_instant() and not c.data.has_custom_text() else "", "", c.buy_text(vars), -1,
 		c.enhancement.icon if c.enhancement else "")
 
 
-func _vars() -> Dictionary:
-	return enc.text_vars() if enc else {}
+## Text values for one card, including its own {gain}.
+func _card_vars(cd: CardData, c: CardInstance = null) -> Dictionary:
+	return enc.card_text_vars(cd, c) if enc else {}
 
 
 func _item_view(it: ItemData, show_cost: bool, sz: Vector2 = CardView.SMALL) -> CardView:
-	var v := CardView.make(it.display_name, it.cost if show_cost else -1, it.get_description(), CardSets.color(it.card_set), sz,
-		"ITEM" if sz == CardView.LARGE else "")
+	var price := (enc.item_price(it) if enc else it.cost) if show_cost else -1
+	var v := CardView.make(it.display_name, price, it.get_description(), CardSets.color(it.card_set), sz,
+		"ITEM" if sz == CardView.LARGE else "", "", "", it.cost if show_cost else -1)
 	_attach_hover(v, it.get_description(), _mentioned_in(it.effects))
 	return v
 
@@ -815,8 +822,8 @@ func _trinket_data_view(td: TrinketData, sz: Vector2) -> CardView:
 	var desc := td.levels[0].get_text() if not td.levels.is_empty() else ""
 	if td.description != "":
 		desc = td.description + "\n" + desc
-	var v := CardView.make(td.display_name, td.cost, desc, CardSets.color(td.card_set), sz,
-		"TRINKET" if sz == CardView.LARGE else "")
+	var v := CardView.make(td.display_name, enc.trinket_buy_cost(td) if enc else td.cost, desc, CardSets.color(td.card_set), sz,
+		"TRINKET" if sz == CardView.LARGE else "", "", "", td.cost)
 	var fx: Array = []
 	for lv in td.levels:
 		fx.append_array(lv.effects)
@@ -834,8 +841,9 @@ func _shop_trinket_view(td: TrinketData, sz: Vector2) -> CardView:
 	var desc := next.get_text()
 	if td.description != "":
 		desc = td.description + "\n" + desc
-	return CardView.make("%s (Lv %d)" % [td.display_name, owned.level + 2], owned.upgrade_cost(), desc,
-		CardSets.color(td.card_set).lerp(Palette.CARD_ENH, 0.5), sz, "UPGRADE" if sz == CardView.LARGE else "")
+	return CardView.make("%s (Lv %d)" % [td.display_name, owned.level + 2], enc.trinket_buy_cost(td), desc,
+		CardSets.color(td.card_set).lerp(Palette.CARD_ENH, 0.5), sz, "UPGRADE" if sz == CardView.LARGE else "", "", "",
+		owned.upgrade_cost())
 
 
 ## Drag one of your trinkets onto the market to sell it (tap = inspect).

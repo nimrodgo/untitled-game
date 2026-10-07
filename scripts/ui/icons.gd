@@ -80,6 +80,11 @@ static func n(amount: int, icon: String) -> String:
 	return icon if amount == 1 else "%d%s" % [amount, icon]
 
 
+## Coins as icons: N times 🪙 up to 5, else "N🪙".
+static func coins(n: int) -> String:
+	return "🪙".repeat(n) if n <= 5 else "%d🪙" % n
+
+
 ## The distinct icons used in `text` (after symbolizing), in order of appearance.
 static func icons_in(text: String) -> Array:
 	var out: Array = []

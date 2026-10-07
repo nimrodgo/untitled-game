@@ -153,22 +153,35 @@ func can_buy_card(slot: int) -> bool:
 	return c != null and player.coins >= card_price(player, c.cost)
 
 
-## What buying a card with base cost `base` costs `p` right now (items such as
-## Needful override it). The lowest override wins.
-func card_price(p: PlayerState, base: int) -> int:
+## What buying anything from the market with base cost `base` costs `p` right
+## now (items such as Needful override it). The lowest override wins.
+func shop_price(p: PlayerState, base: int) -> int:
 	var price := base
 	for it in p.items:
-		var o: int = it.data.card_price_override
+		var o: int = it.data.shop_price_override
 		if o >= 0 and o < price:
 			price = o
 	return price
+
+
+## The price of a market card (see shop_price).
+func card_price(p: PlayerState, base: int) -> int:
+	return shop_price(p, base)
+
+
+func item_price(it: ItemData) -> int:
+	return shop_price(player, it.cost)
+
+
+func enhancement_price(e: EnhancementData) -> int:
+	return shop_price(player, e.cost)
 
 
 func can_buy_item(slot: int) -> bool:
 	if not is_player_turn() or slot < 0 or slot >= shop.items.size():
 		return false
 	var it: ItemData = shop.items[slot]
-	return it != null and player.coins >= it.cost
+	return it != null and player.coins >= item_price(it)
 
 
 ## Buying a trinket you already own upgrades it (for its next upgrade cost);
@@ -181,8 +194,8 @@ func can_buy_trinket(slot: int) -> bool:
 		return false
 	var owned := owned_trinket(t)
 	if owned:
-		return owned.can_upgrade() and player.coins >= owned.upgrade_cost()
-	return player.trinkets.size() < GameRules.MAX_TRINKETS and player.coins >= t.cost
+		return owned.can_upgrade() and player.coins >= trinket_buy_cost(t)
+	return player.trinkets.size() < GameRules.MAX_TRINKETS and player.coins >= trinket_buy_cost(t)
 
 
 ## Your copy of this trinket, or null.
@@ -196,7 +209,7 @@ func owned_trinket(td: TrinketData) -> TrinketInstance:
 ## What buying this market trinket would cost you right now.
 func trinket_buy_cost(td: TrinketData) -> int:
 	var owned := owned_trinket(td)
-	return owned.upgrade_cost() if owned and owned.can_upgrade() else td.cost
+	return shop_price(player, owned.upgrade_cost() if owned and owned.can_upgrade() else td.cost)
 
 
 func can_sell_trinket(idx: int) -> bool:
@@ -224,7 +237,7 @@ func can_buy_enhancement(slot: int, card: CardInstance = null) -> bool:
 	if not is_player_turn() or slot < 0 or slot >= shop.enhancements.size():
 		return false
 	var e: EnhancementData = shop.enhancements[slot]
-	if e == null or player.coins < e.cost:
+	if e == null or player.coins < enhancement_price(e):
 		return false
 	if card != null:
 		return player.hand.has(card) and _can_enhance(card, e)
@@ -267,21 +280,7 @@ func buy_item(slot: int) -> bool:
 func buy_trinket(slot: int) -> bool:
 	if not can_buy_trinket(slot):
 		return false
-	var td := shop.take_trinket(slot)
-	var owned := owned_trinket(td)
-	if owned:
-		var cost := owned.upgrade_cost()
-		player.coins -= cost
-		owned.paid += cost
-		owned.level += 1
-		owned.used = false   # an upgrade refreshes the trinket
-		log_line("You upgrade trinket [color=#ffd166]%s[/color] (refreshed)." % owned.get_name())
-	else:
-		player.coins -= td.cost
-		player.trinkets.append(TrinketInstance.new(td))
-		log_line("You buy trinket [color=#ffd166]%s[/color]." % td.display_name)
-	_begin_action()
-	_finish_action_if(GameRules.TRINKET_BUY_IS_ACTION, false)
+	_buy_trinket(slot)
 	return true
 
 
@@ -588,8 +587,22 @@ func buy_instance(p: PlayerState, card: CardInstance, cost: int, zone_override :
 			log_line("  %s %s." % [_card_name(card), _zone_phrase(dest)])
 		last_bought_zone = dest
 	await _fire(GameRules.Trigger.CARD_BOUGHT, p, ctx)
+	await _fire(GameRules.Trigger.SHOP_BUY, p, _ctx(p, card))
 	await _fire(GameRules.Trigger.OPPONENT_CARD_BOUGHT, opponent_of(p), _ctx(opponent_of(p), card))
 	_absorb(ctx)
+
+
+## Take the card in a market slot for `p` to buy. If `p` owns an item that
+## restocks bought slots, the slot gets a new random card right away.
+func take_market_card(p: PlayerState, slot: int) -> CardData:
+	var cd: CardData = shop.take_card(slot)
+	if shop.cards[slot] == null:
+		for it in p.items:
+			if it.data.restock_bought_cards:
+				shop.restock_card_slot(slot)
+				log_line("  [color=#7fe3d0]%s[/color] restocks the market slot." % it.data.display_name)
+				break
+	return cd
 
 
 ## Run a list of effects for `ctx`'s owner (trinkets in the shop, copies...).
@@ -611,6 +624,22 @@ func text_vars(p: PlayerState = null) -> Dictionary:
 		"removed": p.removed.size(),
 		"destroyed": p.destroyed.size(),
 	}
+
+
+## text_vars() plus values for one card: {gain} = the coins its on-play would
+## give right now (Snowball's current gain, Liquidate's total...). `card` is the
+## instance if there is one (a card in a pile), else null (a market card).
+func card_text_vars(cd: CardData, card: CardInstance = null, p: PlayerState = null) -> Dictionary:
+	if p == null:
+		p = player
+	var vars := text_vars(p)
+	var gain := 0
+	for e in (card.get_on_play() if card else cd.on_play):
+		if e:
+			gain += e.preview_coins(self, p, cd, card)
+	vars["gain"] = gain
+	vars["gain_icons"] = Icons.coins(gain)
+	return vars
 
 
 func log_line(text: String) -> void:
@@ -666,7 +695,7 @@ func _resolve_play(p: PlayerState, card: CardInstance, first: bool) -> void:
 func _buy_from_market(slot: int) -> void:
 	_busy += 1
 	_begin_action()
-	var cd: CardData = shop.take_card(slot)
+	var cd: CardData = take_market_card(player, slot)
 	await buy_instance(player, CardInstance.new(cd), card_price(player, cd.cost))
 	_busy -= 1
 	await _finish_action_if(GameRules.CARD_BUY_IS_ACTION, _act_extra)
@@ -676,13 +705,14 @@ func _buy_enhancement(slot: int, card: CardInstance) -> void:
 	_busy += 1
 	_begin_action()
 	var e := shop.take_enhancement(slot)
-	player.coins -= e.cost
+	player.coins -= enhancement_price(e)
 	if e.destroy_on_apply:
 		log_line("You use %s on %s." % [e.display_name, _card_name(card)])
 		await trash_card(player, card, true)
 	else:
 		card.enhancement = e
 		log_line("You enhance %s with %s." % [_card_name(card), e.display_name])
+	await _fire(GameRules.Trigger.SHOP_BUY, player, _ctx(player))
 	_busy -= 1
 	await _finish_action_if(GameRules.ENHANCEMENT_BUY_IS_ACTION, false)
 
@@ -691,12 +721,37 @@ func _buy_item(slot: int) -> void:
 	_busy += 1
 	_begin_action()
 	var it := shop.take_item(slot)
-	player.coins -= it.cost
+	player.coins -= item_price(it)
+	# Items you already own react to the purchase; the new one doesn't (buying
+	# Needful doesn't curse you).
+	await _fire(GameRules.Trigger.SHOP_BUY, player, _ctx(player))
 	player.items.append(ItemInstance.new(it))
 	log_line("You buy item [color=#7fe3d0]%s[/color]." % it.display_name)
 	await _fire(GameRules.Trigger.ITEM_BOUGHT, player, _ctx(player))
 	_busy -= 1
 	await _finish_action_if(GameRules.ITEM_BUY_IS_ACTION, _act_extra)
+
+
+func _buy_trinket(slot: int) -> void:
+	_busy += 1
+	_begin_action()
+	var td := shop.take_trinket(slot)
+	var owned := owned_trinket(td)
+	var cost := trinket_buy_cost(td)
+	player.coins -= cost
+	if owned:
+		owned.paid += cost
+		owned.level += 1
+		owned.used = false   # an upgrade refreshes the trinket
+		log_line("You upgrade trinket [color=#ffd166]%s[/color] (refreshed)." % owned.get_name())
+	else:
+		var t := TrinketInstance.new(td)
+		t.paid = cost
+		player.trinkets.append(t)
+		log_line("You buy trinket [color=#ffd166]%s[/color]." % td.display_name)
+	await _fire(GameRules.Trigger.SHOP_BUY, player, _ctx(player))
+	_busy -= 1
+	await _finish_action_if(GameRules.TRINKET_BUY_IS_ACTION, false)
 
 
 func _use_trinket(idx: int) -> void:

@@ -19,3 +19,4 @@ card_set = 3
 display_name = "Binge"
 on_play = Array[ExtResource("1_t7nhh")]([SubResource("Resource_ieoj1"), SubResource("Resource_xuxnv")])
 on_play_text = "🂠🂠🂠. You can't draw additional cards this turn"
+on_buy_text = "TBD"

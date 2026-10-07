@@ -13,6 +13,7 @@ Each effect implements these methods:
 | `is_cost()` | True for costs ("Pay 2", "Discard 1", "Pass", "🔥 this"). Generated text puts ➡ after them. |
 | `describe()` | Auto card text. Uses `_who()` to add "Opponent " or "You: ". |
 | `ai_score()` | A rough value for `SimBot`. Positive means good for the owner. |
+| `preview_coins(enc, owner, card_data, card)` | Coins it would give if played now, for the `{gain}` placeholder. Default 0. |
 
 ## Primitives (`scripts/data/effects/`)
 
@@ -69,7 +70,7 @@ All of these **count as playing a card** (cards-played count, `CARD_PLAYED` item
 |---|---|---|
 | `BuyCardEffect` | `source`=MARKET, `free`, `zone`=-1, `play_then_destroy` | Buy a card you choose (and can afford) as part of this effect. `source`: `MARKET`, `REMOVED` or `DESTROYED` this encounter. It's a real buy: on-buy, `BEFORE_CARD_BUY` / `CARD_BOUGHT` items. `zone` overrides the destination (`DRAW_TOP` for "place it on top"). `play_then_destroy`: play it right away, then destroy it. |
 | `NextBuyToHandEffect` | `amount`=1 | The next card you buy is drawn immediately |
-| `SetBuyDestinationEffect` | `destination`=HAND | Sets `ctx.buy_destination` (buy triggers / on-buy only) |
+| `SetBuyDestinationEffect` | `destination`=HAND, `optional` | Sets `ctx.buy_destination` (buy triggers / on-buy only). `optional`: asks the player each time ("you may…", Top Shelf) |
 | `SnatchShopCardEffect` | `mode`, `amount`=1 | Removes market card(s): `CHEAPEST`, `PRICIEST`, `RANDOM`, `LEFTMOST` |
 | `DestroyShopCardEffect` | `restock`=true | You pick a market card to destroy; its slot gets a new random card |
 | `RefreshTrinketsEffect` | `amount`=1, `all` | Used trinkets become usable again (you pick which if there's a choice) |
@@ -82,7 +83,7 @@ All of these **count as playing a card** (cards-played count, `CARD_PLAYED` item
 | `PassEffect` | — | Your turn ends right after this action. The enemy doesn't answer it. Text "Pass ➡". |
 | `ExtraActionEffect` | — | The enemy skips responding to this action |
 | `ExtraRoundEffect` | `amount`=1 | The encounter gets another (normal) round |
-| `RetainCardsEffect` | `amount`=1, `optional` | Choose cards in your hand to keep at the end of this turn |
+| `RetainCardsEffect` | `amount`=1, `optional`, `all_hand` | Choose cards in your hand to keep at the end of this turn. `all_hand`: keep every other card in hand, no choice ("📌 your hand", Hunker Down) |
 | `ChooseOneEffect` | `options: Array[EffectOption]` | "X OR Y". Options whose costs can't be paid are greyed out. `EffectOption` = `label` + `effects`. |
 | `ConditionalEffect` | `condition`, `effects` | Only if: `DISCARD_EMPTY`, `DECK_EMPTY`, `NO_OTHER_CARD_PLAYED` (this turn) |
 
@@ -125,6 +126,7 @@ These are the item `trigger` values in `GameRules.Trigger`. The engine fires eac
 | `CARD_PLAYED` | After on-play resolves (also replays and copies) | player |
 | `OPPONENT_CARD_PLAYED` | Same moment | enemy |
 | `ITEM_BOUGHT` | After an item purchase | player |
+| `SHOP_BUY` | After **any** purchase: a card (after `CARD_BOUGHT`), an item (before the new item is added, so it doesn't react to itself), a trinket or trinket upgrade, an enhancement. Used by Needful | player |
 | `TRINKET_USED` | After a trinket resolves | player |
 | `ROUND_END` | When you pass, before cleanup | both |
 | `ENEMY_ACTED` | After each intent | both |
@@ -151,6 +153,7 @@ These come from `Encounter.text_vars()` and are used as `{name}` in card text.
 | `coins` | Your coins |
 | `round` | Current round number |
 | `removed` / `destroyed` | Cards you removed / destroyed this encounter |
+| `gain` | **Per card** (`Encounter.card_text_vars(card_data, instance)`): the coins its on-play would give right now, summed from each effect's `preview_coins()`. Implemented by `GainCoinsScalingEffect` (amount + current bonus) and `TrashCardsEffect` with `coins_per_card`. `gain_icons`: the same as coin icons (N × 🪙 up to 5, else `N🪙`) | 
 
 ## Stats available to `GainCoinsPerStatEffect.stat`
 

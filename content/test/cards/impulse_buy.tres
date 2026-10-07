@@ -16,3 +16,4 @@ display_name = "Impulse Buy"
 cost = 2
 on_play = Array[ExtResource("1_2mht2")]([SubResource("Resource_vmg64")])
 on_play_text = "Buy a card and play it immediately. Then 🔥 it"
+on_buy_text = "TBD"

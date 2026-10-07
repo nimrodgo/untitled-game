@@ -16,3 +16,4 @@ card_set = 4
 display_name = "Mulligan"
 on_play = Array[ExtResource("1_cj48i")]([SubResource("Resource_6g3k3")])
 on_play_text = "Discard your hand ⤵. Draw that many 🂠"
+on_buy_text = "TBD"

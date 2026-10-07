@@ -66,7 +66,8 @@ flowchart TD
 
 - Buying **doesn't refill** the slot during the round. The legacy flag `refill_card_slots` changes that.
 - **What the pools contain:** an encounter lists its `card_sets`; it sells every card, item, trinket and enhancement of those sets **plus Utility and Coins** (`CardSets.ALWAYS_SOLD`). The manual `*_pool` fields are extras on top (see [content-design.md](content-design.md#card-sets)).
-- **Price overrides:** an owned item with `card_price_override` (Needful: 0) sets the price of **every** market card (the lowest override wins). The tile shows the normal price struck through.
+- **Price overrides:** an owned item with `shop_price_override` (Needful: 0) sets the price of **everything** in the market: cards, items, trinkets, trinket upgrades and enhancements (the lowest override wins). The tile shows the normal price struck through. A trinket bought this way is worth what you actually paid when sold.
+- **Restocking:** an owned item with `restock_bought_cards` (Stockroom) refills a card slot with a new random card as soon as you buy from it (also for cards bought by effects).
 - If you can't afford something, it's shown dimmed and you can't drag it.
 
 ## Buying and playing, in order

@@ -15,3 +15,4 @@ card_set = 9
 display_name = "Curse Recall"
 on_play = Array[ExtResource("1_tpo0i")]([SubResource("Resource_gj73b")])
 on_play_text = "Return all curses from the discard pile to your hand"
+on_buy_text = "TBD"

@@ -48,7 +48,7 @@ The whole rules engine. It's built with `Encounter.new(EncounterData, LoadoutDat
 | Group | Members |
 |---|---|
 | State | `player`, `enemy` (`PlayerState`), `shop`, `rng`, `round_num`, `active`, `is_over`, `won`, `enemy_actions_left`, `last_bought_zone` |
-| Queries | `is_player_turn`, `can_play`, `card_price(p, base)` (applies item price overrides), `can_buy_card/item/trinket/enhancement`, `can_use_trinket`, `can_sell_trinket`, `owned_trinket`, `trinket_buy_cost`, `current_intent`, `upcoming_intents(n)`, `rounds_left` |
+| Queries | `is_player_turn`, `can_play`, `shop_price(p, base)` / `card_price` / `item_price` / `enhancement_price` (apply item price overrides), `card_text_vars(cd, card)` (text values incl. per-card `{gain}`), `take_market_card(p, slot)` (applies Stockroom restocking), `can_buy_card/item/trinket/enhancement`, `can_use_trinket`, `can_sell_trinket`, `owned_trinket`, `trinket_buy_cost`, `current_intent`, `upcoming_intents(n)`, `rounds_left` |
 | Player actions (return `bool`) | `play_card`, `buy_card`, `buy_item`, `buy_trinket` (a duplicate upgrades the owned one), `buy_enhancement(slot, card)`, `use_trinket` (free), `sell_trinket` (free), `pass_turn`. They validate, start the action coroutine and return right away. |
 | Choices | `pending_choice`, `submit_choice(picks)`, `auto_chooser` (headless), `request_choice(req)` / `choose_cards(...)` for effects |
 | Enemy | `enemy_act()` resolves the current intent and hands the turn back |

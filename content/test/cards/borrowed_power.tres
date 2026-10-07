@@ -15,3 +15,4 @@ display_name = "Borrowed Power"
 cost = 2
 on_play = Array[ExtResource("1_ulyvd")]([SubResource("Resource_mnrv4")])
 on_play_text = "Activate the level 3 effect of a trinket in the shop"
+on_buy_text = "TBD"

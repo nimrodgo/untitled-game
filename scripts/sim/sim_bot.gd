@@ -50,7 +50,7 @@ static func take_turn(enc: Encounter) -> void:
 				best_value = v
 				best = enc.buy_card.bind(slot)
 		for slot in enc.shop.items.size():
-			if enc.can_buy_item(slot) and future > 0.4 and me.coins >= enc.shop.items[slot].cost + 3:
+			if enc.can_buy_item(slot) and future > 0.4 and me.coins >= enc.item_price(enc.shop.items[slot]) + 3:
 				best = enc.buy_item.bind(slot)
 				break
 

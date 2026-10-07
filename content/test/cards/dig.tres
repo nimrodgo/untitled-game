@@ -22,3 +22,4 @@ card_set = 7
 display_name = "Dig"
 on_play = Array[ExtResource("1_tbxdx")]([SubResource("Resource_rk1if"), SubResource("Resource_2x5j1")])
 on_play_text = "🂠 from the discard pile and 🗑 this"
+on_buy_text = "TBD"

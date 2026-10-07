@@ -15,3 +15,4 @@ display_name = "Echo"
 cost = 2
 on_play = Array[ExtResource("1_17k28")]([SubResource("Resource_qxdb4")])
 on_play_text = "The next card you play this turn is played an additional time"
+on_buy_text = "TBD"

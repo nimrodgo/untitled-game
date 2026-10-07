@@ -37,6 +37,7 @@ enum Trigger {
 	CARD_REMOVED,          ## A card was removed for the encounter.
 	CARD_DESTROYED,        ## A card was destroyed permanently.
 	CARD_TRASHED_FROM_HAND, ## A card in your hand was removed or destroyed.
+	SHOP_BUY,              ## Any purchase: a card, an item (not the item just bought), a trinket or upgrade, an enhancement.
 }
 
 ## Terminology: a TURN is your whole round (draw a hand, act until you pass).

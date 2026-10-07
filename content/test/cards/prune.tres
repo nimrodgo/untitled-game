@@ -21,3 +21,4 @@ card_set = 5
 display_name = "Prune"
 on_play = Array[ExtResource("1_a4if2")]([SubResource("Resource_88kkb"), SubResource("Resource_s644p")])
 on_play_text = "🂠🂠. 🗑 from hand"
+on_buy_text = "TBD"

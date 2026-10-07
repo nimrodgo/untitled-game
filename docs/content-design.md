@@ -18,7 +18,7 @@ To play your content, point an `EncounterData` at your pools and enemy, then set
 | `cost` | 1 | Coins to buy it from the market |
 | `instant` | false | Playing it is a **free** action |
 | `on_play` | [] | Effects when played |
-| `on_buy` | [] | Effects once, when bought |
+| `on_buy` | [] | Effects once, when bought. **Every card should have an on-buy**; placeholder ones use `on_buy_text = "TBD"` and no effects |
 | `playable` | true | false = can't be played (curses) |
 | `on_discard` / `on_destroy` / `on_turn_end_in_hand` | [] | Card hooks (see [effects-reference](effects-reference.md#card-hooks-carddata)) |
 | `curse` / `permanent` | false | Curse styling + "curse" filters; permanent = stays between encounters (flag only for now) |
@@ -36,7 +36,8 @@ If you write custom text, the auto "INSTANT" tag is hidden. Put ⚡ in the text 
 | `trigger` | `CARD_BOUGHT` | When it fires (see [triggers](effects-reference.md#triggers)) |
 | `effects` | [] | |
 | `limit_per_encounter` / `limit_per_round` | 0 | 0 = unlimited |
-| `card_price_override` | -1 | While you own it, every market card costs this much (-1 = off; the lowest override wins). Needful uses 0. |
+| `shop_price_override` | -1 | While you own it, **everything** in the market (cards, items, trinkets, trinket upgrades, enhancements) costs this much (-1 = off; the lowest override wins). Needful uses 0. |
+| `restock_bought_cards` | false | While you own it, a market card slot you buy from gets a new random card right away (Stockroom) |
 | `description` | "" | Auto: "*When…* (*limit*): *effects*" |
 
 ### TrinketData + TrinketLevel — an activated ability
@@ -107,9 +108,9 @@ Every card, item, trinket, enhancement and curse has exactly one `card_set` (enu
 | Draw | 9 | Drawing, fetching from the deck, draw synergy |
 | Discard | 11 | Discarding and discard payoffs |
 | Trim | 14 | Remove and destroy |
-| Retain | 2 | Keeping cards in hand (thin, needs more cards) |
+| Retain | 3 | Keeping cards in hand (thin, needs more cards) |
 | Utility | 10 | Unique effects: replays, trinket refresh, extra turns (sold everywhere) |
-| Market | 6 | Buying, restocking, recovering cards, market manipulation |
+| Market | 8 | Buying, restocking, recovering cards, market manipulation |
 | Curse Synergy | 12 | Gaining, moving and cashing in curses |
 
 `ContentLibrary` (`scripts/data/content_library.gd`) scans `res://content/test/{cards,items,trinkets,enhancements}` at runtime, so moving a piece to another set or adding a new `.tres` needs no script re-run. Curses are not scanned. Gotcha: a static func called `set_name` on a `class_name` script collides with `Resource.set_name`; use `display_name`.
@@ -133,6 +134,7 @@ Every card, item, trinket, enhancement and curse has exactly one `card_set` (enu
 
 - **Live values** go in braces and update while you play: `{cards_drawn_this_turn}`, `{cards_played_this_turn}`, `{coins}`, `{round}`. The `_this_round` versions are aliases. The full list is in [effects-reference.md](effects-reference.md#text-placeholders).
 - Example: `Gain 1 🪙 for every card drawn this turn ([i]{cards_drawn_this_turn}[/i])`
+- `{gain}` is per card: the coins the card would give if played right now (Liquidate: `… for each ([i]{gain}[/i])`). `{gain_icons}` is the same amount drawn as coins: N × 🪙 up to 5, else `N🪙` (Snowball: `{gain_icons} and increase…`). Effects report it with `preview_coins()`.
 
 ## Recipes
 
@@ -161,7 +163,9 @@ Cards, items, trinkets and curses come from `tools/build_test_content.gd` (see t
 | Nimrod's cards | This is a card (`example1`), This is another card (`example2`), Draw Synergy (`drawful`) |
 | Idea cards (44) | Every card idea from `design/ideas.md`, plus Pawn (listed under items, meant as a card). P1 is **Snowball** (dummy name). All in the market pool. |
 | Curses (`content/test/curses/`) | C1 **Dead Weight** (does nothing), C2 **Barnacle** (permanent), C3 **Driftwood** (play: remove this), C4 **Leaky Purse** (end of turn in hand: lose 2 🪙). Dummy names; the ids match (`dead_weight`, `barnacle`, `driftwood`, `leaky_purse`). Not in the market. |
-| Items (15) | Rebate, Express Delivery, the 11 item ideas, Shredder ("when you discard, remove it") and Needful (all market cards cost 0, every buy shuffles a random curse into your deck) |
+| Items (17) | Rebate, Express Delivery, the 11 item ideas, Shredder ("when you discard, remove it"), Needful (the whole shop costs 0, every purchase adds a random curse to your deck), **Top Shelf** (Market: when you buy a card you may put it on top of your deck) and **Stockroom** (Market: bought card slots restock) |
+| Hunker Down | Retain card, cost 2: "Pass. 📌 your hand this turn" |
+| On-buy placeholders | Every card without a real on-buy shows a "TBD" buy strip (`on_buy_text = "TBD"`) |
 | Trinkets (7) | Coin Trinket + the 6 trinket ideas, 3 levels each |
 | Enemy | TEST Moray: Pinch (steal 1) → Toll (you lose 1) → Snatch (priciest market card). 3 actions per round. |
 | Encounter | TEST Encounter: 3 rounds, target 10, 3 card slots, 1 item slot, 1 trinket slot, 0 upgrade slots. Uses explicit pools, no `card_sets`. It is not in `encounter_pool`, but the tests and the simulator use it. |

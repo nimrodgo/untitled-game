@@ -21,3 +21,4 @@ cost = 2
 instant = true
 on_play = Array[ExtResource("1_nx0qf")]([SubResource("Resource_dy3he"), SubResource("Resource_8nam4")])
 on_play_text = "⚡🔥 a card in the shop and restock it. 🪙🪙"
+on_buy_text = "TBD"

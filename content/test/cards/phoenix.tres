@@ -15,3 +15,4 @@ card_set = 5
 display_name = "Phoenix"
 on_play = Array[ExtResource("1_440kr")]([SubResource("Resource_h1l6m")])
 on_play_text = "Buy a card you 🔥 this encounter"
+on_buy_text = "TBD"

@@ -17,4 +17,5 @@ card_set = 5
 display_name = "Liquidate"
 cost = 2
 on_play = Array[ExtResource("1_jt6pp")]([SubResource("Resource_gdv25")])
-on_play_text = "🗑 all other cards in your hand. 🪙🪙🪙 for each"
+on_play_text = "🗑 all other cards in your hand. 🪙🪙🪙 for each ([i]{gain}[/i])"
+on_buy_text = "TBD"
