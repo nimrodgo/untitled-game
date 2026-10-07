@@ -6,7 +6,8 @@ extends RefCounted
 enum Target { SELF, OPPONENT }
 
 ## Where a card goes when bought / added.
-enum Zone { HAND, DRAW_TOP, DRAW_SHUFFLE, DISCARD, DRAW_BOTTOM }
+## There is no "shuffle into the deck": the deck is only ever shuffled at the start of the encounter.
+enum Zone { HAND, DRAW_TOP, DISCARD, DRAW_BOTTOM }
 
 ## Card piles an effect can pick from (bit flags, combine with |).
 const PILE_HAND := 1
@@ -43,8 +44,8 @@ enum Trigger {
 enum TrinketLimit { PER_TURN, PER_ACTION }
 
 const HAND_SIZE := 5
-## Concept: bought cards are shuffled into your deck.
-const DEFAULT_BUY_DESTINATION := Zone.DRAW_SHUFFLE
+## Bought cards go to the bottom of your deck.
+const DEFAULT_BUY_DESTINATION := Zone.DRAW_BOTTOM
 const DISCARD_HAND_AT_ROUND_END := true
 ## Trinkets: usable once per turn (= once per round).
 const TRINKET_LIMIT := TrinketLimit.PER_TURN

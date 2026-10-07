@@ -4,7 +4,7 @@ extends Effect
 
 @export var card: CardData
 @export var amount: int = 1
-@export var zone: GameRules.Zone = GameRules.Zone.DRAW_SHUFFLE
+@export var zone: GameRules.Zone = GameRules.Zone.DRAW_BOTTOM
 
 
 func apply(ctx: EffectContext) -> void:
@@ -16,7 +16,7 @@ func apply(ctx: EffectContext) -> void:
 
 
 func describe() -> String:
-	var where := "deck"
+	var where := "deck (bottom)"
 	match zone:
 		GameRules.Zone.HAND: where = "hand"
 		GameRules.Zone.DISCARD: where = "discard"

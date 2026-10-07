@@ -15,7 +15,7 @@ func describe() -> String:
 		GameRules.Zone.HAND: return "Bought card goes to your hand"
 		GameRules.Zone.DRAW_TOP: return "Bought card goes on top of your deck"
 		GameRules.Zone.DISCARD: return "Bought card goes to your discard"
-	return "Bought card is shuffled into your deck"
+	return "Bought card goes to the bottom of your deck"
 
 
 func ai_score() -> float:

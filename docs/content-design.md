@@ -148,7 +148,7 @@ Every card, item, trinket, enhancement and curse has exactly one `card_set` (enu
 | "🔥 this ➡ …" | `TrashCardsEffect what=SELF as_cost=true` first |
 | A curse | `curse=true`, `playable=false`; add it with `AddCardEffect target=SELF` |
 | An enemy that denies the market | Intent with `SnatchShopCardEffect mode=PRICIEST` |
-| Junk cards in the player's deck | Intent with `AddCardEffect card=<junk> zone=DRAW_SHUFFLE target=OPPONENT` |
+| Junk cards in the player's deck | Intent with `AddCardEffect card=<junk> zone=DRAW_BOTTOM target=OPPONENT` |
 | A card that doesn't let the enemy respond | Add `ExtraActionEffect` to `on_play` |
 
 ## Current test content (`content/test/`)

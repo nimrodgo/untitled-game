@@ -47,9 +47,9 @@ Each effect implements these methods:
 | `TrashCardsEffect` | `destroy`=true, `what`=CHOOSE, `amount`=1, `piles`=all, `curses_only`, `coins_per_card`, `gain_cost_as_coins`, `as_cost` | **Remove** 🗑 (for this encounter, `destroy=false`) or **destroy** 🔥 (permanently). `what`: `SELF` (this card / the played card for items), `CHOOSE` (exactly `amount` from `piles`, fewer only if there aren't enough), `ALL_OTHER_HAND`, `DRAW_PILE` ("your deck"). |
 | `MoveCardsEffect` | `from_piles`, `to_zone`, `curses_only`, `amount`=0 | Move cards between piles (no triggers). `amount=0` = all matching cards; otherwise you choose. |
 | `TransformCardsEffect` | `into` | Choose any number of cards in your hand; each becomes `into` (upgrades are lost) |
-| `AddCardEffect` | `card`, `amount`=1, `zone`=DRAW_SHUFFLE | Creates new copies of a card (curses: "Shuffle C3 into your deck", "Gain C2") |
-| `AddRandomCurseEffect` | `curses`, `amount`=1, `zone`=DRAW_SHUFFLE | Adds `amount` curses picked at random from `curses` (with the encounter's rng). Used by Needful. |
-| `AddCopyOfThisCardEffect` | `zone`=DRAW_SHUFFLE | Adds a copy of the card this effect belongs to. The copy is the plain card (no enhancements), so copies can't snowball. Used by the Franchise enhancement. |
+| `AddCardEffect` | `card`, `amount`=1, `zone`=DRAW_BOTTOM | Creates new copies of a card (curses: "Add C3 to the bottom of your deck", "Gain C2") |
+| `AddRandomCurseEffect` | `curses`, `amount`=1, `zone`=DRAW_BOTTOM | Adds `amount` curses picked at random from `curses` (with the encounter's rng). Used by Needful. |
+| `AddCopyOfThisCardEffect` | `zone`=DRAW_BOTTOM | Adds a copy of the card this effect belongs to. The copy is the plain card (no enhancements), so copies can't snowball. Used by the Franchise enhancement. |
 
 `piles` / `from_piles` are flags: Hand, Deck (draw pile), Discard. "Remove / destroy" default to all three, "discard" is from the hand unless stated otherwise.
 
@@ -137,9 +137,8 @@ Only **items** listen to triggers. An item fires if `can_trigger()` passes (its 
 |---|---|
 | `HAND` | Added to the hand |
 | `DRAW_TOP` | On top of the draw pile (drawn next) |
-| `DRAW_SHUFFLE` | Random position in the draw pile. **This is the default for bought cards.** |
 | `DISCARD` | Discard pile |
-| `DRAW_BOTTOM` | Bottom of the draw pile |
+| `DRAW_BOTTOM` | Bottom of the draw pile. **This is the default for bought cards and gained cards.** |
 
 ## Text placeholders
 

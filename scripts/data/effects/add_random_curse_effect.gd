@@ -4,7 +4,7 @@ extends Effect
 
 @export var curses: Array[CardData] = []
 @export var amount: int = 1
-@export var zone: GameRules.Zone = GameRules.Zone.DRAW_SHUFFLE
+@export var zone: GameRules.Zone = GameRules.Zone.DRAW_BOTTOM
 
 
 func apply(ctx: EffectContext) -> void:
@@ -16,12 +16,12 @@ func apply(ctx: EffectContext) -> void:
 
 
 func describe() -> String:
-	var where := "deck"
+	var where := "deck (bottom)"
 	match zone:
 		GameRules.Zone.HAND: where = "hand"
 		GameRules.Zone.DISCARD: where = "discard"
 		GameRules.Zone.DRAW_TOP: where = "deck (top)"
-	return "%sShuffle %s into your %s" % [_who(), "a random curse" if amount == 1 else "%d random curses" % amount, where]
+	return "%sAdd %s to your %s" % [_who(), "a random curse" if amount == 1 else "%d random curses" % amount, where]
 
 
 func ai_score() -> float:

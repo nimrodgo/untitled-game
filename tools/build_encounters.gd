@@ -29,10 +29,10 @@ func _init() -> void:
 
 	# --- A. Trim + Curse Synergy: the Sea Hag floods your deck with curses ---
 	var hag := _enemy("Sea Hag", Color("8e6bbf"), [
-		_intent("Hex", Kind.CURSE, "Shuffle Leaky Purse into your deck",
-			[_add(_curse["leaky_purse"], GameRules.Zone.DRAW_SHUFFLE)]),
+		_intent("Hex", Kind.CURSE, "Add Leaky Purse into your deck",
+			[_add(_curse["leaky_purse"], GameRules.Zone.DRAW_BOTTOM)]),
 		_intent("Tithe", Kind.ATTACK, "You lose 1 🪙", [_lose(1)]),
-		_intent("Foul Brew", Kind.CURSE, "Shuffle a random curse into your deck",
+		_intent("Foul Brew", Kind.CURSE, "Add a random curse into your deck",
 			[_random_curse(["dead_weight", "driftwood", "leaky_purse"])]),
 	])
 	_encounter("Hag's Hex", "hags_hex", hag, [S.TRIM, S.CURSE_SYNERGY])

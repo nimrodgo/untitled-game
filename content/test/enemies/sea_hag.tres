@@ -22,7 +22,7 @@ script = ExtResource("1_ru4f7")
 display_name = "Hex"
 kind = 3
 effects = Array[ExtResource("2_ngq76")]([SubResource("Resource_njlf4")])
-description = "Shuffle Leaky Purse into your deck"
+description = "Add Leaky Purse into your deck"
 
 [sub_resource type="Resource" id="Resource_qv847"]
 script = ExtResource("5_08sqi")
@@ -44,7 +44,7 @@ script = ExtResource("1_ru4f7")
 display_name = "Foul Brew"
 kind = 3
 effects = Array[ExtResource("2_ngq76")]([SubResource("Resource_chv3v")])
-description = "Shuffle a random curse into your deck"
+description = "Add a random curse into your deck"
 
 [resource]
 script = ExtResource("11_86p16")

@@ -13,11 +13,7 @@ func apply(ctx: EffectContext) -> void:
 		if enc.is_over:
 			return
 		if p.draw_pile.is_empty():
-			if p.discard.is_empty():
-				return
-			p.draw_pile = p.discard.duplicate()
-			p.discard.clear()
-			enc._shuffle(p.draw_pile)
+			return
 		var c: CardInstance = p.draw_pile.back()
 		if not c.data.playable:
 			enc.move_card(p, c, GameRules.Zone.DISCARD)
