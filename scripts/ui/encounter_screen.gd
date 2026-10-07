@@ -402,10 +402,10 @@ func _fill_shop() -> void:
 				row.add_child(_empty_slot(gear_tile)); continue
 			var s := slot
 			var tint := CardSets.color(ed.card_set).lerp(Palette.CARD_ENH, 0.5)
-			var v := CardView.make(ed.display_name, ed.cost, ed.get_description(), tint, gear_tile)
+			var v := CardView.make(ed.display_name, ed.cost, ed.get_description(), tint, gear_tile, "", "", "", -1, ed.icon)
 			v.set_enabled(enc.can_buy_enhancement(s))
 			v.tapped.connect(func(): _show_popup(
-				CardView.make(ed.display_name, ed.cost, ed.get_description(), tint, CardView.LARGE, "UPGRADE"), ed.description, [
+				CardView.make(ed.display_name, ed.cost, ed.get_description(), tint, CardView.LARGE, "UPGRADE", "", "", -1, ed.icon), ed.description, [
 				{"label": "Choose card (%d)" % ed.cost, "enabled": enc.can_buy_enhancement(s),
 					"cb": func(): pending_enh_slot = s; _refresh()}]))
 			row.add_child(v)
@@ -788,16 +788,15 @@ func _card_data_view_raw(cd: CardData, sz: Vector2) -> CardView:
 
 func _card_instance_view(c: CardInstance, sz: Vector2) -> CardView:
 	var v := _card_instance_view_raw(c, sz)
-	_attach_hover(v, c.play_text(_vars()) + " " + c.buy_text(_vars()), _mentioned(c.data))
+	_attach_hover(v, c.play_text(_vars()) + " " + c.buy_text(_vars()), _mentioned(c.data), c.enhancement)
 	return v
 
 
 func _card_instance_view_raw(c: CardInstance, sz: Vector2) -> CardView:
-	var footer := ""
-	for e in c.enhancements:
-		footer += "+ " + e.display_name + "  "
+	# An enhancement shows as a corner badge; it never changes the card's text.
 	return CardView.make(c.get_name(), c.get_cost(), c.play_text(_vars()), CardSets.color(c.data.card_set), sz,
-		"⚡" if c.is_instant() and not c.data.has_custom_text() else "", footer.strip_edges(), c.buy_text(_vars()))
+		"⚡" if c.is_instant() and not c.data.has_custom_text() else "", "", c.buy_text(_vars()), -1,
+		c.enhancement.icon if c.enhancement else "")
 
 
 func _vars() -> Dictionary:
@@ -939,13 +938,17 @@ func _clear(n: Node) -> void:
 # ============================================================ hover legend
 
 ## Hovering a tile shows what its icons mean, plus any cards it mentions.
-func _attach_hover(v: CardView, text: String, cards: Array) -> void:
+func _attach_hover(v: CardView, text: String, cards: Array, enh: EnhancementData = null) -> void:
 	var icons := Icons.icons_in(text)
-	if icons.is_empty() and cards.is_empty():
+	if enh:
+		for ic in Icons.icons_in(enh.get_description()):
+			if not icons.has(ic):
+				icons.append(ic)
+	if icons.is_empty() and cards.is_empty() and enh == null:
 		return
 	v.hover_changed.connect(func(on: bool):
 		if on:
-			_show_legend(v, icons, cards)
+			_show_legend(v, icons, cards, enh)
 		elif _hover_owner == v:
 			_hide_legend())
 	v.tree_exiting.connect(func():
@@ -960,7 +963,7 @@ func _hide_legend() -> void:
 			c.queue_free()
 
 
-func _show_legend(v: CardView, icons: Array, cards: Array) -> void:
+func _show_legend(v: CardView, icons: Array, cards: Array, enh: EnhancementData = null) -> void:
 	_hide_legend()
 	_hover_owner = v
 	var panel := PanelContainer.new()
@@ -970,6 +973,10 @@ func _show_legend(v: CardView, icons: Array, cards: Array) -> void:
 	vb.add_theme_constant_override("separation", 6)
 	vb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(vb)
+	if enh:
+		var erow := Icons.rich_label("%s  [b]%s[/b]: %s" % [enh.icon, enh.display_name, enh.get_description()], 16, Palette.FOAM)
+		erow.autowrap_mode = TextServer.AUTOWRAP_OFF
+		vb.add_child(erow)
 	for ic in icons:
 		var row := Icons.rich_label("%s  %s" % [ic, Icons.TIPS[ic]], 16, Palette.FOAM)
 		row.autowrap_mode = TextServer.AUTOWRAP_OFF

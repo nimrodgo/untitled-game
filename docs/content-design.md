@@ -46,7 +46,7 @@ If you write custom text, the auto "INSTANT" tag is hidden. Put ⚡ in the text 
 - You can use each trinket once per turn. Upgrading moves it to the next level. The name shows "(Lv N)" only when a trinket has more than one level.
 - **Style rule:** don't write "once per turn" or "(free)" on trinkets.
 
-### EnhancementData — a market "upgrade" for one card
+### EnhancementData — a market "upgrade" for one card (a card holds at most one)
 
 | Field | Notes |
 |---|---|
@@ -58,7 +58,8 @@ If you write custom text, the auto "INSTANT" tag is hidden. Put ⚡ in the text 
 | `retain` | The card stays in hand at the end of every turn |
 | `destroy_on_apply` | Buying it destroys the chosen card (permanently) on the spot; nothing is attached |
 | `counts_as_curse` | The card counts as a curse (curse triggers, curse filters) |
-| `description` | Shown on the shop tile and added to the card's text. Auto-generated if empty |
+| `icon` | Icon token (see `Icons`) drawn as a round badge on the enhanced card's corner and on the shop tile. The card text is never changed |
+| `description` | Shown on the shop tile and in the hover legend of an enhanced card. Auto-generated if empty |
 
 One enhancement per set, built by `tools/build_enhancements.gd` into `content/test/enhancements/` (names and the price of 3 are placeholders). The shop's upgrade slot is rerolled every round from the encounter's pool, like trinkets.
 

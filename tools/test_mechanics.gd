@@ -648,7 +648,7 @@ func _enh(id: String) -> EnhancementData:
 ## A card from `deck`'s data with enhancement `enh_id` in the hand.
 func _give_enh(e: Encounter, card_id: String, enh_id: String) -> CardInstance:
 	var c := _give(e, card_id)
-	c.enhancements.append(_enh(enh_id))
+	c.enhancement = _enh(enh_id)
 	return c
 
 
@@ -679,7 +679,8 @@ func _enhancement_rules() -> void:
 	before = e.player.coins
 	e.play_card(c)
 	_check(e.player.coins - before == plain + 2, "Gilded: +2 coins on play (%d vs %d)" % [e.player.coins - before, plain])
-	_check(c.play_text().contains("+2"), "Gilded: card text shows the extra coins")
+	_check(c.play_text() == c.data.get_play_text() and c.get_name() == c.data.display_name,
+		"Gilded: the enhancement does not change the card text or name")
 
 	# Draw: one extra card on play.
 	e = _enc(DECK5 + DECK5)
@@ -720,7 +721,7 @@ func _enhancement_rules() -> void:
 	_check(e.can_buy_enhancement(0, c), "Fleeting: can be bought with a card in hand")
 	_check(e.buy_enhancement(0, c), "Fleeting: buy_enhancement succeeds")
 	_check(e.player.destroyed.has(c) and not e.player.hand.has(c), "Fleeting: the card is destroyed the moment you buy it")
-	_check(c.enhancements.is_empty() and e.player.hand.has(keep_c), "Fleeting: nothing is attached, other cards untouched")
+	_check(c.enhancement == null and e.player.hand.has(keep_c), "Fleeting: nothing is attached, other cards untouched")
 	_check(e.player.coins == coins_before - 3, "Fleeting: pays 3 coins")
 	_check(e.shop.enhancements[0] == null, "Fleeting: the slot is empty until the next round")
 	_consistent(e, "Fleeting")
@@ -757,7 +758,7 @@ func _enhancement_rules() -> void:
 	var enhanced := 0
 	for zone in [e.player.hand, e.player.draw_pile, e.player.discard]:
 		for k in zone:
-			if not k.enhancements.is_empty():
+			if k.enhancement != null:
 				enhanced += 1
 	_check(enhanced == 1, "Franchise: only the original is enhanced, the copy is plain (no snowball)")
 
@@ -800,7 +801,7 @@ func _enhancement_rules() -> void:
 	var coins := e.player.coins
 	_check(e.can_buy_enhancement(0, c), "can buy an enhancement with a card in hand")
 	_check(e.buy_enhancement(0, c), "buy_enhancement succeeds")
-	_check(c.enhancements.size() == 1 and e.player.coins == coins - 3, "bought: attached, 3 coins paid")
+	_check(c.enhancement != null and e.player.coins == coins - 3, "bought: attached, 3 coins paid")
 	_check(e.shop.enhancements[0] == null, "bought: slot is empty until the next round")
 
 
@@ -863,3 +864,26 @@ func _deck_cycle_rules() -> void:
 	p.discard.append(CardInstance.new(_card("example1")))
 	e.draw_cards(p, 2)
 	_check(p.hand.size() == 3 and p.discard.size() == 1, "Deck cycle: empty deck is not reshuffled mid-turn")
+
+
+func _one_enhancement_rules() -> void:
+	# Every enhancement has a corner icon that exists and has a legend entry.
+	for en in ContentLibrary.enhancements():
+		_check(en.icon != "" and Icons.SVG.has(en.icon) and Icons.TIPS.has(en.icon), "%s: has a drawn corner icon with a tip" % en.display_name)
+
+	# A card holds only one enhancement.
+	var e := _enc(DECK5, true, false, ENC_DIR % "toll_booth")
+	e.shop.enhancements[0] = _enh("gilded")
+	var c: CardInstance = e.player.hand[0]
+	c.enhancement = _enh("insight")
+	_check(not e.can_buy_enhancement(0, c), "an enhanced card cannot take another enhancement")
+	_check(not e.buy_enhancement(0, c), "buy_enhancement refuses an enhanced card")
+	_check(e.player.coins == 10 and c.enhancement.id == &"insight", "refused: nothing paid, enhancement unchanged")
+	_check(e.can_buy_enhancement(0, e.player.hand[1]), "a plain card in hand can still take it")
+	_check(e.can_buy_enhancement(0), "shop tile is buyable while some hand card is plain")
+	for k in e.player.hand:
+		k.enhancement = _enh("insight")
+	_check(not e.can_buy_enhancement(0), "shop tile is not buyable when every hand card is enhanced")
+	# Trim's enhancement only destroys, so it still works on an enhanced card.
+	e.shop.enhancements[0] = _enh("fleeting")
+	_check(e.can_buy_enhancement(0, c), "Trim enhancement can destroy an already-enhanced card")

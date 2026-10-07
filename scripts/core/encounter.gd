@@ -224,9 +224,20 @@ func can_buy_enhancement(slot: int, card: CardInstance = null) -> bool:
 	if not is_player_turn() or slot < 0 or slot >= shop.enhancements.size():
 		return false
 	var e: EnhancementData = shop.enhancements[slot]
-	if e == null or player.coins < e.cost or player.hand.is_empty():
+	if e == null or player.coins < e.cost:
 		return false
-	return card == null or player.hand.has(card)
+	if card != null:
+		return player.hand.has(card) and _can_enhance(card, e)
+	for c in player.hand:
+		if _can_enhance(c, e):
+			return true
+	return false
+
+
+## One enhancement per card: an enhanced card can't take another. (An enhancement
+## that only destroys the card, like Trim's, attaches nothing, so it can still be used.)
+func _can_enhance(card: CardInstance, e: EnhancementData) -> bool:
+	return card.enhancement == null or e.destroy_on_apply
 
 
 # ---------------------------------------------------------- player actions
@@ -670,7 +681,7 @@ func _buy_enhancement(slot: int, card: CardInstance) -> void:
 		log_line("You use %s on %s." % [e.display_name, _card_name(card)])
 		await trash_card(player, card, true)
 	else:
-		card.enhancements.append(e)
+		card.enhancement = e
 		log_line("You enhance %s with %s." % [_card_name(card), e.display_name])
 	_busy -= 1
 	await _finish_action_if(GameRules.ENHANCEMENT_BUY_IS_ACTION, false)

@@ -34,7 +34,8 @@ var _press_pos := Vector2.ZERO
 ## `body` is the main text (for cards: the on-play effect). `buy_text`, if
 ## given, is shown in a separate gold "on buy" strip at the bottom of the card.
 static func make(title: String, cost: int, body: String, bg: Color = Palette.CARD,
-		min_size: Vector2 = SMALL, tag := "", footer := "", buy_text := "", old_cost := -1) -> CardView:
+		min_size: Vector2 = SMALL, tag := "", footer := "", buy_text := "", old_cost := -1,
+		badge := "") -> CardView:
 	var v := CardView.new()
 	v._bg = bg
 	v.custom_minimum_size = min_size
@@ -96,11 +97,39 @@ static func make(title: String, cost: int, body: String, bg: Color = Palette.CAR
 	if buy_text != "":
 		vb.add_child(_buy_strip(buy_text, k))
 
+	if badge != "" and Icons.SVG.has(Icons.ALIASES.get(badge, badge)):
+		v.add_child(_badge_overlay(badge, k))
+
 	v._restyle()
 	v.mouse_entered.connect(v._on_hover.bind(true))
 	v.mouse_exited.connect(v._on_hover.bind(false))
 	v.resized.connect(func(): v.pivot_offset = v.size * 0.5 if v.hover_grow else v.pivot_offset)
 	return v
+
+
+## Round enhancement badge hanging off the top-left corner of the tile. That
+## corner stays visible when hand cards overlap, and it clears the title text.
+## (A full-size child of the PanelContainer, so the badge can anchor to a corner.)
+static func _badge_overlay(token: String, k: float) -> Control:
+	var overlay := Control.new()
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var s := 24.0 * k
+	var badge := PanelContainer.new()
+	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	badge.custom_minimum_size = Vector2(s, s)
+	badge.add_theme_stylebox_override("panel", Palette.box(Palette.CARD_ENH.lightened(0.1), Palette.FOAM, int(s / 2), 2, int(4 * k)))
+	var icon := TextureRect.new()
+	icon.texture = Icons.texture(token)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	badge.add_child(icon)
+	overlay.add_child(badge)
+	# The overlay starts at the tile's content margin (10px in); put the badge
+	# mostly outside the tile, its inner edge just touching where the text begins.
+	badge.position = Vector2(-s - 4.0 * k + 12.0 * k, -s - 4.0 * k + 12.0 * k) + Vector2(-2, -2)
+	badge.size = Vector2(s, s)
+	return overlay
 
 
 ## Gold strip with a shopping-bag icon: what happens when the card is bought.

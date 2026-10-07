@@ -36,7 +36,7 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 | Tap anything | Inspect popup, with action buttons (Play / Buy / Upgrade / Use) | — |
 | Tap the deck | Deck viewer (the draw pile is sorted so it doesn't reveal the order), hand, played cards, discard | — |
 | Tap the intent bubble | The next 4 intents, and actions left | — |
-| Upgrade (enhancement) → "Choose card" → tap a hand card | Enhance it | Hand cards get a gold highlight |
+| Upgrade (enhancement) → "Choose card" → tap a hand card | Enhance it (one per card: enhanced cards are dimmed) | Eligible hand cards get a gold highlight. The result is a round icon on the card's corner, never card text; hovering the card explains it |
 | A card asks you to pick cards **in your hand** | Tap cards to pick them, then **Confirm** (single picks confirm on tap) | Candidates stay bright, others dim; picked cards lift and glow gold. A bar above the hand shows the verb + icon and the count. |
 | Any other choice (deck / discard / market / trinkets / "X OR Y") | A picker popup: tap to pick, **Confirm** or **Skip** | Shows the source card, the verb + icon, cards grouped by pile. It can't be closed without answering. |
 | Hover (desktop) | The hand card lifts; market tiles grow slightly | — |
@@ -65,7 +65,7 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 │ INSTANT (auto tag, only when  │
 │   there's no custom text)     │
 │ On-play text…                 │
-│ + Enhancement names (coral)   │
+│                          (◉) │  ← enhancement badge, bottom-right corner
 │ ┌ 🛍 on-buy text (gold strip)┐│
 │ └───────────────────────────┘ │
 └───────────────────────────────┘

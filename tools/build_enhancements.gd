@@ -2,7 +2,7 @@ extends SceneTree
 ## Writes one enhancement per card set into content/test/enhancements/.
 ## Run:  godot --headless --path . --script res://tools/build_enhancements.gd
 ## Source of truth for the effects: the "Card set enhancements" doc (Nimrod's table).
-## Names and prices are placeholders.
+## Names and prices are placeholders. Each has a corner icon (EnhancementData.icon).
 
 const DIR := "res://content/test/enhancements/"
 const PLACEHOLDER_COST := 3
@@ -15,47 +15,55 @@ func _init() -> void:
 	var gain := GainCoinsEffect.new()
 	gain.amount = 2
 	var e := _make("gilded", "Gilded", CardSets.Id.COINS)
+	e.icon = "🪙"
 	e.extra_on_play.assign([gain])
 	_save(e)
 
 	# Draw: 🂠 (draw a card on play)
 	var draw := DrawCardsEffect.new()
 	e = _make("insight", "Insight", CardSets.Id.DRAW)
+	e.icon = "🂠"
 	e.extra_on_play.assign([draw])
 	_save(e)
 
 	# Discard: When this is ⤵, 🂠 it
 	e = _make("boomerang", "Boomerang", CardSets.Id.DISCARD)
+	e.icon = "⤵"
 	e.on_discard.assign([DrawThisCardEffect.new()])
 	e.description = "When this is ⤵, 🂠 it"
 	_save(e)
 
 	# Trim: This card is immediately 🔥 (the moment you buy it, not when played)
 	e = _make("fleeting", "Fleeting", CardSets.Id.TRIM)
+	e.icon = "🔥"
 	e.destroy_on_apply = true
 	e.description = "This card is immediately 🔥"
 	_save(e)
 
 	# Retain: This card is 📌 while in your hand
 	e = _make("anchored", "Anchored", CardSets.Id.RETAIN)
+	e.icon = "📌"
 	e.retain = true
 	e.description = "This card is 📌 while in your hand"
 	_save(e)
 
 	# Utility: This card effect is ⚡
 	e = _make("hasty", "Hasty", CardSets.Id.UTILITY)
+	e.icon = "⚡"
 	e.make_instant = true
 	e.description = "This card effect is ⚡"
 	_save(e)
 
 	# Market: When you play this card, add a copy to your deck
 	e = _make("franchise", "Franchise", CardSets.Id.MARKET)
+	e.icon = "⧉"
 	e.extra_on_play.assign([AddCopyOfThisCardEffect.new()])
 	e.description = "When you play this card, add a copy to your deck"
 	_save(e)
 
 	# Curse Synergy: This card is considered a curse
 	e = _make("tainted", "Tainted", CardSets.Id.CURSE_SYNERGY)
+	e.icon = "☠"
 	e.counts_as_curse = true
 	e.description = "This card is considered a curse"
 	_save(e)

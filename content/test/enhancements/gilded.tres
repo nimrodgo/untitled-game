@@ -20,4 +20,5 @@ on_discard = Array[ExtResource("1_5er63")]([])
 retain = false
 destroy_on_apply = false
 counts_as_curse = false
+icon = "🪙"
 description = ""

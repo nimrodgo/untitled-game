@@ -15,4 +15,5 @@ on_discard = Array[ExtResource("1_uc3g0")]([])
 retain = false
 destroy_on_apply = false
 counts_as_curse = false
+icon = "⚡"
 description = "This card effect is ⚡"

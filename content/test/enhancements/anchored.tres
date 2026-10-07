@@ -15,4 +15,5 @@ on_discard = Array[ExtResource("1_dk56r")]([])
 retain = true
 destroy_on_apply = false
 counts_as_curse = false
+icon = "📌"
 description = "This card is 📌 while in your hand"
