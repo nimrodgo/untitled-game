@@ -100,7 +100,7 @@ func _init() -> void:
 		"Buy a card you destroyed 🔥 this encounter"))
 
 	ideas.append(_card("cursed_cache", "Cursed Cache", 0, false, [_add(driftwood), _draw(2)],
-		"Shuffle Driftwood into your deck. 2🂠"))
+		"Add Driftwood into your deck. 2🂠"))
 
 	var tf := TransformCardsEffect.new(); tf.into = driftwood
 	ideas.append(_card("hex", "Hex", 1, false, [tf],
@@ -208,7 +208,7 @@ func _init() -> void:
 		"+2🪙 and increase gain from all Snowballs by 2 this encounter"))
 
 	ideas.append(_card("risky_draw", "Risky Draw", 0, false, [_draw(3), _add(leaky_purse)],
-		"3🂠. Shuffle Leaky Purse into your deck"))
+		"3🂠. Add Leaky Purse into your deck"))
 
 	# Listed under items in ideas.md, but meant to be a card.
 	var pawn := _trash(true, 1); pawn.piles = HAND; pawn.gain_cost_as_coins = true
@@ -282,13 +282,13 @@ func _init() -> void:
 		[[_draw(2), _discard(1)], "⚡2🂠. ⤵", 3],
 		[[_draw(3), _discard(1)], "⚡3🂠. ⤵", 4]])
 	var t_urn := _trinket("ash_urn", "Ash Urn", 3, [
-		[[_add(barnacle), _trash(true, 1)], "⚡Shuffle 1 Barnacle into your deck. 🔥", 0],
-		[[_add(barnacle), _trash(true, 2)], "⚡Shuffle 1 Barnacle into your deck. 2🔥", 3],
-		[[_add(barnacle, 2), _trash(true, 3)], "⚡Shuffle 2 Barnacles into your deck. 3🔥", 4]])
+		[[_add(barnacle), _trash(true, 1)], "⚡Add 1 Barnacle into your deck. 🔥", 0],
+		[[_add(barnacle), _trash(true, 2)], "⚡Add 1 Barnacle into your deck. 2🔥", 3],
+		[[_add(barnacle, 2), _trash(true, 3)], "⚡Add 2 Barnacles into your deck. 3🔥", 4]])
 	var t_pan := _trinket("dust_pan", "Dust Pan", 3, [
-		[[_add(dead_weight), _trash(false, 2)], "⚡Shuffle 1 Dead Weight into your deck. 2🗑", 0],
-		[[_add(dead_weight), _trash(false, 3)], "⚡Shuffle 1 Dead Weight into your deck. 3🗑", 3],
-		[[_add(dead_weight, 2), _trash(false, 4)], "⚡Shuffle 2 Dead Weights into your deck. 4🗑", 4]])
+		[[_add(dead_weight), _trash(false, 2)], "⚡Add 1 Dead Weight into your deck. 2🗑", 0],
+		[[_add(dead_weight), _trash(false, 3)], "⚡Add 1 Dead Weight into your deck. 3🗑", 3],
+		[[_add(dead_weight, 2), _trash(false, 4)], "⚡Add 2 Dead Weights into your deck. 4🗑", 4]])
 	var t_glass := _trinket("spyglass", "Spyglass", 3, [
 		[[_peek(2)], "⚡Look at the top 2 cards of your deck. ⤵ any of them", 0],
 		[[_peek(3)], "⚡Look at the top 3 cards of your deck. ⤵ any of them", 3],

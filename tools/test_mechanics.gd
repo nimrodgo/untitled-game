@@ -17,6 +17,7 @@ func _init() -> void:
 	_rules(data)
 	_encounter_rules()
 	_enhancement_rules()
+	_deck_cycle_rules()
 	print("\n%d checks, %d failed" % [checks, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -252,7 +253,7 @@ func _rules(_data: EncounterData) -> void:
 	_check(e.total_rounds() == 3, "Meditate after a play: no extra round")
 
 	# Spring: discarded by an effect -> draw 2; end-of-round cleanup doesn't.
-	e = _enc(["example1", "example1", "example1", "example1", "example1", "example2", "example2", "example2", "example2"], false)
+	e = _enc(["example1", "example1", "example1", "example1", "example1", "example2", "example2", "example2", "example2", "example2"], false)
 	var spring := _give(e, "spring")
 	e.play_card(_give(e, "study"))   # draw 3, discard 1
 	var n := e.player.hand.size()
@@ -801,3 +802,64 @@ func _enhancement_rules() -> void:
 	_check(e.buy_enhancement(0, c), "buy_enhancement succeeds")
 	_check(c.enhancements.size() == 1 and e.player.coins == coins - 3, "bought: attached, 3 coins paid")
 	_check(e.shop.enhancements[0] == null, "bought: slot is empty until the next round")
+
+
+# ---------------------------------------------------------------- deck cycle
+
+## Draw 5 from the top, buys go to the bottom, played + unplayed cards go to
+## the discard pile, and at the end of the turn the shuffled discard pile is
+## put under the deck. The deck is never reshuffled mid-turn.
+func _deck_cycle_rules() -> void:
+	var ids := []
+	for i in 12:
+		ids.append("example1")
+	var e := _enc(ids)
+	var p := e.player
+	_check(p.hand.size() == 5 and p.draw_pile.size() == 7, "Deck cycle: opening hand is 5 from the deck")
+	var top5: Array = p.draw_pile.slice(p.draw_pile.size() - 5)
+
+	# Buy: the card goes to the bottom of the deck (nothing is shuffled).
+	var before := p.draw_pile.duplicate()
+	var bought := false
+	for slot in e.shop.cards.size():
+		if e.can_buy_card(slot):
+			bought = e.buy_card(slot)
+			break
+	_check(bought, "Deck cycle: bought a card")
+	_check(p.draw_pile.size() == before.size() + 1 and not before.has(p.draw_pile[0]), "Deck cycle: bought card is at the bottom of the deck")
+	_check(p.draw_pile.slice(1) == before, "Deck cycle: buying doesn't shuffle the deck")
+	var bought_card: CardInstance = p.draw_pile[0]
+
+	# Play one card, leave the rest unplayed; pass the turn.
+	var played: CardInstance = p.hand[0]
+	var old_hand := p.hand.duplicate()
+	e.play_card(played)
+	_check(not p.hand.has(played) and (p.in_play.has(played) or p.discard.has(played)), "Deck cycle: played card leaves the hand")
+	_check(e.round_num == 1, "Deck cycle: still the same turn after one action (round %d)" % e.round_num)
+	# (the played card may itself have drawn cards from the top)
+	var top5_now: Array = p.draw_pile.slice(p.draw_pile.size() - 5)
+	var n_under := p.hand.size() + p.in_play.size() + p.discard.size()
+	var deck_before := p.draw_pile.size()
+	e.pass_turn()
+	_check(p.discard.is_empty(), "Deck cycle: discard pile is emptied at the end of the turn")
+	var all_under := true
+	for c in old_hand:
+		if not p.draw_pile.has(c):
+			all_under = false
+	_check(all_under, "Deck cycle: played and unplayed cards are back in the deck")
+	_check(p.draw_pile.size() == deck_before + n_under - 5 and p.hand.size() == 5, "Deck cycle: next hand is 5 from the top")
+	var same := true
+	for c in top5_now:
+		if not p.hand.has(c):
+			same = false
+	_check(same, "Deck cycle: next hand is the old top 5 (the discards went under it)")
+	_check(p.draw_pile.find(bought_card) == n_under, "Deck cycle: bought card sits right above the shuffled discards")
+	_consistent(e, "Deck cycle")
+
+	# Deck smaller than 5: draw what's there, and no mid-turn reshuffle.
+	e = _enc(["example1", "example1", "example1"])
+	p = e.player
+	_check(p.hand.size() == 3 and p.draw_pile.is_empty(), "Deck cycle: small deck draws what is there")
+	p.discard.append(CardInstance.new(_card("example1")))
+	e.draw_cards(p, 2)
+	_check(p.hand.size() == 3 and p.discard.size() == 1, "Deck cycle: empty deck is not reshuffled mid-turn")

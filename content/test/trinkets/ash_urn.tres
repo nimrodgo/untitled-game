@@ -18,7 +18,7 @@ script = ExtResource("5_tikte")
 script = ExtResource("1_ntubv")
 upgrade_cost = 0
 effects = Array[ExtResource("2_dggjt")]([SubResource("Resource_n7buh"), SubResource("Resource_n5s3p")])
-text = "⚡Shuffle 1 Barnacle into your deck. 🔥"
+text = "⚡Add 1 Barnacle into your deck. 🔥"
 
 [sub_resource type="Resource" id="Resource_st1gu"]
 script = ExtResource("4_bvn34")
@@ -31,7 +31,7 @@ amount = 2
 [sub_resource type="Resource" id="Resource_1vqiq"]
 script = ExtResource("1_ntubv")
 effects = Array[ExtResource("2_dggjt")]([SubResource("Resource_st1gu"), SubResource("Resource_ct1q2")])
-text = "⚡Shuffle 1 Barnacle into your deck. 🔥🔥"
+text = "⚡Add 1 Barnacle into your deck. 🔥🔥"
 
 [sub_resource type="Resource" id="Resource_i7mh4"]
 script = ExtResource("4_bvn34")
@@ -46,7 +46,7 @@ amount = 3
 script = ExtResource("1_ntubv")
 upgrade_cost = 4
 effects = Array[ExtResource("2_dggjt")]([SubResource("Resource_i7mh4"), SubResource("Resource_uy3jb")])
-text = "⚡Shuffle 2 Barnacles into your deck. 🔥🔥🔥"
+text = "⚡Add 2 Barnacles into your deck. 🔥🔥🔥"
 
 [resource]
 script = ExtResource("6_bohki")

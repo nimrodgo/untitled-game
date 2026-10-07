@@ -75,7 +75,7 @@ flowchart TD
 **Buy a card:**
 1. Pay the cost. The `BEFORE_CARD_BUY` trigger fires, and items can change where the card goes.
 2. The card's **on-buy** effects resolve.
-3. The card goes to its destination. By default it's **shuffled into the draw pile**, never your hand, unless something like Express Delivery says otherwise.
+3. The card goes to its destination. By default it goes to the **bottom of the draw pile**, never your hand, unless something like Express Delivery says otherwise.
 4. `CARD_BOUGHT` fires for you and `OPPONENT_CARD_BOUGHT` fires for the enemy. Then the enemy may respond.
 
 **Play a card:** it leaves your hand → its on-play effects resolve (including any enhancement effects) → it goes **in play** → `CARD_PLAYED` / `OPPONENT_CARD_PLAYED` fire → the enemy may respond, unless the card is instant.
@@ -121,9 +121,10 @@ Curses are cards with `curse = true`, usually **unplayable**, and shown in dark 
 
 ## Deck mechanics
 
-- **Hand size is 5.** At round start you draw 5, on top of any retained cards, plus any "draw at the start of your next turn" bonus.
-- When the draw pile is empty, the **discard pile is shuffled** into a new draw pile. Cards **in play** aren't included, which prevents infinite draw loops within a round.
-- At round end, in-play cards and your remaining hand go to the discard pile (`DISCARD_HAND_AT_ROUND_END`).
+- **Hand size is 5.** At round start you draw 5 from the **top** of the deck, on top of any retained cards, plus any "draw at the start of your next turn" bonus. If the deck has fewer cards you just draw what's there.
+- **Cards you gain go to the bottom of the deck** (bought cards, curses, copies). Nothing is ever shuffled into the middle of the deck; only effects that say "on top of your deck" (e.g. Loan) put a card on top.
+- Played cards go to the discard pile at the end of the turn, and so do the cards left in your hand, except retained (📌) ones (`DISCARD_HAND_AT_ROUND_END`).
+- **At the end of every turn the whole discard pile is shuffled and put at the bottom of the deck.** The deck itself is never reshuffled. If the deck runs out in the middle of a turn, you just draw fewer cards (no reshuffle), which also stops infinite draw loops. The first deck order is shuffled once at the start of the encounter.
 - Coins can never drop below 0. A steal only takes what the opponent has.
 
 ## Tunables — `scripts/core/game_rules.gd`
@@ -131,7 +132,7 @@ Curses are cards with `curse = true`, usually **unplayable**, and shown in dark 
 | Constant | Value | Effect |
 |---|---|---|
 | `HAND_SIZE` | 5 | Cards you draw up to each round |
-| `DEFAULT_BUY_DESTINATION` | `DRAW_SHUFFLE` | Where bought cards go |
+| `DEFAULT_BUY_DESTINATION` | `DRAW_BOTTOM` | Where bought cards go |
 | `DISCARD_HAND_AT_ROUND_END` | true | Whether you keep unplayed cards between rounds |
 | `TRINKET_LIMIT` | `PER_TURN` | `PER_ACTION` would reset trinkets after every action |
 | `CARD/ITEM/TRINKET_BUY_IS_ACTION`, `ENHANCEMENT_BUY_IS_ACTION` | all true | Whether each purchase uses an action (and lets the enemy respond). Buying a trinket duplicate (an upgrade) counts as a trinket buy. |

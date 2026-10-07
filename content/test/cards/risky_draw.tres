@@ -21,4 +21,4 @@ card_set = 9
 display_name = "Risky Draw"
 cost = 0
 on_play = Array[ExtResource("1_cnjvh")]([SubResource("Resource_p2syd"), SubResource("Resource_qanq8")])
-on_play_text = "🂠🂠🂠. Shuffle Leaky Purse into your deck"
+on_play_text = "🂠🂠🂠. Add Leaky Purse into your deck"

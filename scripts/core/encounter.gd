@@ -435,20 +435,16 @@ func change_coins(p: PlayerState, delta: int, source: String = "") -> void:
 			(" (" + source + ")") if source != "" else ""])
 
 
-## Draw from the top (or `from_bottom`) of the draw pile, reshuffling the
-## discard pile when it runs out.
+## Draw from the top (or `from_bottom`) of the draw pile. The discard pile is
+## never reshuffled mid-turn: if the deck runs out you just draw what's there
+## (the discard pile goes under the deck at the end of every turn).
 func draw_cards(p: PlayerState, n: int, from_bottom := false, opening := false) -> int:
 	var drawn := 0
 	for i in n:
 		if is_over or (p.draw_locked and not opening):
 			break
 		if p.draw_pile.is_empty():
-			if p.discard.is_empty():
-				break
-			p.draw_pile = p.discard.duplicate()
-			p.discard.clear()
-			_shuffle(p.draw_pile)
-			log_line("  %s shuffle the discard pile into the deck." % p.display_name)
+			break
 		var c: CardInstance = p.draw_pile.pop_front() if from_bottom else p.draw_pile.pop_back()
 		p.hand.append(c)
 		drawn += 1
@@ -780,11 +776,25 @@ func _end_round() -> void:
 		player.hand = keep
 	for c in player.hand:
 		c.retain = false
+	_cycle_discard_under_deck(player)
 	_busy -= 1
 	if round_num >= total_rounds():
 		_finish_encounter()
 	else:
 		await _start_round()
+
+
+## End of turn: shuffle the discard pile and put it at the bottom of the deck.
+## (draw_pile[0] is the bottom, draw_pile.back() the top.)
+func _cycle_discard_under_deck(p: PlayerState) -> void:
+	if p.discard.is_empty():
+		return
+	var moved := p.discard.duplicate()
+	p.discard.clear()
+	_shuffle(moved)
+	moved.append_array(p.draw_pile)
+	p.draw_pile.assign(moved)
+	log_line("  The discard pile is shuffled under your deck (%d cards)." % moved.size())
 
 
 func _finish_encounter() -> void:
@@ -883,21 +893,18 @@ func _place_card(p: PlayerState, card: CardInstance, zone: GameRules.Zone) -> vo
 			p.hand.append(card)
 		GameRules.Zone.DRAW_TOP:
 			p.draw_pile.append(card)
-		GameRules.Zone.DRAW_BOTTOM:
-			p.draw_pile.insert(0, card)
 		GameRules.Zone.DISCARD:
 			p.discard.append(card)
-		_:
-			p.draw_pile.insert(rng.randi_range(0, p.draw_pile.size()), card)
+		GameRules.Zone.DRAW_BOTTOM:
+			p.draw_pile.insert(0, card)
 
 
 func _zone_phrase(zone: GameRules.Zone) -> String:
 	match zone:
 		GameRules.Zone.HAND: return "goes to your hand"
 		GameRules.Zone.DRAW_TOP: return "goes on top of your deck"
-		GameRules.Zone.DRAW_BOTTOM: return "goes to the bottom of your deck"
 		GameRules.Zone.DISCARD: return "goes to your discard pile"
-	return "is shuffled into your deck"
+	return "goes to the bottom of your deck"
 
 
 func _ctx(owner: PlayerState, card: CardInstance = null) -> EffectContext:

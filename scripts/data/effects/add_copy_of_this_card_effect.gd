@@ -3,7 +3,7 @@ extends Effect
 ## Adds a copy of the card this effect belongs to. The copy is the plain card:
 ## it does not inherit enhancements, so copy effects can't snowball.
 
-@export var zone: GameRules.Zone = GameRules.Zone.DRAW_SHUFFLE
+@export var zone: GameRules.Zone = GameRules.Zone.DRAW_BOTTOM
 
 
 func apply(ctx: EffectContext) -> void:
@@ -13,7 +13,7 @@ func apply(ctx: EffectContext) -> void:
 
 
 func describe() -> String:
-	var where := "deck"
+	var where := "deck (bottom)"
 	match zone:
 		GameRules.Zone.HAND: where = "hand"
 		GameRules.Zone.DISCARD: where = "discard"
