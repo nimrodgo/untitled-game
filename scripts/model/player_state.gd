@@ -8,9 +8,6 @@ var coins := 0
 var draw_pile: Array[CardInstance] = []
 var hand: Array[CardInstance] = []
 var discard: Array[CardInstance] = []
-## Cards played this round. They return to discard at round end, so they
-## can't be redrawn in the same round (prevents infinite draw loops).
-var in_play: Array[CardInstance] = []
 ## Removed for this encounter only / destroyed permanently (both out of play).
 var removed: Array[CardInstance] = []
 var destroyed: Array[CardInstance] = []
@@ -47,5 +44,4 @@ func all_cards() -> Array[CardInstance]:
 	out.append_array(draw_pile)
 	out.append_array(hand)
 	out.append_array(discard)
-	out.append_array(in_play)
 	return out

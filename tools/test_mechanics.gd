@@ -88,7 +88,7 @@ func _consistent(e: Encounter, what: String) -> void:
 	var p := e.player
 	var seen := {}
 	var ok := true
-	for pile in [p.hand, p.draw_pile, p.discard, p.in_play, p.removed, p.destroyed]:
+	for pile in [p.hand, p.draw_pile, p.discard, p.removed, p.destroyed]:
 		for c in pile:
 			if seen.has(c):
 				ok = false
@@ -204,7 +204,7 @@ func _rules(_data: EncounterData) -> void:
 	_check(req != null and req.hand_only and req.min_count == 2, "Sift: pick 2 in hand")
 	_check(not e.submit_choice([req.candidates[0]]), "wrong number of picks is rejected")
 	e.submit_choice(req.candidates.slice(0, 2))
-	_check(e.pending_choice == null and e.player.discard.size() == 2, "Sift discarded 2")
+	_check(e.pending_choice == null and e.player.discard.size() == 3 and e.player.discard.has(c), "Sift discarded 2, and itself went to the discard pile")
 
 	# Destroy exactly N unless nothing to pick; mixed piles -> not hand_only.
 	e = _enc(["example1", "example1", "example1", "example1", "example1", "example2"], false)
@@ -654,7 +654,7 @@ func _give_enh(e: Encounter, card_id: String, enh_id: String) -> CardInstance:
 
 func _all_count(e: Encounter, id: String) -> int:
 	var n := 0
-	for pile in [e.player.hand, e.player.draw_pile, e.player.discard, e.player.in_play]:
+	for pile in [e.player.hand, e.player.draw_pile, e.player.discard]:
 		n += _count_id(pile, id)
 	return n
 
@@ -729,7 +729,7 @@ func _enhancement_rules() -> void:
 	e = _enc(DECK5 + DECK5)
 	c = _give(e, "example1")
 	e.play_card(c)
-	_check(e.player.in_play.has(c) and e.player.destroyed.is_empty(), "plain card goes in play, nothing destroyed")
+	_check(e.player.discard.has(c) and e.player.destroyed.is_empty(), "plain card goes to the discard pile, nothing destroyed")
 
 	# Retain: stays in hand at the end of the turn, a plain card does not.
 	e = _enc(DECK5 + DECK5, false)
@@ -755,7 +755,7 @@ func _enhancement_rules() -> void:
 	var after := _all_count(e, "example1")
 	_check(after == total + 1, "Franchise: a copy is added to the deck (%d -> %d)" % [total, after])
 	var enhanced := 0
-	for zone in [e.player.hand, e.player.draw_pile, e.player.discard, e.player.in_play]:
+	for zone in [e.player.hand, e.player.draw_pile, e.player.discard]:
 		for k in zone:
 			if not k.enhancements.is_empty():
 				enhanced += 1
@@ -834,11 +834,11 @@ func _deck_cycle_rules() -> void:
 	var played: CardInstance = p.hand[0]
 	var old_hand := p.hand.duplicate()
 	e.play_card(played)
-	_check(not p.hand.has(played) and (p.in_play.has(played) or p.discard.has(played)), "Deck cycle: played card leaves the hand")
+	_check(not p.hand.has(played) and p.discard.has(played), "Deck cycle: played card goes to the discard pile")
 	_check(e.round_num == 1, "Deck cycle: still the same turn after one action (round %d)" % e.round_num)
 	# (the played card may itself have drawn cards from the top)
 	var top5_now: Array = p.draw_pile.slice(p.draw_pile.size() - 5)
-	var n_under := p.hand.size() + p.in_play.size() + p.discard.size()
+	var n_under := p.hand.size() + p.discard.size()
 	var deck_before := p.draw_pile.size()
 	e.pass_turn()
 	_check(p.discard.is_empty(), "Deck cycle: discard pile is emptied at the end of the turn")
