@@ -79,7 +79,7 @@ flowchart TD
 
 **Play a card:** it leaves your hand → its on-play effects resolve (including any enhancement effects) → it goes to the **discard pile** → `CARD_PLAYED` / `OPPONENT_CARD_PLAYED` fire → the enemy may respond, unless the card is instant.
 
-**Upgrade (enhancement):** pay, then pick a card **in your hand**. The upgrade attaches to that card instance: it can add on-play effects, make the card instant, retain it, return it when discarded or make it count as a curse, and the card's name gets a `+`. The Trim enhancement is the exception: it destroys the chosen card immediately (permanently) and attaches nothing.
+**Upgrade (enhancement):** pay, then pick a card **in your hand**. The upgrade attaches to that card instance: it can add on-play effects, make the card instant, retain it, return it when discarded or make it count as a curse. **A card holds only one enhancement** (an enhanced card can't be picked again), and the card's text never changes: the enhancement shows as a small round icon on the card's bottom-right corner. The Trim enhancement is the exception: it destroys the chosen card immediately (permanently) and attaches nothing.
 
 ## Trinkets: buy, upgrade, sell
 

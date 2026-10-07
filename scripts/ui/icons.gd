@@ -54,6 +54,14 @@ const SVG := {
 	"↺": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
 		<path d="M11.8 6.9 A10 10 0 1 0 21.7 7.8" fill="none" stroke="#7fe3d0" stroke-width="3.4" stroke-linecap="round"/>
 		<path d="M18.5 5.5 L25.1 4.7 L20 12.1 Z" fill="#7fe3d0" stroke="#7fe3d0" stroke-width="2" stroke-linejoin="round"/></svg>""",
+	"☠": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+		<path d="M16 3 C8.5 3 5 8.5 5 14 C5 18 7 20.5 9.5 22 V27 H22.5 V22 C25 20.5 27 18 27 14 C27 8.5 23.5 3 16 3 Z"
+		fill="#e9d9ff" stroke="#4a1f33" stroke-width="2.2" stroke-linejoin="round"/>
+		<circle cx="11.5" cy="14.5" r="3" fill="#4a1f33"/><circle cx="20.5" cy="14.5" r="3" fill="#4a1f33"/>
+		<path d="M14 20 H18 M13.5 27 V23 M16 27 V23 M18.5 27 V23" stroke="#4a1f33" stroke-width="1.8" stroke-linecap="round"/></svg>""",
+	"⧉": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+		<rect x="3" y="3" width="17" height="17" rx="3.5" fill="#9fc3cf" stroke="#243c48" stroke-width="2.2"/>
+		<rect x="12" y="12" width="17" height="17" rx="3.5" fill="#e8f4f5" stroke="#243c48" stroke-width="2.2"/></svg>""",
 }
 
 ## What each icon means (shown as a hover pop-up).
@@ -61,6 +69,7 @@ const TIPS := {
 	"🪙": "Coins", "🂠": "Card — draw", "⚡": "Instant — free action, doesn't end your turn",
 	"🛍": "On buy — happens when you buy it", "⤵": "Discard", "➡": "Pay what's on the left to get what's on the right",
 	"🔥": "Destroy — gone for good", "🗑": "Remove — gone for this encounter", "↺": "Refresh", "📌": "Retain — keep the card in your hand at the end of the turn",
+	"☠": "Curse", "⧉": "Copy",
 }
 
 static var _cache := {}

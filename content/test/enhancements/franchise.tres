@@ -19,4 +19,5 @@ on_discard = Array[ExtResource("1_eb8kf")]([])
 retain = false
 destroy_on_apply = false
 counts_as_curse = false
+icon = "⧉"
 description = "When you play this card, add a copy to your deck"

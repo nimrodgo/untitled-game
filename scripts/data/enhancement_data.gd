@@ -1,6 +1,7 @@
 class_name EnhancementData
 extends Resource
 ## A shop upgrade applied to one card in your hand (permanently, for the run).
+## A card holds at most ONE enhancement.
 ## Sold by the encounters that list its `card_set` (see EncounterData.card_sets).
 
 @export var id: StringName
@@ -19,7 +20,10 @@ extends Resource
 @export var destroy_on_apply: bool = false
 ## The card counts as a curse for everything that looks at curses.
 @export var counts_as_curse: bool = false
-## Text for the shop tile and appended to the card. Leave empty to auto-generate.
+## Icon token (see Icons) shown in the corner of an enhanced card and on the
+## shop tile. The card's own text is never changed by an enhancement.
+@export var icon: String = ""
+## Text for the shop tile and the hover legend. Leave empty to auto-generate.
 @export_multiline var description: String = ""
 
 
@@ -40,13 +44,3 @@ func get_description() -> String:
 	if counts_as_curse:
 		parts.append("Counts as a curse")
 	return ". ".join(parts)
-
-
-## What this adds to a card's own text.
-func card_text() -> String:
-	if description != "":
-		return description
-	if extra_on_play.is_empty() and on_discard.is_empty() and not retain \
-			and not destroy_on_apply and not counts_as_curse:
-		return ""   # make_instant only: the card already shows the instant icon
-	return get_description()

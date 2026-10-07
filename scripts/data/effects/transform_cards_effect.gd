@@ -1,7 +1,7 @@
 class_name TransformCardsEffect
 extends Effect
 ## Choose any number of cards in your hand; each becomes `into` (its
-## upgrades are lost).
+## enhancement is lost).
 
 @export var into: CardData
 
@@ -15,7 +15,7 @@ func apply(ctx: EffectContext) -> void:
 	for c in picks:
 		ctx.encounter.log_line("  %s transform %s into %s." % [p.display_name, c.get_name(), into.display_name])
 		c.data = into
-		c.enhancements.clear()
+		c.enhancement = null
 
 
 func describe() -> String:

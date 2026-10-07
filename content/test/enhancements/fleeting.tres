@@ -15,4 +15,5 @@ on_discard = Array[ExtResource("1_eiyhi")]([])
 retain = false
 destroy_on_apply = true
 counts_as_curse = false
+icon = "🔥"
 description = "This card is immediately 🔥"
