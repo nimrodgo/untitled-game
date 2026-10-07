@@ -13,4 +13,5 @@ id = &"snowball"
 card_set = 2
 display_name = "Snowball"
 on_play = Array[ExtResource("1_17gsv")]([SubResource("Resource_42qk1")])
-on_play_text = "🪙🪙 and increase 🪙 gain from all Snowballs by 2 this encounter"
+on_play_text = "{gain_icons} and increase 🪙 gain from all Snowballs by 2 this encounter"
+on_buy_text = "TBD"

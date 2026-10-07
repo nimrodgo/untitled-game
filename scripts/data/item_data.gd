@@ -13,9 +13,13 @@ extends Resource
 @export var limit_per_round: int = 0
 @export_multiline var description: String = ""
 @export var icon: Texture2D
-## Passive: while you own this, every market card costs this much (-1 = off).
+## Passive: while you own this, everything in the market (cards, items,
+## trinkets, trinket upgrades, enhancements) costs this much (-1 = off).
 ## The market shows the normal price struck through next to the new one.
-@export var card_price_override: int = -1
+@export var shop_price_override: int = -1
+## Passive: while you own this, a market card slot you buy from is restocked
+## with a new random card right away.
+@export var restock_bought_cards: bool = false
 ## Which set this belongs to (see CardSets). One set per card/item/trinket.
 @export var card_set: CardSets.Id = CardSets.Id.NONE
 
@@ -43,6 +47,7 @@ func get_description() -> String:
 		GameRules.Trigger.CARD_REMOVED: when = "When you remove a card"
 		GameRules.Trigger.CARD_DESTROYED: when = "When you destroy a card"
 		GameRules.Trigger.CARD_TRASHED_FROM_HAND: when = "When you remove or destroy a card in your hand"
+		GameRules.Trigger.SHOP_BUY: when = "When you buy anything"
 	var limit := ""
 	if limit_per_encounter == 1:
 		limit = " (first time each encounter)"

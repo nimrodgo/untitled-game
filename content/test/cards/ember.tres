@@ -21,3 +21,4 @@ display_name = "Ember"
 on_play = Array[ExtResource("1_hm6me")]([SubResource("Resource_5wm56")])
 on_play_text = "🪙🪙. When this is 🔥, 🂠🂠"
 on_destroy = Array[ExtResource("1_hm6me")]([SubResource("Resource_wmu5d")])
+on_buy_text = "TBD"

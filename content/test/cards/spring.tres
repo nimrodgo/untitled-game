@@ -19,3 +19,4 @@ display_name = "Spring"
 on_play = Array[ExtResource("1_38fl6")]([SubResource("Resource_h2jxp")])
 on_play_text = "🂠. When this card is ⤵, 🂠🂠"
 on_discard = Array[ExtResource("1_38fl6")]([SubResource("Resource_38fl6")])
+on_buy_text = "TBD"

@@ -22,3 +22,4 @@ display_name = "Cursed Cache"
 cost = 0
 on_play = Array[ExtResource("1_np5qb")]([SubResource("Resource_e723f"), SubResource("Resource_t721j")])
 on_play_text = "Add Driftwood into your deck. 🂠🂠"
+on_buy_text = "TBD"

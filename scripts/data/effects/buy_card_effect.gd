@@ -43,7 +43,7 @@ func apply(ctx: EffectContext) -> void:
 		return
 	var card: CardInstance
 	if source == Source.MARKET:
-		card = CardInstance.new(enc.shop.take_card(picks[0]))
+		card = CardInstance.new(enc.take_market_card(p, picks[0]))
 	else:
 		card = picks[0]
 		p.removed.erase(card)

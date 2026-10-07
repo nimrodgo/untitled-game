@@ -257,9 +257,9 @@ func _init() -> void:
 	# "One never pays here - not with money": every market card is free, but each buy adds a random curse.
 	var random_curse := AddRandomCurseEffect.new()
 	random_curse.curses.assign([dead_weight, barnacle, driftwood, leaky_purse])
-	var bargain := _item("needful", "Needful", 5, T.CARD_BOUGHT, [random_curse], 0, 0,
+	var bargain := _item("needful", "Needful", 5, T.SHOP_BUY, [random_curse], 0, 0,
 		"One never pays here - not with money")
-	bargain.card_price_override = 0
+	bargain.shop_price_override = 0
 	_save(bargain, "items/needful.tres")
 	idea_items.append(bargain)
 

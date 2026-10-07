@@ -51,6 +51,18 @@ func apply(ctx: EffectContext) -> void:
 		enc.change_coins(p, coins, ctx.source_name)
 
 
+func preview_coins(_enc: Encounter, owner: PlayerState, _cd: CardData, card: CardInstance) -> int:
+	if coins_per_card <= 0:
+		return 0
+	var n := 0
+	match what:
+		What.SELF: n = 1
+		What.ALL_OTHER_HAND: n = owner.hand.size() - (1 if card and owner.hand.has(card) else 0)
+		What.DRAW_PILE: n = owner.draw_pile.size()
+		_: n = amount
+	return n * coins_per_card
+
+
 func is_cost() -> bool:
 	return as_cost
 

@@ -22,3 +22,4 @@ display_name = "All In"
 cost = 3
 on_play = Array[ExtResource("1_u4nku")]([SubResource("Resource_407uy")])
 on_play_text = "Double your 🪙 if your deck is empty"
+on_buy_text = "TBD"

@@ -16,6 +16,10 @@ func apply(ctx: EffectContext) -> void:
 	p.card_bonus[key] = bonus + increase
 
 
+func preview_coins(_enc: Encounter, owner: PlayerState, cd: CardData, _card: CardInstance) -> int:
+	return amount + int(owner.card_bonus.get(cd.id, 0))
+
+
 func describe() -> String:
 	var coin_text: String = "🪙".repeat(amount) if amount <= 5 else "%d🪙" % amount
 	return "%s and increase gain from all copies of this card by %d this encounter" % [coin_text, increase]

@@ -23,3 +23,4 @@ cost = 2
 instant = true
 on_play = Array[ExtResource("1_yxa7p")]([SubResource("Resource_x1i4u"), SubResource("Resource_7niqt")])
 on_play_text = "⚡🔥 this ➡ 🂠🂠🂠🂠🂠"
+on_buy_text = "TBD"

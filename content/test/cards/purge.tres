@@ -36,3 +36,4 @@ display_name = "Purge"
 cost = 2
 on_play = Array[ExtResource("1_7jqd5")]([SubResource("Resource_bxe20")])
 on_play_text = "🔥 OR 🗑🗑"
+on_buy_text = "TBD"

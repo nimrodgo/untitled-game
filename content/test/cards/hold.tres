@@ -7,6 +7,7 @@
 
 [sub_resource type="Resource" id="Resource_7e5y2"]
 script = ExtResource("2_a37aw")
+amount = 2
 
 [sub_resource type="Resource" id="Resource_tu6ha"]
 script = ExtResource("3_35f6j")
@@ -17,4 +18,5 @@ id = &"hold"
 card_set = 6
 display_name = "Hold"
 on_play = Array[ExtResource("1_lfa0w")]([SubResource("Resource_7e5y2"), SubResource("Resource_tu6ha")])
-on_play_text = "🪙. 📌 a card"
+on_play_text = "🪙🪙. 📌 a card"
+on_buy_text = "TBD"

@@ -29,6 +29,12 @@ func describe() -> String:
 	return "(effect)"
 
 
+## Coins this effect would give its owner if the card were played right now,
+## shown on cards as {gain}. `card` is null for a market card. Default 0.
+func preview_coins(_enc: Encounter, _owner: PlayerState, _cd: CardData, _card: CardInstance) -> int:
+	return 0
+
+
 ## Rough value for the AI, from the owner's point of view. Positive = good.
 func ai_score() -> float:
 	return 0.0

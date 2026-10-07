@@ -40,3 +40,4 @@ display_name = "Patience"
 instant = true
 on_play = Array[ExtResource("1_ayial")]([SubResource("Resource_uf1g5")])
 on_play_text = "⚡🪙🪙 OR Pass ➡ 🪙🪙🪙"
+on_buy_text = "TBD"
