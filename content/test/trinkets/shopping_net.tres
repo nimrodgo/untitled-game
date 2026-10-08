@@ -39,8 +39,8 @@ effects = Array[ExtResource("2_361o8")]([SubResource("Resource_2cbaf"), SubResou
 
 [resource]
 script = ExtResource("2_px3ns")
-id = &"impulse_buy"
-display_name = "Impulse Buy"
+id = &"shopping_net"
+display_name = "Shopping Net"
 cost = 3
 levels = Array[ExtResource("1_mxcps")]([SubResource("Resource_on81o"), SubResource("Resource_pwp67"), SubResource("Resource_u2d0m")])
 card_set = 8
