@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://c5ows1fwfe3c5"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_wh6am"]
-[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_t7fas"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_5cke1"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_wh6am"]
+[ext_resource type="Script" uid="uid://8karyx1sco5o" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_t7fas"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_5cke1"]
 
 [sub_resource type="Resource" id="Resource_bna1x"]
 script = ExtResource("2_t7fas")
@@ -20,4 +20,3 @@ on_play = Array[ExtResource("1_wh6am")]([SubResource("Resource_bna1x"), SubResou
 on_play_text = "🂠. 🂠 from the bottom of your deck"
 on_buy_text = "TBD"
 card_set = 3
-tags = PackedStringArray()

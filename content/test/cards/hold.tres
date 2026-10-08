@@ -15,8 +15,8 @@ script = ExtResource("3_35f6j")
 [resource]
 script = ExtResource("4_wpfef")
 id = &"hold"
-card_set = 6
 display_name = "Hold"
 on_play = Array[ExtResource("1_lfa0w")]([SubResource("Resource_7e5y2"), SubResource("Resource_tu6ha")])
 on_play_text = "🪙🪙. 📌 a card"
 on_buy_text = "TBD"
+card_set = 6

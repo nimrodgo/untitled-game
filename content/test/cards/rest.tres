@@ -15,9 +15,9 @@ amount = 3
 [resource]
 script = ExtResource("4_u4q8q")
 id = &"rest"
-card_set = 3
 display_name = "Rest"
 cost = 0
 on_play = Array[ExtResource("1_ws4xy")]([SubResource("Resource_kyne1"), SubResource("Resource_pe1vx")])
 on_play_text = "Pass ➡ 🂠🂠🂠 at the start of your next turn"
 on_buy_text = "TBD"
+card_set = 3

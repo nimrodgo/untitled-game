@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemData" format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dyr446y3ejoay"]
 
 [ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_eff"]
 [ext_resource type="Script" uid="uid://dluv2ln5einag" path="res://scripts/data/effects/set_buy_destination_effect.gd" id="2_dest"]
@@ -12,9 +12,8 @@ optional = true
 [resource]
 script = ExtResource("3_item")
 id = &"top_shelf"
-card_set = 8
 display_name = "Top Shelf"
-cost = 3
 trigger = 3
 effects = Array[ExtResource("1_eff")]([SubResource("Resource_top")])
 description = "When you buy a card, you may place it on top of your deck"
+card_set = 8

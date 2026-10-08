@@ -11,10 +11,10 @@ mode = 1
 [resource]
 script = ExtResource("3_heqlf")
 id = &"echo_chamber"
-card_set = 7
 display_name = "Echo Chamber"
 cost = 6
 trigger = 5
 effects = Array[ExtResource("1_q81en")]([SubResource("Resource_vai53")])
 limit_per_round = 1
 description = "The first card you play each turn is played an extra time"
+card_set = 7

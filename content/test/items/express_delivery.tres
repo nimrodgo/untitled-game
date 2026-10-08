@@ -10,10 +10,10 @@ script = ExtResource("2_mr4kr")
 [resource]
 script = ExtResource("3_yytpu")
 id = &"express_delivery"
-card_set = 8
 display_name = "Express Delivery"
 cost = 2
 trigger = 3
 effects = Array[ExtResource("1_r6xr6")]([SubResource("Resource_w4ax2")])
 limit_per_encounter = 1
 description = "The first card you buy each encounter goes to your hand"
+card_set = 8

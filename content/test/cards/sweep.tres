@@ -17,8 +17,8 @@ script = ExtResource("3_07s55")
 [resource]
 script = ExtResource("4_pmy6q")
 id = &"sweep"
-card_set = 9
 display_name = "Sweep Under"
 on_play = Array[ExtResource("1_lp2db")]([SubResource("Resource_j5fpp"), SubResource("Resource_8503p")])
 on_play_text = "Move all curses in your deck to the bottom. 🂠"
 on_buy_text = "TBD"
+card_set = 9

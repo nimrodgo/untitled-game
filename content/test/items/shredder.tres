@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="ItemData" format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://v48qns3cjqnw"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_po22l"]
-[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="2_qud4n"]
-[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="3_8i2h4"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_po22l"]
+[ext_resource type="Script" uid="uid://4udkm66plln6" path="res://scripts/data/effects/trash_cards_effect.gd" id="2_qud4n"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="3_8i2h4"]
 
 [sub_resource type="Resource" id="Resource_74usk"]
 script = ExtResource("2_qud4n")

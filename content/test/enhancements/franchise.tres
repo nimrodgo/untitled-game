@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="EnhancementData" format=3]
+[gd_resource type="Resource" script_class="EnhancementData" format=3 uid="uid://dgwi8w3xrycj3"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_eb8kf"]
-[ext_resource type="Script" path="res://scripts/data/effects/add_copy_of_this_card_effect.gd" id="2_to5on"]
-[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="3_qmxad"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_eb8kf"]
+[ext_resource type="Script" uid="uid://bwh6v0knrggnj" path="res://scripts/data/effects/add_copy_of_this_card_effect.gd" id="2_to5on"]
+[ext_resource type="Script" uid="uid://c7wqsr8q832fh" path="res://scripts/data/enhancement_data.gd" id="3_qmxad"]
 
 [sub_resource type="Resource" id="Resource_4hurc"]
 script = ExtResource("2_to5on")
@@ -13,11 +13,6 @@ id = &"franchise"
 display_name = "Franchise"
 cost = 3
 card_set = 8
-make_instant = false
 extra_on_play = Array[ExtResource("1_eb8kf")]([SubResource("Resource_4hurc")])
-on_discard = Array[ExtResource("1_eb8kf")]([])
-retain = false
-destroy_on_apply = false
-counts_as_curse = false
 icon = "⧉"
 description = "When you play this card, add a copy to your deck"

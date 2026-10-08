@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://ch50ad0anieqw"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_la0o5"]
-[ext_resource type="Script" path="res://scripts/data/effects/reduce_target_effect.gd" id="2_a8jy6"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_uvifg"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_la0o5"]
+[ext_resource type="Script" uid="uid://p605rniaqw2g" path="res://scripts/data/effects/reduce_target_effect.gd" id="2_a8jy6"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_uvifg"]
 
 [sub_resource type="Resource" id="Resource_u7fdo"]
 script = ExtResource("2_a8jy6")
@@ -16,4 +16,3 @@ on_play = Array[ExtResource("1_la0o5")]([SubResource("Resource_u7fdo")])
 on_play_text = "Reduce the encounter target by 3"
 on_buy_text = "TBD"
 card_set = 7
-tags = PackedStringArray()

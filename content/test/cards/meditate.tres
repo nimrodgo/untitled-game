@@ -26,9 +26,9 @@ effects = Array[ExtResource("1_4bcxb")]([SubResource("Resource_lnw5y"), SubResou
 [resource]
 script = ExtResource("6_0tvi2")
 id = &"meditate"
-card_set = 7
 display_name = "Meditate"
 cost = 0
 on_play = Array[ExtResource("1_4bcxb")]([SubResource("Resource_g7bvs"), SubResource("Resource_2vvr3")])
 on_play_text = "Pass. If you didn't play any card this turn, take an extra turn and 🔥 this"
 on_buy_text = "TBD"
+card_set = 7

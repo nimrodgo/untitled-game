@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="TrinketData" format=3 uid="uid://b63wramqgep0"]
+
+[ext_resource type="Script" uid="uid://dvhdcguit2rs0" path="res://scripts/data/trinket_level.gd" id="1_rxqq7"]
+[ext_resource type="Script" uid="uid://bldvg83fphc0b" path="res://scripts/data/trinket_data.gd" id="2_uqp18"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="2_vof3j"]
+[ext_resource type="Script" uid="uid://ggw16a8n3int" path="res://scripts/data/effects/pay_coins_effect.gd" id="3_vof3j"]
+[ext_resource type="Script" uid="uid://8karyx1sco5o" path="res://scripts/data/effects/draw_cards_effect.gd" id="4_t2bn6"]
+[ext_resource type="Script" uid="uid://dow1kbluxxx0s" path="res://scripts/data/effects/gain_coins_effect.gd" id="5_ffy15"]
+
+[sub_resource type="Resource" id="Resource_ffy15"]
+script = ExtResource("3_vof3j")
+
+[sub_resource type="Resource" id="Resource_utalk"]
+script = ExtResource("4_t2bn6")
+
+[sub_resource type="Resource" id="Resource_t2bn6"]
+script = ExtResource("1_rxqq7")
+effects = Array[ExtResource("2_vof3j")]([SubResource("Resource_ffy15"), SubResource("Resource_utalk")])
+text = "⚡🪙➡🂠"
+
+[sub_resource type="Resource" id="Resource_5a0gv"]
+script = ExtResource("4_t2bn6")
+
+[sub_resource type="Resource" id="Resource_lbfsj"]
+script = ExtResource("1_rxqq7")
+effects = Array[ExtResource("2_vof3j")]([SubResource("Resource_5a0gv")])
+text = "🂠"
+
+[sub_resource type="Resource" id="Resource_wiexh"]
+script = ExtResource("4_t2bn6")
+
+[sub_resource type="Resource" id="Resource_nysui"]
+script = ExtResource("5_ffy15")
+
+[sub_resource type="Resource" id="Resource_wy6eu"]
+script = ExtResource("1_rxqq7")
+effects = Array[ExtResource("2_vof3j")]([SubResource("Resource_wiexh"), SubResource("Resource_nysui")])
+text = "🂠🪙"
+
+[resource]
+script = ExtResource("2_uqp18")
+id = &"quickdraw"
+display_name = "Quickdraw"
+cost = 3
+levels = Array[ExtResource("1_rxqq7")]([SubResource("Resource_t2bn6"), SubResource("Resource_lbfsj"), SubResource("Resource_wy6eu")])
+card_set = 3

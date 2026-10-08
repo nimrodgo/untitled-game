@@ -48,14 +48,13 @@ amount = 4
 
 [sub_resource type="Resource" id="Resource_a7nm7"]
 script = ExtResource("1_cnwei")
-upgrade_cost = 4
 effects = Array[ExtResource("2_262yt")]([SubResource("Resource_2t04g"), SubResource("Resource_waaos")])
 text = "⚡Add 2 Dead Weights into your deck. 🗑🗑🗑🗑"
 
 [resource]
 script = ExtResource("6_jjeqw")
 id = &"dust_pan"
-card_set = 9
 display_name = "Dust Pan"
 cost = 3
 levels = Array[ExtResource("1_cnwei")]([SubResource("Resource_qju17"), SubResource("Resource_1vul8"), SubResource("Resource_a7nm7")])
+card_set = 9

@@ -10,9 +10,9 @@ script = ExtResource("2_1jg8j")
 [resource]
 script = ExtResource("3_xbky0")
 id = &"recycler"
-card_set = 5
 display_name = "Recycler"
 cost = 4
 trigger = 18
 effects = Array[ExtResource("1_mn4bx")]([SubResource("Resource_yxnqg")])
 description = "When you 🗑 or 🔥 a card in your hand, 🂠"
+card_set = 5

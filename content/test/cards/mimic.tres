@@ -3,21 +3,21 @@
 [ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_440nw"]
 [ext_resource type="Script" uid="uid://b6cwpapa6frx3" path="res://scripts/data/effects/play_copy_effect.gd" id="2_wj8gg"]
 [ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_hv2nf"]
-[ext_resource type="Script" path="res://scripts/data/effects/play_random_from_hand_effect.gd" id="14_mimic"]
-
-[sub_resource type="Resource" id="Resource_qhyba"]
-script = ExtResource("2_wj8gg")
+[ext_resource type="Script" uid="uid://ct3femebs81gn" path="res://scripts/data/effects/play_random_from_hand_effect.gd" id="14_mimic"]
 
 [sub_resource type="Resource" id="Resource_on_buy_mimic0"]
 script = ExtResource("14_mimic")
 
+[sub_resource type="Resource" id="Resource_qhyba"]
+script = ExtResource("2_wj8gg")
+
 [resource]
 script = ExtResource("3_hv2nf")
 id = &"mimic"
-card_set = 7
 display_name = "Mimic"
 cost = 2
 on_play = Array[ExtResource("1_440nw")]([SubResource("Resource_qhyba")])
+on_buy = Array[ExtResource("1_440nw")]([SubResource("Resource_on_buy_mimic0")])
 on_play_text = "Play the effect of the last card you played this turn"
 on_buy_text = "Play a random card from your hand"
-on_buy = Array[ExtResource("1_440nw")]([SubResource("Resource_on_buy_mimic0")])
+card_set = 7

@@ -17,9 +17,9 @@ amount = 2
 [resource]
 script = ExtResource("5_ufcs7")
 id = &"cursed_coin"
-card_set = 9
 display_name = "Cursed Coin"
 cost = 0
 on_play = Array[ExtResource("1_u3tay")]([SubResource("Resource_dqhr8"), SubResource("Resource_ko7nx")])
 on_play_text = "Gain Barnacle and 🪙🪙"
 on_buy_text = "TBD"
+card_set = 9

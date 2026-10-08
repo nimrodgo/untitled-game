@@ -41,7 +41,7 @@ text = "⚡🪙🔥"
 [resource]
 script = ExtResource("6_y4h6i")
 id = &"forge"
-card_set = 5
 display_name = "Forge"
 cost = 3
 levels = Array[ExtResource("1_8vyrv")]([SubResource("Resource_0yv6q"), SubResource("Resource_5hkx3"), SubResource("Resource_uc64m")])
+card_set = 5

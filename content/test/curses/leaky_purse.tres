@@ -11,10 +11,10 @@ amount = 2
 [resource]
 script = ExtResource("2_0q16h")
 id = &"leaky_purse"
-card_set = 1
 display_name = "Leaky Purse"
 cost = 0
 playable = false
 on_play_text = "End of turn in hand: -2🪙"
 on_turn_end_in_hand = Array[ExtResource("1_7mydw")]([SubResource("Resource_xehsl")])
 curse = true
+card_set = 1

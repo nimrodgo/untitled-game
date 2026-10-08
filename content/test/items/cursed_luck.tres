@@ -11,8 +11,8 @@ amount = 2
 [resource]
 script = ExtResource("3_6o3d4")
 id = &"cursed_luck"
-card_set = 9
 display_name = "Cursed Luck"
 trigger = 14
 effects = Array[ExtResource("1_nm1tb")]([SubResource("Resource_yqcle")])
 description = "When you draw a curse, 🪙🪙"
+card_set = 9

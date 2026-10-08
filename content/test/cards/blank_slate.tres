@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://cs7yfaic2n28m"]
 
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_ye05c"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="2_ua64n"]
-[ext_resource type="Script" path="res://scripts/data/effects/random_enhance_effect.gd" id="13_blank"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_ye05c"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="2_ua64n"]
+[ext_resource type="Script" uid="uid://c8ghofluf0dxm" path="res://scripts/data/effects/random_enhance_effect.gd" id="13_blank"]
 
 [sub_resource type="Resource" id="Resource_on_buy_blank0"]
 script = ExtResource("13_blank")
@@ -12,9 +12,8 @@ script = ExtResource("2_ua64n")
 id = &"blank_slate"
 display_name = "Blank Slate"
 cost = 2
+on_buy = Array[ExtResource("1_ye05c")]([SubResource("Resource_on_buy_blank0")])
 on_play_text = "This card can have infinite upgrades"
 on_buy_text = "Randomly enhance this"
 unlimited_enhancements = true
 card_set = 7
-tags = PackedStringArray()
-on_buy = Array[ExtResource("1_ye05c")]([SubResource("Resource_on_buy_blank0")])

@@ -11,9 +11,9 @@ source = 0
 [resource]
 script = ExtResource("3_5f6l6")
 id = &"necromancy"
-card_set = 5
 display_name = "Necromancy"
 cost = 2
 on_play = Array[ExtResource("1_6qpdf")]([SubResource("Resource_vae0m")])
 on_play_text = "Play the effect of a card that was 🔥 this encounter"
 on_buy_text = "TBD"
+card_set = 5

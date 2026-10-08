@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="TrinketData" format=3 uid="uid://eflfasvwnp76"]
+
+[ext_resource type="Script" uid="uid://dvhdcguit2rs0" path="res://scripts/data/trinket_level.gd" id="1_mxcps"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="2_361o8"]
+[ext_resource type="Script" uid="uid://bldvg83fphc0b" path="res://scripts/data/trinket_data.gd" id="2_px3ns"]
+[ext_resource type="Script" uid="uid://ggw16a8n3int" path="res://scripts/data/effects/pay_coins_effect.gd" id="3_361o8"]
+[ext_resource type="Script" uid="uid://dkswjgn5ega1g" path="res://scripts/data/effects/buy_card_effect.gd" id="4_on81o"]
+[ext_resource type="Script" uid="uid://dow1kbluxxx0s" path="res://scripts/data/effects/gain_coins_effect.gd" id="5_2gc3c"]
+
+[sub_resource type="Resource" id="Resource_2gc3c"]
+script = ExtResource("3_361o8")
+
+[sub_resource type="Resource" id="Resource_c26ow"]
+script = ExtResource("4_on81o")
+free = true
+
+[sub_resource type="Resource" id="Resource_on81o"]
+script = ExtResource("1_mxcps")
+effects = Array[ExtResource("2_361o8")]([SubResource("Resource_2gc3c"), SubResource("Resource_c26ow")])
+
+[sub_resource type="Resource" id="Resource_lbm70"]
+script = ExtResource("4_on81o")
+free = true
+
+[sub_resource type="Resource" id="Resource_pwp67"]
+script = ExtResource("1_mxcps")
+effects = Array[ExtResource("2_361o8")]([SubResource("Resource_lbm70")])
+
+[sub_resource type="Resource" id="Resource_2cbaf"]
+script = ExtResource("4_on81o")
+free = true
+
+[sub_resource type="Resource" id="Resource_3pw0u"]
+script = ExtResource("5_2gc3c")
+
+[sub_resource type="Resource" id="Resource_u2d0m"]
+script = ExtResource("1_mxcps")
+effects = Array[ExtResource("2_361o8")]([SubResource("Resource_2cbaf"), SubResource("Resource_3pw0u")])
+
+[resource]
+script = ExtResource("2_px3ns")
+id = &"impulse_buy"
+display_name = "Impulse Buy"
+cost = 3
+levels = Array[ExtResource("1_mxcps")]([SubResource("Resource_on81o"), SubResource("Resource_pwp67"), SubResource("Resource_u2d0m")])
+card_set = 8

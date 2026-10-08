@@ -11,8 +11,8 @@ curses_only = true
 [resource]
 script = ExtResource("3_qfwe6")
 id = &"curse_recall"
-card_set = 9
 display_name = "Curse Recall"
 on_play = Array[ExtResource("1_tpo0i")]([SubResource("Resource_gj73b")])
 on_play_text = "Return all curses from the discard pile to your hand"
 on_buy_text = "TBD"
+card_set = 9

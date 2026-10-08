@@ -18,8 +18,8 @@ as_cost = true
 [resource]
 script = ExtResource("4_i0w8d")
 id = &"dig"
-card_set = 7
 display_name = "Dig"
 on_play = Array[ExtResource("1_tbxdx")]([SubResource("Resource_rk1if"), SubResource("Resource_2x5j1")])
 on_play_text = "🂠 from the discard pile and 🗑 this"
 on_buy_text = "TBD"
+card_set = 7
