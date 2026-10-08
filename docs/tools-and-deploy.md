@@ -29,6 +29,16 @@ Each step, the bot does the following:
 
 It answers choices with `SimBot.choose` (gets rid of curses / weakest cards, keeps the best). It never buys trinkets or upgrades and rarely buys items, so **treat its win rate as a floor**. For reproducible runs, set `rng_seed` on the encounter.
 
+## Content browser (editor plugin)
+
+`addons/content_browser/` adds the **Content** main-screen tab (enabled in `project.godot`; if it's missing, turn it on in **Project → Project Settings → Plugins**). See [content-design.md](content-design.md) for what it does. Notes:
+
+- It builds its edit panel from each resource's exported properties, so new fields, enums and effect types appear without changing the plugin. Arrays of resource classes listed in `REF_DIRS` (cards, items, trinkets, enhancements, enemies, encounters) are edited as references; any other resource array (effects, `EffectOption`, `TrinketLevel`, `EnemyIntent`) is edited inline, and **+ Add** offers every `class_name` that extends the element type.
+- The content scripts aren't `@tool`, so in the editor their methods can't run. Tiles show your custom text as written; when a text field is empty, the tile shows an `auto:` summary of the effects instead of the game's generated wording.
+- Edits are written with `ResourceSaver`, so a file gets re-serialized in Godot's normal format the first time you edit it (expect some reordering in the git diff).
+- Files changed outside the editor (git, a text editor, the generator scripts) are reloaded when you switch back to the tab, or with **Reload from disk**.
+- Excluded from the web export (`export_presets.cfg`).
+
 ## Playtesting on a phone
 
 ### Option A: GitHub Pages (from anywhere)

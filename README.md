@@ -40,6 +40,8 @@ Everything else lives in [`docs/`](docs/README.md):
 
 Ideas for future cards and items are in [`design/ideas.md`](design/ideas.md).
 
+**Editing content:** open the **Content** tab at the top of the Godot editor (next to 2D / 3D / Script) to browse every card, item, trinket, enhancement, enemy, encounter and loadout as tiles and edit them in place. Edits save to the `.tres` files automatically.
+
 ## Headless tools (from the project folder)
 ```
 godot --headless --path . --script res://tools/test_mechanics.gd      # rules tests
