@@ -17,4 +17,4 @@ display_name = "Free Sample"
 cost = 3
 on_play = Array[ExtResource("1_ps2q2")]([SubResource("Resource_a4k5q")])
 on_play_text = "Buy a card for free and place it on top of the draw pile"
-on_buy_text = "TBD"
+on_buy_text = "🂠"

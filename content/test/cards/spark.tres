@@ -22,4 +22,4 @@ display_name = "Spark"
 instant = true
 on_play = Array[ExtResource("1_is0jr")]([SubResource("Resource_rwcic"), SubResource("Resource_6tukv")])
 on_play_text = "⚡🔥 this ➡ ↺ all trinkets"
-on_buy_text = "TBD"
+on_buy_text = "↺ a trinket"

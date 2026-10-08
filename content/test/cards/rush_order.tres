@@ -15,4 +15,4 @@ display_name = "Rush Order"
 instant = true
 on_play = Array[ExtResource("1_3fu4m")]([SubResource("Resource_hjdat")])
 on_play_text = "⚡The next card you buy is 🂠 immediately"
-on_buy_text = "TBD"
+on_buy_text = "🂠 this"

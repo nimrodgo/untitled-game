@@ -6,6 +6,7 @@
 
 [sub_resource type="Resource" id="Resource_42qk1"]
 script = ExtResource("2_joayj")
+base_amount = 1
 
 [resource]
 script = ExtResource("3_q4oee")
@@ -14,4 +15,4 @@ card_set = 2
 display_name = "Snowball"
 on_play = Array[ExtResource("1_17gsv")]([SubResource("Resource_42qk1")])
 on_play_text = "{gain_icons} and increase 🪙 gain from all Snowballs by 2 this encounter"
-on_buy_text = "TBD"
+on_buy_text = "increase 🪙 gain from all Snowballs by 1 this encounter"

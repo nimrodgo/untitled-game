@@ -15,4 +15,4 @@ display_name = "Mimic"
 cost = 2
 on_play = Array[ExtResource("1_440nw")]([SubResource("Resource_qhyba")])
 on_play_text = "Play the effect of the last card you played this turn"
-on_buy_text = "TBD"
+on_buy_text = "Play a random card from your hand"
