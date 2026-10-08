@@ -34,6 +34,7 @@ var _intent_bubble: PanelContainer
 var _intent_title: Label
 var _intent_kind: Label
 var _intent_desc: RichTextLabel
+var _intent_cross: Control
 var _shop_panel: DropTarget      ## the market; also where you drag a trinket to sell it
 var _sell_drag := {}
 var _shop_row: VBoxContainer        ## market lines: cards, then items/trinkets
@@ -179,9 +180,9 @@ func _refresh() -> void:
 
 	# Top bar + coin change pop-ups.
 	_round_label.text = "Round %d/%d" % [enc.round_num, enc.total_rounds()]
-	_coins_label.text = "%d / %d" % [me.coins, enc.data.coin_target]
-	_coins_bar.max_value = enc.data.coin_target
-	_coins_bar.value = mini(me.coins, enc.data.coin_target)
+	_coins_label.text = "%d / %d" % [me.coins, enc.coin_target()]
+	_coins_bar.max_value = maxi(1, enc.coin_target())
+	_coins_bar.value = mini(me.coins, enc.coin_target())
 	_coin_pop(_coins_label, _last_coins, me.coins)
 	_coin_pop(_enemy_sub, _last_enemy_coins, enc.enemy.coins)
 	_last_coins = me.coins
@@ -202,12 +203,16 @@ func _refresh() -> void:
 	_enemy_portrait.add_theme_stylebox_override("panel", Palette.box(ecol.darkened(0.5), ecol, 48, 3, 0))
 	var intent := enc.current_intent()
 	_intent_desc.clear()
+	# A cancel card is waiting: the next intent is shown struck through.
+	var cancelled := intent != null and enc.player.cancel_opponent_actions > 0 and enc.enemy_actions_left > 0
 	if intent:
 		_intent_title.text = intent.display_name
 		_intent_kind.text = "NEXT · " + EnemyIntent.kind_label(intent.kind)
-		Icons.append(_intent_desc, intent.get_description(), 19)
+		Icons.append(_intent_desc, ("[s]%s[/s]" if cancelled else "%s") % intent.get_description(), 19)
 	else:
 		_intent_title.text = "—"
+	_intent_title.add_theme_color_override("font_color", Palette.MUTED if cancelled else Palette.FOAM)
+	_intent_cross.visible = cancelled
 	# Actions left this round: filled pips; the intent fades once it's spent.
 	var total_actions: int = enc.data.enemy.actions_per_round if enc.data.enemy else 0
 	_clear(_enemy_pips)
@@ -769,6 +774,10 @@ func _picker_view(req: ChoiceRequest, item: Variant) -> CardView:
 			return _trinket_data_view(enc.shop.trinkets[item], CardView.SMALL)
 		ChoiceRequest.Kind.TRINKET:
 			var t: TrinketInstance = enc.player.trinkets[item]
+			if req.trinket_level > 0 and not t.data.levels.is_empty():
+				var lv := mini(req.trinket_level, t.data.levels.size())
+				return CardView.make("%s (Lv %d)" % [t.data.display_name, lv], -1, t.data.levels[lv - 1].get_text(),
+					CardSets.color(t.data.card_set), CardView.SMALL)
 			return CardView.make(t.get_name(), -1, t.get_text(), CardSets.color(t.data.card_set), CardView.SMALL)
 	return _card_instance_view(item, CardView.SMALL)
 
@@ -792,16 +801,16 @@ func _card_data_view_raw(cd: CardData, sz: Vector2) -> CardView:
 func _card_instance_view(c: CardInstance, sz: Vector2) -> CardView:
 	var v := _card_instance_view_raw(c, sz)
 	var vars := _card_vars(c.data, c)
-	_attach_hover(v, c.play_text(vars) + " " + c.buy_text(vars), _mentioned(c.data), c.enhancement)
+	_attach_hover(v, c.play_text(vars) + " " + c.buy_text(vars), _mentioned(c.data), c.enhancements)
 	return v
 
 
 func _card_instance_view_raw(c: CardInstance, sz: Vector2) -> CardView:
-	# An enhancement shows as a corner badge; it never changes the card's text.
+	# Enhancements show as corner badges; they never change the card's text.
 	var vars := _card_vars(c.data, c)
 	return CardView.make(c.get_name(), c.get_cost(), c.play_text(vars), CardSets.color(c.data.card_set), sz,
 		"⚡" if c.is_instant() and not c.data.has_custom_text() else "", "", c.buy_text(vars), -1,
-		c.enhancement.icon if c.enhancement else "")
+		c.enhancements.map(func(e: EnhancementData): return e.icon))
 
 
 ## Text values for one card, including its own {gain}.
@@ -946,17 +955,18 @@ func _clear(n: Node) -> void:
 # ============================================================ hover legend
 
 ## Hovering a tile shows what its icons mean, plus any cards it mentions.
-func _attach_hover(v: CardView, text: String, cards: Array, enh: EnhancementData = null) -> void:
+## `enhs`: the card's enhancements (one legend row each).
+func _attach_hover(v: CardView, text: String, cards: Array, enhs: Array = []) -> void:
 	var icons := Icons.icons_in(text)
-	if enh:
+	for enh in enhs:
 		for ic in Icons.icons_in(enh.get_description()):
 			if not icons.has(ic):
 				icons.append(ic)
-	if icons.is_empty() and cards.is_empty() and enh == null:
+	if icons.is_empty() and cards.is_empty() and enhs.is_empty():
 		return
 	v.hover_changed.connect(func(on: bool):
 		if on:
-			_show_legend(v, icons, cards, enh)
+			_show_legend(v, icons, cards, enhs)
 		elif _hover_owner == v:
 			_hide_legend())
 	v.tree_exiting.connect(func():
@@ -971,7 +981,7 @@ func _hide_legend() -> void:
 			c.queue_free()
 
 
-func _show_legend(v: CardView, icons: Array, cards: Array, enh: EnhancementData = null) -> void:
+func _show_legend(v: CardView, icons: Array, cards: Array, enhs: Array = []) -> void:
 	_hide_legend()
 	_hover_owner = v
 	var panel := PanelContainer.new()
@@ -981,8 +991,13 @@ func _show_legend(v: CardView, icons: Array, cards: Array, enh: EnhancementData 
 	vb.add_theme_constant_override("separation", 6)
 	vb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(vb)
-	if enh:
-		var erow := Icons.rich_label("%s  [b]%s[/b]: %s" % [enh.icon, enh.display_name, enh.get_description()], 16, Palette.FOAM)
+	# One row per enhancement; repeats are shown once with a count.
+	var counts := {}
+	for enh in enhs:
+		counts[enh] = counts.get(enh, 0) + 1
+	for enh in counts:
+		var times: String = "  ×%d" % counts[enh] if counts[enh] > 1 else ""
+		var erow := Icons.rich_label("%s  [b]%s[/b]%s: %s" % [enh.icon, enh.display_name, times, enh.get_description()], 16, Palette.FOAM)
 		erow.autowrap_mode = TextServer.AUTOWRAP_OFF
 		vb.add_child(erow)
 	for ic in icons:
@@ -1140,7 +1155,7 @@ func _show_end_overlay(won: bool) -> void:
 	var h := CardView._label("Victory!" if won else "Sunk.", 56, Palette.GOLD if won else Palette.CORAL)
 	h.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vb.add_child(h)
-	var d := CardView._label("You finished with %d / %d coins." % [enc.player.coins, enc.data.coin_target]
+	var d := CardView._label("You finished with %d / %d coins." % [enc.player.coins, enc.coin_target()]
 		+ ("\nReward: %d gold" % enc.data.gold_reward if won else ""), 24, Palette.FOAM)
 	d.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vb.add_child(d)
@@ -1259,8 +1274,19 @@ func _build_ui() -> void:
 	ib.add_child(_intent_kind)
 	_intent_title = CardView._label("", 24, Palette.FOAM)
 	ib.add_child(_intent_title)
+	# A red X over the intent while a cancel is pending (see _refresh). Drawn,
+	# not a glyph, so it shows on web builds without symbol fonts.
+	_intent_cross = Control.new()
+	_intent_cross.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_intent_cross.visible = false
+	_intent_cross.draw.connect(func():
+		var r := Rect2(Vector2.ZERO, _intent_cross.size).grow(-6)
+		_intent_cross.draw_line(r.position, r.end, Palette.CORAL, 5.0, true)
+		_intent_cross.draw_line(Vector2(r.end.x, r.position.y), Vector2(r.position.x, r.end.y), Palette.CORAL, 5.0, true))
+	_intent_cross.resized.connect(_intent_cross.queue_redraw)
 	_intent_desc = Icons.rich_label("", 17, Palette.FOAM.darkened(0.1))
 	ib.add_child(_intent_desc)
+	_intent_bubble.add_child(_intent_cross)
 	_enemy_chips = HBoxContainer.new()
 	_enemy_chips.add_theme_constant_override("separation", 6)
 	ev.add_child(_enemy_chips)

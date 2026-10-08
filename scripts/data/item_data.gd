@@ -20,6 +20,9 @@ extends Resource
 ## Passive: while you own this, a market card slot you buy from is restocked
 ## with a new random card right away.
 @export var restock_bought_cards: bool = false
+## Passive: while you own this, every time you gain coins from anything else,
+## you gain this many more (0 = off). One bonus per gain, not per coin.
+@export var coin_gain_bonus: int = 0
 ## Which set this belongs to (see CardSets). One set per card/item/trinket.
 @export var card_set: CardSets.Id = CardSets.Id.NONE
 

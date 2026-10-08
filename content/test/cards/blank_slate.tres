@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_ye05c"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="2_ua64n"]
+
+[resource]
+script = ExtResource("2_ua64n")
+id = &"blank_slate"
+display_name = "Blank Slate"
+cost = 2
+on_play_text = "This card can have infinite upgrades"
+on_buy_text = "TBD"
+unlimited_enhancements = true
+card_set = 7
+tags = PackedStringArray()

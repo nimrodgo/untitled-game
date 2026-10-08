@@ -56,6 +56,12 @@
 - Draw a card from the discard pile and remove this
 - P1: Gain 2 coins and increase gain from all P1s by 2 this encounter
 - Draw 3 cards. Shuffle C4 to your deck
+- {instant} Disable the enemy action this turn
+- Use the level 3 effect of a trinket you own
+- Gain 1 coin for each card in the discard pile
+- Draw 1 card. Draw a card from the bottom of your deck
+- Reduce encounter target by 3
+- This card can have infinite upgrades (does nothing at first, gets on-play effects from enhancements)
 ## Item Ideas
 - The first card you play each turn is destroyed
 - When you remove a card gain 2 coins
@@ -69,6 +75,7 @@
 - Destroy a card in your hand. Gain coins equal to its cost
 - Draw an additional card at the start of the turn
 - The first card you play each turn is played an extra time
+- When you gain coins from another source gain 1 more
 ## Trinket Ideas
 - Pay 1 coin/.../Get 1 coin. Destroy a card
 - Gain C2 and 2/4/6 coins

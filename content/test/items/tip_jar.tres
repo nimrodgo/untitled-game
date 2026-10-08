@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_oc587"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_48wff"]
+
+[resource]
+script = ExtResource("2_48wff")
+id = &"tip_jar"
+display_name = "Tip Jar"
+cost = 4
+description = "When you gain 🪙 from another source, gain 🪙 more"
+coin_gain_bonus = 1
+card_set = 2

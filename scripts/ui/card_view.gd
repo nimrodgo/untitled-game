@@ -35,7 +35,7 @@ var _press_pos := Vector2.ZERO
 ## given, is shown in a separate gold "on buy" strip at the bottom of the card.
 static func make(title: String, cost: int, body: String, bg: Color = Palette.CARD,
 		min_size: Vector2 = SMALL, tag := "", footer := "", buy_text := "", old_cost := -1,
-		badge := "") -> CardView:
+		badge: Variant = "") -> CardView:
 	var v := CardView.new()
 	v._bg = bg
 	v.custom_minimum_size = min_size
@@ -97,8 +97,11 @@ static func make(title: String, cost: int, body: String, bg: Color = Palette.CAR
 	if buy_text != "":
 		vb.add_child(_buy_strip(buy_text, k))
 
-	if badge != "" and Icons.SVG.has(Icons.ALIASES.get(badge, badge)):
-		v.add_child(_badge_overlay(badge, k))
+	# `badge`: one icon token, or an Array of them (a card with several enhancements).
+	var tokens: Array = badge if badge is Array else [badge]
+	tokens = tokens.filter(func(t): return t is String and t != "" and Icons.SVG.has(Icons.ALIASES.get(t, t)))
+	if not tokens.is_empty():
+		v.add_child(_badge_overlay(tokens, k))
 
 	v._restyle()
 	v.mouse_entered.connect(v._on_hover.bind(true))
@@ -107,28 +110,32 @@ static func make(title: String, cost: int, body: String, bg: Color = Palette.CAR
 	return v
 
 
-## Round enhancement badge hanging off the top-left corner of the tile. That
-## corner stays visible when hand cards overlap, and it clears the title text.
-## (A full-size child of the PanelContainer, so the badge can anchor to a corner.)
-static func _badge_overlay(token: String, k: float) -> Control:
+## Round enhancement badges: the first hangs off the top-left corner of the
+## tile, more stack down the left edge. That edge stays visible when hand cards
+## overlap, and the first badge clears the title text.
+## (A full-size child of the PanelContainer, so the badges can anchor to a corner.)
+static func _badge_overlay(tokens: Array, k: float) -> Control:
 	var overlay := Control.new()
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var s := 24.0 * k
-	var badge := PanelContainer.new()
-	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	badge.custom_minimum_size = Vector2(s, s)
-	badge.add_theme_stylebox_override("panel", Palette.box(Palette.CARD_ENH.lightened(0.1), Palette.FOAM, int(s / 2), 2, int(4 * k)))
-	var icon := TextureRect.new()
-	icon.texture = Icons.texture(token)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	badge.add_child(icon)
-	overlay.add_child(badge)
 	# The overlay starts at the tile's content margin (10px in); put the badge
 	# mostly outside the tile, its inner edge just touching where the text begins.
-	badge.position = Vector2(-s - 4.0 * k + 12.0 * k, -s - 4.0 * k + 12.0 * k) + Vector2(-2, -2)
-	badge.size = Vector2(s, s)
+	var origin := Vector2(-s - 4.0 * k + 12.0 * k, -s - 4.0 * k + 12.0 * k) + Vector2(-2, -2)
+	var step := s * 0.8   # later badges overlap the one above a little
+	for i in tokens.size():
+		var badge := PanelContainer.new()
+		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		badge.custom_minimum_size = Vector2(s, s)
+		badge.add_theme_stylebox_override("panel", Palette.box(Palette.CARD_ENH.lightened(0.1), Palette.FOAM, int(s / 2), 2, int(4 * k)))
+		var icon := TextureRect.new()
+		icon.texture = Icons.texture(tokens[i])
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		badge.add_child(icon)
+		overlay.add_child(badge)
+		badge.position = origin + Vector2(0, step * i)
+		badge.size = Vector2(s, s)
 	return overlay
 
 

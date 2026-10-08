@@ -32,6 +32,9 @@ extends Resource
 @export var permanent: bool = false
 @export_group("")
 
+## This card can hold any number of enhancements (normally only one), including
+## the same one more than once.
+@export var unlimited_enhancements: bool = false
 ## Which set this belongs to (see CardSets). One set per card/item/trinket.
 @export var card_set: CardSets.Id = CardSets.Id.NONE
 @export var art: Texture2D

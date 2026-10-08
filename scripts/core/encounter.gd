@@ -43,6 +43,8 @@ var enemy_actions_left := 0
 var last_bought_zone: GameRules.Zone = GameRules.DEFAULT_BUY_DESTINATION
 ## Rounds added by effects ("take an extra turn").
 var extra_rounds := 0
+## Taken off the encounter's coin target by effects (see coin_target()).
+var target_reduction := 0
 ## The decision the player has to make right now (null = none).
 var pending_choice: ChoiceRequest
 ## If valid, called with a ChoiceRequest and must return the picks
@@ -85,7 +87,7 @@ func start() -> void:
 	shop.trinket_weight = _trinket_weight
 	shop.setup(data, rng)
 	_shuffle(player.draw_pile)
-	log_line("[b]%s[/b] — have %d coins after %d rounds." % [data.display_name, data.coin_target, data.rounds])
+	log_line("[b]%s[/b] — have %d coins after %d rounds." % [data.display_name, coin_target(), data.rounds])
 	_start_async()
 
 
@@ -103,6 +105,11 @@ func opponent_of(p: PlayerState) -> PlayerState:
 
 func total_rounds() -> int:
 	return data.rounds + extra_rounds
+
+
+## Coins you need at the end to win (the encounter's target minus reductions).
+func coin_target() -> int:
+	return maxi(0, data.coin_target - target_reduction)
 
 
 func rounds_left() -> int:
@@ -247,10 +254,11 @@ func can_buy_enhancement(slot: int, card: CardInstance = null) -> bool:
 	return false
 
 
-## One enhancement per card: an enhanced card can't take another. (An enhancement
-## that only destroys the card, like Trim's, attaches nothing, so it can still be used.)
+## One enhancement per card: an enhanced card can't take another, unless the card
+## allows any number (CardData.unlimited_enhancements). An enhancement that only
+## destroys the card, like Trim's, attaches nothing, so it can still be used.
 func _can_enhance(card: CardInstance, e: EnhancementData) -> bool:
-	return card.enhancement == null or e.destroy_on_apply
+	return card.enhancements.is_empty() or card.data.unlimited_enhancements or e.destroy_on_apply
 
 
 # ---------------------------------------------------------- player actions
@@ -440,9 +448,21 @@ func change_coins(p: PlayerState, delta: int, source: String = "") -> void:
 	p.coins = maxi(0, p.coins + delta)
 	var real := p.coins - before
 	if real != 0:
-		var col := "#ffd166" if real > 0 else "#ff7f6a"
-		log_line("  %s [color=%s]%+d coin%s[/color]%s" % [p.display_name, col, real, "" if absi(real) == 1 else "s",
-			(" (" + source + ")") if source != "" else ""])
+		_log_coins(p, real, source)
+	# Items like Tip Jar: every gain from another source gives a bit more (the
+	# bonus itself doesn't count as a new gain, so bonuses never chain).
+	if real > 0:
+		for it in p.items:
+			var bonus: int = it.data.coin_gain_bonus
+			if bonus > 0:
+				p.coins += bonus
+				_log_coins(p, bonus, it.data.display_name)
+
+
+func _log_coins(p: PlayerState, real: int, source: String) -> void:
+	var col := "#ffd166" if real > 0 else "#ff7f6a"
+	log_line("  %s [color=%s]%+d coin%s[/color]%s" % [p.display_name, col, real, "" if absi(real) == 1 else "s",
+		(" (" + source + ")") if source != "" else ""])
 
 
 ## Draw from the top (or `from_bottom`) of the draw pile. The discard pile is
@@ -710,7 +730,7 @@ func _buy_enhancement(slot: int, card: CardInstance) -> void:
 		log_line("You use %s on %s." % [e.display_name, _card_name(card)])
 		await trash_card(player, card, true)
 	else:
-		card.enhancement = e
+		card.add_enhancement(e)
 		log_line("You enhance %s with %s." % [_card_name(card), e.display_name])
 	await _fire(GameRules.Trigger.SHOP_BUY, player, _ctx(player))
 	_busy -= 1
@@ -787,6 +807,8 @@ func _start_round() -> void:
 	log_line("\n[b]— Round %d / %d —[/b]" % [round_num, total_rounds()])
 	player.buys_this_round = 0
 	player.draw_locked = false
+	player.cancel_opponent_actions = 0
+	enemy.cancel_opponent_actions = 0
 	player.played_log.clear()
 	if round_num > 1:
 		shop.restock()
@@ -864,8 +886,8 @@ func _cycle_discard_under_deck(p: PlayerState) -> void:
 func _finish_encounter() -> void:
 	is_over = true
 	active = null
-	won = player.coins >= data.coin_target
-	log_line("\n[b]%s[/b] You have %d / %d coins." % ["VICTORY!" if won else "DEFEAT.", player.coins, data.coin_target])
+	won = player.coins >= coin_target()
+	log_line("\n[b]%s[/b] You have %d / %d coins." % ["VICTORY!" if won else "DEFEAT.", player.coins, coin_target()])
 	changed.emit()
 	ended.emit(won)
 
@@ -897,7 +919,14 @@ func _finish_action(extra: bool) -> void:
 		log_line("  You take another action.")
 		changed.emit()
 		return
-	if enemy_actions_left > 0 and current_intent() != null:
+	if enemy_actions_left > 0 and current_intent() != null and player.cancel_opponent_actions > 0:
+		# A cancel card: the enemy's answer is skipped (its intent is used up).
+		player.cancel_opponent_actions -= 1
+		log_line("[color=#ff7f6a]%s: %s[/color] is cancelled." % [enemy.display_name, current_intent().display_name])
+		enemy.intent_index += 1
+		enemy_actions_left -= 1
+		_await_player_action()
+	elif enemy_actions_left > 0 and current_intent() != null:
 		active = enemy
 		changed.emit()
 		enemy_turn_pending.emit()

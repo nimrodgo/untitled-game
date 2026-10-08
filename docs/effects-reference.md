@@ -25,7 +25,7 @@ Each effect implements these methods:
 | `LoseCoinsEffect` | `amount`=1 | −coins (floor 0) | Lose N 🪙 / You lose N 🪙 |
 | `PayCoinsEffect` | `amount`=1 | **Cost:** −coins; unplayable if you don't have them | Pay N 🪙 ➡ |
 | `StealCoinsEffect` | `amount`=1 | Moves up to N coins from the opponent to the owner (ignores `target`) | Steal N 🪙 |
-| `GainCoinsPerStatEffect` | `stat`, `per`=1 | +`per` × a `PlayerState` stat (`stat=coins` doubles your coins) | Gain N 🪙 for every *stat* |
+| `GainCoinsPerStatEffect` | `stat`, `per`=1 | +`per` × a `PlayerState` stat (`stat=coins` doubles your coins). A pile counts its cards (`stat=discard`: Hindsight). Shows as `{gain}` | Gain N 🪙 for every *stat* |
 | `GainCoinsScalingEffect` | `amount`=2, `increase`=2 | Gain `amount` + this card's bonus, then all copies (same `id`) gain `increase` more this encounter | Gain 2 🪙 and increase gain… |
 
 ### Drawing and discarding
@@ -75,6 +75,7 @@ All of these **count as playing a card** (cards-played count, `CARD_PLAYED` item
 | `DestroyShopCardEffect` | `restock`=true | You pick a market card to destroy; its slot gets a new random card |
 | `RefreshTrinketsEffect` | `amount`=1, `all` | Used trinkets become usable again (you pick which if there's a choice) |
 | `ActivateShopTrinketEffect` | `level`=3 | You pick a market trinket and resolve its level-N effect (its top level if it has fewer). It stays in the market. |
+| `ActivateOwnedTrinketEffect` | `level`=3 | You pick a trinket you own and resolve its level-N effect (its top level if it has fewer), whatever its level. It doesn't use the trinket up (a used one can be picked; an unused one stays usable). Nothing happens if you own none. The picker shows the level-N text (`ChoiceRequest.trinket_level`). Overclock. |
 
 ### Turn flow and logic
 
@@ -82,6 +83,8 @@ All of these **count as playing a card** (cards-played count, `CARD_PLAYED` item
 |---|---|---|
 | `PassEffect` | — | Your turn ends right after this action. The enemy doesn't answer it. Text "Pass ➡". |
 | `ExtraActionEffect` | — | The enemy skips responding to this action |
+| `CancelEnemyActionEffect` | `amount`=1 | The enemy doesn't answer your next `amount` normal actions this turn; each skipped answer still uses up its intent and one enemy action (`PlayerState.cancel_opponent_actions`, reset every round). Stonewall. |
+| `ReduceTargetEffect` | `amount`=3 | Lowers this encounter's coin target (`Encounter.target_reduction`, never below 0). Moving Goalposts. |
 | `ExtraRoundEffect` | `amount`=1 | The encounter gets another (normal) round |
 | `RetainCardsEffect` | `amount`=1, `optional`, `all_hand` | Choose cards in your hand to keep at the end of this turn. `all_hand`: keep every other card in hand, no choice ("📌 your hand", Hunker Down) |
 | `ChooseOneEffect` | `options: Array[EffectOption]` | "X OR Y". Options whose costs can't be paid are greyed out. `EffectOption` = `label` + `effects`. |
@@ -153,8 +156,8 @@ These come from `Encounter.text_vars()` and are used as `{name}` in card text.
 | `coins` | Your coins |
 | `round` | Current round number |
 | `removed` / `destroyed` | Cards you removed / destroyed this encounter |
-| `gain` | **Per card** (`Encounter.card_text_vars(card_data, instance)`): the coins its on-play would give right now, summed from each effect's `preview_coins()`. Implemented by `GainCoinsScalingEffect` (amount + current bonus) and `TrashCardsEffect` with `coins_per_card`. `gain_icons`: the same as coin icons (N × 🪙 up to 5, else `N🪙`) | 
+| `gain` | **Per card** (`Encounter.card_text_vars(card_data, instance)`): the coins its on-play would give right now, summed from each effect's `preview_coins()`. Implemented by `GainCoinsScalingEffect` (amount + current bonus), `GainCoinsPerStatEffect` and `TrashCardsEffect` with `coins_per_card`. `gain_icons`: the same as coin icons (N × 🪙 up to 5, else `N🪙`) | 
 
 ## Stats available to `GainCoinsPerStatEffect.stat`
 
-Any `int` field of `PlayerState` works. The useful ones are `cards_drawn_this_turn`, `cards_played_this_turn`, `buys_this_round`, `cards_bought`, and `coins`.
+Any `int` field of `PlayerState` works. The useful ones are `cards_drawn_this_turn`, `cards_played_this_turn`, `buys_this_round`, `cards_bought`, and `coins`. Piles count their cards: `discard`, `hand`, `draw_pile`, `removed`, `destroyed` (a card being played is in no pile, so it doesn't count itself).

@@ -19,6 +19,7 @@ func _init() -> void:
 	_enhancement_rules()
 	_deck_cycle_rules()
 	_shop_content_rules()
+	_more_ideas_rules()
 	print("\n%d checks, %d failed" % [checks, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -995,3 +996,162 @@ func _shop_content_rules() -> void:
 			if cd.get_buy_text() == "":
 				missing.append(cd.id)
 	_check(missing.is_empty(), "every card has an on-buy text %s" % str(missing))
+
+
+## Play every new card once and finish the encounter (they aren't in the TEST pools).
+func _smoke_ids(ids: Array) -> void:
+	for id in ids:
+		var e := _enc(["example2", "example2", "example1", "dead_weight", "leaky_purse", "example1", "example2"], true, true)
+		var t := TrinketInstance.new(_trinket("coin_trinket"))
+		e.player.trinkets.append(t)
+		var c := _give(e, id)
+		_check(e.play_card(c), "%s: playable" % id)
+		_wait_enemy(e)
+		_check(not e.is_busy(), "%s: action finished (not stuck)" % id)
+		_consistent(e, id)
+		var steps := 0
+		while not e.is_over and steps < 200:
+			if e.active == e.enemy:
+				e.enemy_act()
+			else:
+				SimBot.take_turn(e)
+			steps += 1
+		_check(e.is_over, "%s: encounter finishes" % id)
+
+
+func _more_ideas_rules() -> void:
+	_smoke_ids(["stonewall", "overclock", "hindsight", "both_ends", "moving_goalposts", "blank_slate"])
+	var deck := ["example1", "example1", "example1", "example1", "example1", "example1", "example1", "example1"]
+
+	# Stonewall: instant; the enemy doesn't answer your next normal action this turn.
+	var e := _enc(deck, true, true)
+	var sw := _give(e, "stonewall")
+	_check(sw.is_instant(), "Stonewall: instant")
+	var acts := e.enemy_actions_left
+	var idx := e.enemy.intent_index
+	var coins := e.player.coins
+	e.play_card(sw)
+	_check(e.active == e.player and e.enemy_actions_left == acts, "Stonewall: playing it doesn't wake the enemy")
+	e.play_card(e.player.hand[0])
+	_check(e.active == e.player, "Stonewall: the enemy doesn't answer the next action")
+	_check(e.enemy_actions_left == acts - 1 and e.enemy.intent_index == idx + 1,
+		"Stonewall: the cancelled intent is used up (one action spent, cycle moves on)")
+	_check(e.player.coins == coins and e.player.cancel_opponent_actions == 0, "Stonewall: nothing happened to you")
+	e.play_card(e.player.hand[0])
+	_check(e.active == e.enemy, "Stonewall: only one action is cancelled")
+	_wait_enemy(e)
+	# An unused cancel ends with the turn.
+	e = _enc(deck, true, true)
+	e.play_card(_give(e, "stonewall"))
+	e.pass_turn()
+	_check(e.round_num == 2 and e.player.cancel_opponent_actions == 0, "Stonewall: an unused cancel ends with the turn")
+
+	# Overclock: the level-3 effect of a trinket you own, without using it up.
+	e = _enc(deck)
+	var t := TrinketInstance.new(_trinket("coin_trinket"))
+	t.used = true
+	e.player.trinkets.append(t)
+	coins = e.player.coins
+	e.play_card(_give(e, "overclock"))
+	_check(e.player.coins == coins + 3, "Overclock: level-3 Coin Trinket gives 3 even at level 1")
+	_check(t.used and t.level == 0, "Overclock: a used trinket stays used, level unchanged")
+	e = _enc(deck)
+	t = TrinketInstance.new(_trinket("coin_trinket"))
+	e.player.trinkets.append(t)
+	e.play_card(_give(e, "overclock"))
+	_check(not t.used and e.can_use_trinket(0), "Overclock: an unused trinket stays usable")
+	e = _enc(deck, false)
+	e.player.trinkets.append(TrinketInstance.new(_trinket("coin_trinket")))
+	e.player.trinkets.append(TrinketInstance.new(_trinket("forge")))
+	e.play_card(_give(e, "overclock"))
+	_check(e.pending_choice != null and e.pending_choice.kind == ChoiceRequest.Kind.TRINKET
+		and e.pending_choice.trinket_level == 3 and e.pending_choice.candidates.size() == 2,
+		"Overclock: asks which owned trinket (shows level 3)")
+	coins = e.player.coins
+	e.submit_choice([0])
+	_check(e.player.coins == coins + 3 and e.pending_choice == null, "Overclock: picked trinket resolves")
+	e = _enc(deck)
+	coins = e.player.coins
+	_check(e.play_card(_give(e, "overclock")) and e.player.coins == coins and not e.is_busy(),
+		"Overclock: playable with no trinkets, does nothing")
+
+	# Hindsight: 1 coin per card in the discard pile (not counting itself).
+	e = _enc(deck)
+	for i in 4:
+		e.player.discard.append(CardInstance.new(_card("example2")))
+	var hs := _give(e, "hindsight")
+	_check(e.card_text_vars(hs.data, hs)["gain"] == 4, "Hindsight shows 4")
+	_check(hs.play_text(e.card_text_vars(hs.data, hs)).ends_with("([i]4[/i])"), "Hindsight text shows the number")
+	coins = e.player.coins
+	e.play_card(hs)
+	_check(e.player.coins == coins + 4 and e.player.discard.has(hs), "Hindsight: +4, then goes to the discard")
+
+	# Both Ends: one from the top, one from the bottom.
+	e = _enc(deck)
+	var top: CardInstance = e.player.draw_pile.back()
+	var bottom: CardInstance = e.player.draw_pile[0]
+	e.play_card(_give(e, "both_ends"))
+	_check(e.player.hand.has(top) and e.player.hand.has(bottom), "Both Ends: draws the top and the bottom card")
+
+	# Moving Goalposts: the target drops by 3 for this encounter, never below 0.
+	e = _enc(deck)
+	var base := e.data.coin_target
+	e.play_card(_give(e, "moving_goalposts"))
+	_check(e.coin_target() == base - 3 and e.data.coin_target == base, "Moving Goalposts: target -3 (data untouched)")
+	e.target_reduction = 999
+	_check(e.coin_target() == 0, "target never goes below 0")
+	e = _enc(deck)
+	e.target_reduction = 3
+	e.player.coins = base - 3
+	while not e.is_over:
+		e.pass_turn()
+	_check(e.won, "Moving Goalposts: winning checks the reduced target")
+
+	# Blank Slate: any number of enhancements, the same one more than once.
+	e = _enc(deck)
+	e.player.coins = 50
+	var bs := _give(e, "blank_slate")
+	e.shop.enhancements.clear()
+	e.shop.enhancements.append(_enh("gilded"))
+	_check(e.buy_enhancement(0, bs), "Blank Slate: first enhancement")
+	e.shop.enhancements[0] = _enh("gilded")
+	_check(e.can_buy_enhancement(0, bs) and e.buy_enhancement(0, bs), "Blank Slate: the same enhancement again")
+	e.shop.enhancements[0] = _enh("hasty")
+	_check(e.buy_enhancement(0, bs), "Blank Slate: a third one")
+	_check(bs.enhancements.size() == 3 and bs.is_instant(), "Blank Slate: holds all three (Hasty makes it instant)")
+	coins = e.player.coins
+	e.play_card(bs)
+	_check(e.player.coins == coins + 4, "Blank Slate: Gilded twice gives 🪙🪙🪙🪙")
+	var plain := e.player.hand[0]
+	plain.enhancement = _enh("insight")
+	e.shop.enhancements[0] = _enh("gilded")
+	_check(not e.can_buy_enhancement(0, plain), "a normal card still holds only one enhancement")
+	_check(_card("blank_slate").on_play.is_empty(), "Blank Slate does nothing on its own")
+
+	# Tip Jar: +1 on every gain from another source (once per gain, not per coin).
+	e = _enc(deck)
+	e.player.items.append(ItemInstance.new(_item("tip_jar")))
+	coins = e.player.coins
+	e.change_coins(e.player, 2, "test")
+	_check(e.player.coins == coins + 3, "Tip Jar: +2 becomes +3")
+	e.change_coins(e.player, -2, "test")
+	_check(e.player.coins == coins + 1, "Tip Jar: losing coins gets no bonus")
+	e = _enc(deck)
+	e.player.items.append(ItemInstance.new(_item("tip_jar")))
+	for i in 3:
+		e.player.hand.append(CardInstance.new(_card("dead_weight")))
+	var lq := _give(e, "liquidate")
+	var others := e.player.hand.size() - 1
+	coins = e.player.coins
+	e.play_card(lq)
+	_check(e.player.coins == coins + 3 * others + 1, "Tip Jar: Liquidate's total is one gain (+1)")
+	e = _enc(deck)
+	e.player.items.append(ItemInstance.new(_item("tip_jar")))
+	e.player.trinkets.append(TrinketInstance.new(_trinket("coin_trinket")))
+	coins = e.player.coins
+	e.use_trinket(0)
+	_check(e.player.coins == coins + 2, "Tip Jar: trinket gain +1")
+	e.player.items.append(ItemInstance.new(_item("tip_jar")))
+	coins = e.player.coins
+	e.change_coins(e.player, 1, "test")
+	_check(e.player.coins == coins + 3, "two Tip Jars: +1 each, they don't feed each other")
