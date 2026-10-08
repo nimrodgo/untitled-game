@@ -13,7 +13,7 @@ What `scripts/core/encounter.gd` actually does. The tunables are listed at the e
 
 ## Goal
 
-Have **coins ≥ `coin_target`** after the last round. If you win, `gold_reward` is shown. It isn't used yet because there's no run layer.
+Have **coins ≥ `coin_target`** after the last round. Effects can lower the target for this encounter (Moving Goalposts: −3; never below 0); the top bar shows the current target (`Encounter.coin_target()`). If you win, `gold_reward` is shown. It isn't used yet because there's no run layer.
 
 ## Round flow
 
@@ -45,6 +45,7 @@ flowchart TD
 
 - Which purchases count as actions is set by the `*_IS_ACTION` flags in `GameRules` (all `true` right now).
 - An **extra action** effect (`ExtraActionEffect`) skips the enemy's response to that action.
+- A **cancel** effect (`CancelEnemyActionEffect`, Stonewall: ⚡ "Cancel the enemy's next action this turn") skips the enemy's answer to your **next** normal action this turn. The cancelled intent is still used up: the intent cycle moves on and one of the enemy's actions this round is spent. While a cancel is waiting, the intent bubble shows a red ✕ and the intent text struck through. An unused cancel ends with the turn.
 - When the enemy runs out of actions for the round, you keep acting freely until you Pass.
 
 ## The enemy
@@ -74,13 +75,13 @@ flowchart TD
 
 **Buy a card:**
 1. Pay the cost. The `BEFORE_CARD_BUY` trigger fires, and items can change where the card goes.
-2. The card's **on-buy** effects resolve.
-3. The card goes to its destination. By default it goes to the **bottom of the draw pile**, never your hand, unless something like Express Delivery says otherwise.
+2. The card's **on-buy** effects resolve. A cost on an on-buy that can't be paid ("⤵ ➡ 🂠" with an empty hand) doesn't block the purchase: the rest of that on-buy is just skipped.
+3. The card goes to its destination. By default it goes to the **bottom of the draw pile**, never your hand, unless something like Express Delivery says otherwise. An on-buy "🂠 this" (Rush Order) **draws** it instead (it counts as a draw; if you can't draw, it goes to the bottom as usual). If its on-buy removed or destroyed it (Ember: "🗑 this"), it goes nowhere.
 4. `CARD_BOUGHT` fires for you and `OPPONENT_CARD_BOUGHT` fires for the enemy. Then the enemy may respond.
 
 **Play a card:** it leaves your hand → its on-play effects resolve (including any enhancement effects) → it goes to the **discard pile** → `CARD_PLAYED` / `OPPONENT_CARD_PLAYED` fire → the enemy may respond, unless the card is instant.
 
-**Upgrade (enhancement):** pay, then pick a card **in your hand**. The upgrade attaches to that card instance: it can add on-play effects, make the card instant, retain it, return it when discarded or make it count as a curse. **A card holds only one enhancement** (an enhanced card can't be picked again), and the card's text never changes: the enhancement shows as a small round icon on the card's bottom-right corner. The Trim enhancement is the exception: it destroys the chosen card immediately (permanently) and attaches nothing.
+**Upgrade (enhancement):** pay, then pick a card **in your hand**. The upgrade attaches to that card instance: it can add on-play effects, make the card instant, retain it, return it when discarded or make it count as a curse. **A card holds only one enhancement** (an enhanced card can't be picked again), unless the card has `unlimited_enhancements` (Blank Slate): then it takes any number, the same one more than once too (two Gilded = 🪙🪙🪙🪙). The card's text never changes: each enhancement shows as a small round icon hanging off the card's top-left corner, more of them stacked down the left edge. The Trim enhancement is the exception: it destroys the chosen card immediately (permanently) and attaches nothing.
 
 ## Trinkets: buy, upgrade, sell
 
@@ -101,7 +102,7 @@ Some effects make you decide something while they resolve: pick cards to discard
 
 | Term | Meaning |
 |---|---|
-| **Remove** 🗑 | Out of the deck for this encounter (`PlayerState.removed`) |
+| **Remove** 🗑 | Out of the deck for this encounter (`PlayerState.removed`). Fires the card's `on_remove` (destroying doesn't). |
 | **Destroy** 🔥 | Out permanently (`PlayerState.destroyed`). Fires the card's `on_destroy`. |
 | **Discard** ⤵ | From the hand to the discard pile, unless the text says otherwise. Fires `on_discard` and `CARD_DISCARDED`. The end-of-round cleanup is **not** a discard. |
 | **Retain** | The card stays in your hand at the end of the turn. You then draw a **full** new hand of 5 on top of it. |

@@ -22,6 +22,8 @@ extends Resource
 @export var on_discard: Array[Effect] = []
 ## Resolves when this card is destroyed.
 @export var on_destroy: Array[Effect] = []
+## Resolves when this card is removed (for the encounter; not when destroyed).
+@export var on_remove: Array[Effect] = []
 ## Resolves at the end of your turn if this card is still in your hand.
 @export var on_turn_end_in_hand: Array[Effect] = []
 
@@ -32,6 +34,9 @@ extends Resource
 @export var permanent: bool = false
 @export_group("")
 
+## This card can hold any number of enhancements (normally only one), including
+## the same one more than once.
+@export var unlimited_enhancements: bool = false
 ## Which set this belongs to (see CardSets). One set per card/item/trinket.
 @export var card_set: CardSets.Id = CardSets.Id.NONE
 @export var art: Texture2D
@@ -50,6 +55,8 @@ func get_play_text(vars: Dictionary = {}) -> String:
 			parts.append("When discarded: " + Effect.describe_list(on_discard))
 		if not on_destroy.is_empty():
 			parts.append("When destroyed: " + Effect.describe_list(on_destroy))
+		if not on_remove.is_empty():
+			parts.append("When removed: " + Effect.describe_list(on_remove))
 		if not on_turn_end_in_hand.is_empty():
 			parts.append("At the end of your turn, if in hand: " + Effect.describe_list(on_turn_end_in_hand))
 		if permanent:

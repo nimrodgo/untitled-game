@@ -18,5 +18,5 @@ card_set = 4
 display_name = "Peek"
 cost = 0
 on_play = Array[ExtResource("1_lou63")]([SubResource("Resource_lm1yh"), SubResource("Resource_7mitd")])
-on_play_text = "You may ⤵ the top card of your deck. 🂠"
+on_play_text = "Look at the top card of your deck. You may ⤵ it. 🂠"
 on_buy_text = "TBD"

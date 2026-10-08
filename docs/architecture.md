@@ -48,7 +48,7 @@ The whole rules engine. It's built with `Encounter.new(EncounterData, LoadoutDat
 | Group | Members |
 |---|---|
 | State | `player`, `enemy` (`PlayerState`), `shop`, `rng`, `round_num`, `active`, `is_over`, `won`, `enemy_actions_left`, `last_bought_zone` |
-| Queries | `is_player_turn`, `can_play`, `shop_price(p, base)` / `card_price` / `item_price` / `enhancement_price` (apply item price overrides), `card_text_vars(cd, card)` (text values incl. per-card `{gain}`), `take_market_card(p, slot)` (applies Stockroom restocking), `can_buy_card/item/trinket/enhancement`, `can_use_trinket`, `can_sell_trinket`, `owned_trinket`, `trinket_buy_cost`, `current_intent`, `upcoming_intents(n)`, `rounds_left` |
+| Queries | `is_player_turn`, `can_play`, `shop_price(p, base)` / `card_price` / `item_price` / `enhancement_price` (apply item price overrides), `card_text_vars(cd, card)` (text values incl. per-card `{gain}`), `take_market_card(p, slot)` (applies Stockroom restocking), `can_buy_card/item/trinket/enhancement`, `can_use_trinket`, `can_sell_trinket`, `owned_trinket`, `trinket_buy_cost`, `current_intent`, `upcoming_intents(n)`, `rounds_left`, `coin_target()` (the target minus `target_reduction`) |
 | Player actions (return `bool`) | `play_card`, `buy_card`, `buy_item`, `buy_trinket` (a duplicate upgrades the owned one), `buy_enhancement(slot, card)`, `use_trinket` (free), `sell_trinket` (free), `pass_turn`. They validate, start the action coroutine and return right away. |
 | Choices | `pending_choice`, `submit_choice(picks)`, `auto_chooser` (headless), `request_choice(req)` / `choose_cards(...)` for effects |
 | Enemy | `enemy_act()` resolves the current intent and hands the turn back |
@@ -87,7 +87,7 @@ This holds the shared enums (`Target`, `Zone`, `Trigger`, `TrinketLimit`) and th
 |---|---|
 | `PlayerState` | `coins`, `draw_pile`, `hand`, `discard`, `removed`, `destroyed`, `items`, `trinkets`, turn state (`played_log`, `draw_locked`, `bonus_draw_next_turn`, `replay_next`, `next_buy_to_hand`, `card_bonus`), stats (`cards_drawn_this_turn`, `cards_played_this_turn`, `buys_this_round`, `cards_bought`), enemy-only `intent_index`. `all_cards()` returns every card. |
 | `ShopState` | Slot arrays `cards/items/trinkets/enhancements` (`null` = empty) and private pools resolved once in `setup` from `EncounterData.get_*_pool()` (the encounter's `card_sets` via `ContentLibrary`, plus the manual pools). Methods: `setup`, `restock`, `restock_trinkets`, `take_*`, `snatch_card(mode, rng)`. |
-| `CardInstance` | One copy of a card: `uid` (unique, used by the hand to animate new cards), `data`, `enhancement` (at most one, or null). It merges the enhancement's effects in `get_on_play()` and `is_instant()`. |
+| `CardInstance` | One copy of a card: `uid` (unique, used by the hand to animate new cards), `data`, `enhancements` (at most one, unless `CardData.unlimited_enhancements`; `enhancement` = the first one or null, and setting it replaces them all). It merges every enhancement's effects in `get_on_play()`, `get_on_discard()`, `is_instant()`, `is_retained()`, `is_curse()`. |
 | `ItemInstance` | `uses_this_round`, `uses_this_encounter`, `can_trigger()`, `mark_used()` |
 | `TrinketInstance` | `level` (an index into `data.levels`), `used`, `paid`, `sell_value()`, `current_effects()`, `can_upgrade()`, `upgrade_cost()` |
 

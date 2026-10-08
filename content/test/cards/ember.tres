@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://8karyx1sco5o" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_2567r"]
 [ext_resource type="Script" uid="uid://dow1kbluxxx0s" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_u3bud"]
 [ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_2567r"]
+[ext_resource type="Script" path="res://scripts/data/effects/trash_cards_effect.gd" id="15_ember"]
 
 [sub_resource type="Resource" id="Resource_wmu5d"]
 script = ExtResource("2_2567r")
@@ -13,12 +14,18 @@ amount = 2
 script = ExtResource("2_u3bud")
 amount = 2
 
+[sub_resource type="Resource" id="Resource_on_buy_ember0"]
+script = ExtResource("15_ember")
+destroy = false
+what = 0
+
 [resource]
 script = ExtResource("3_2567r")
 id = &"ember"
 card_set = 5
 display_name = "Ember"
 on_play = Array[ExtResource("1_hm6me")]([SubResource("Resource_5wm56")])
-on_play_text = "🪙🪙. When this is 🔥, 🂠🂠"
-on_destroy = Array[ExtResource("1_hm6me")]([SubResource("Resource_wmu5d")])
-on_buy_text = "TBD"
+on_play_text = "🪙🪙. When this is 🗑, 🂠🂠"
+on_remove = Array[ExtResource("1_hm6me")]([SubResource("Resource_wmu5d")])
+on_buy_text = "🗑 this"
+on_buy = Array[ExtResource("1_hm6me")]([SubResource("Resource_on_buy_ember0")])

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_la0o5"]
+[ext_resource type="Script" path="res://scripts/data/effects/reduce_target_effect.gd" id="2_a8jy6"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_uvifg"]
+
+[sub_resource type="Resource" id="Resource_u7fdo"]
+script = ExtResource("2_a8jy6")
+
+[resource]
+script = ExtResource("3_uvifg")
+id = &"moving_goalposts"
+display_name = "Moving Goalposts"
+cost = 4
+on_play = Array[ExtResource("1_la0o5")]([SubResource("Resource_u7fdo")])
+on_play_text = "Reduce the encounter target by 3"
+on_buy_text = "TBD"
+card_set = 7
+tags = PackedStringArray()

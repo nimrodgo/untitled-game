@@ -6,9 +6,15 @@ extends Effect
 
 @export var destination: GameRules.Zone = GameRules.Zone.HAND
 @export var optional: bool = false
+## "🂠 this": the bought card is drawn instead (counts as a draw; can't-draw
+## effects send it where it would normally go). `destination` is ignored.
+@export var draw: bool = false
 
 
 func apply(ctx: EffectContext) -> void:
+	if draw:
+		ctx.buy_draw = true
+		return
 	if optional:
 		var req := ChoiceRequest.new()
 		req.kind = ChoiceRequest.Kind.OPTIONS
@@ -32,6 +38,8 @@ func _place_label() -> String:
 
 
 func describe() -> String:
+	if draw:
+		return "🂠 this"
 	if optional:
 		match destination:
 			GameRules.Zone.HAND: return "You may put the bought card in your hand"

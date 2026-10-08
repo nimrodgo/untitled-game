@@ -30,6 +30,9 @@ var bonus_draw_next_turn := 0
 var replay_next := 0
 ## "The next card you buy is drawn immediately."
 var next_buy_to_hand := 0
+## "Cancel the enemy's next action this turn": the opponent's next N answers
+## this turn are skipped (reset at the start of every round).
+var cancel_opponent_actions := 0
 ## Scaling bonuses per card id ("increase gain from all P1s by 2").
 var card_bonus := {}
 

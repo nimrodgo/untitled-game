@@ -26,6 +26,9 @@ func apply(ctx: EffectContext) -> void:
 	else:
 		picks = await enc.choose_cards(p, GameRules.PILE_HAND, amount, "Discard", ctx, false, Callable(), ctx.card)
 	await enc.discard_cards(p, picks)
+	if as_cost and not all_hand and picks.size() < amount:
+		ctx.cost_unpaid = true   # e.g. an on-buy "⤵ ➡ 🂠" with an empty hand
+		return
 	if draw_that_many and not picks.is_empty():
 		await enc.draw_cards(p, picks.size())
 

@@ -14,6 +14,9 @@ as_cost = true
 script = ExtResource("3_m84jq")
 all = true
 
+[sub_resource type="Resource" id="Resource_on_buy_spark0"]
+script = ExtResource("3_m84jq")
+
 [resource]
 script = ExtResource("4_apmpy")
 id = &"spark"
@@ -22,4 +25,5 @@ display_name = "Spark"
 instant = true
 on_play = Array[ExtResource("1_is0jr")]([SubResource("Resource_rwcic"), SubResource("Resource_6tukv")])
 on_play_text = "⚡🔥 this ➡ ↺ all trinkets"
-on_buy_text = "TBD"
+on_buy_text = "↺ a trinket"
+on_buy = Array[ExtResource("1_is0jr")]([SubResource("Resource_on_buy_spark0")])

@@ -3,9 +3,14 @@
 [ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_17gsv"]
 [ext_resource type="Script" uid="uid://ujcmypl6hxrb" path="res://scripts/data/effects/gain_coins_scaling_effect.gd" id="2_joayj"]
 [ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_q4oee"]
+[ext_resource type="Script" path="res://scripts/data/effects/boost_card_bonus_effect.gd" id="14_snowb"]
 
 [sub_resource type="Resource" id="Resource_42qk1"]
 script = ExtResource("2_joayj")
+amount = 1
+
+[sub_resource type="Resource" id="Resource_on_buy_snowb0"]
+script = ExtResource("14_snowb")
 
 [resource]
 script = ExtResource("3_q4oee")
@@ -14,4 +19,5 @@ card_set = 2
 display_name = "Snowball"
 on_play = Array[ExtResource("1_17gsv")]([SubResource("Resource_42qk1")])
 on_play_text = "{gain_icons} and increase 🪙 gain from all Snowballs by 2 this encounter"
-on_buy_text = "TBD"
+on_buy_text = "increase 🪙 gain from all Snowballs by 1 this encounter"
+on_buy = Array[ExtResource("1_17gsv")]([SubResource("Resource_on_buy_snowb0")])

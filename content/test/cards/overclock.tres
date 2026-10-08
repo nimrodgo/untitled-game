@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_kpjex"]
+[ext_resource type="Script" path="res://scripts/data/effects/activate_owned_trinket_effect.gd" id="2_csmnp"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_miva0"]
+
+[sub_resource type="Resource" id="Resource_veway"]
+script = ExtResource("2_csmnp")
+
+[resource]
+script = ExtResource("3_miva0")
+id = &"overclock"
+display_name = "Overclock"
+cost = 3
+on_play = Array[ExtResource("1_kpjex")]([SubResource("Resource_veway")])
+on_play_text = "Use the level 3 effect of a trinket you own"
+on_buy_text = "TBD"
+card_set = 7
+tags = PackedStringArray()

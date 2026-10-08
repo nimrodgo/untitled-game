@@ -1,7 +1,7 @@
 class_name TransformCardsEffect
 extends Effect
 ## Choose any number of cards in your hand; each becomes `into` (its
-## enhancement is lost).
+## enhancements are lost).
 
 @export var into: CardData
 

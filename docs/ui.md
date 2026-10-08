@@ -60,12 +60,12 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 ## Card visual anatomy
 
 ```
-┌───────────────────────── ●cost┐
+(◉)───────────────────────●cost┐  ← enhancement badge hanging off the top-left corner
+(◉)                             │     (more enhancements stack down the left edge)
 │ Name                          │
 │ INSTANT (auto tag, only when  │
 │   there's no custom text)     │
 │ On-play text…                 │
-│                          (◉) │  ← enhancement badge, bottom-right corner
 │ ┌ 🛍 on-buy text (gold strip)┐│
 │ └───────────────────────────┘ │
 └───────────────────────────────┘

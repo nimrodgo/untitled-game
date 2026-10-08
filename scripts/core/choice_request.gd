@@ -34,6 +34,9 @@ var hand_only := false
 var ordered := false
 ## Optional per-candidate labels for the picker (e.g. "Deck", "Discard").
 var groups: Array = []
+## TRINKET: show this level's text for each trinket (1 = level 1...; 0 = its
+## current level).
+var trinket_level := 0
 
 
 func is_optional() -> bool:

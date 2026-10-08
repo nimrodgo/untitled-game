@@ -20,6 +20,12 @@ var opening_draw := false
 var declined := false
 ## The pile a card came from (GameRules.PILE_*), for trash triggers.
 var from_pile := 0
+## "🂠 this" on a card's on-buy: the bought card is drawn (counts as a draw;
+## if you can't draw it goes where it normally would).
+var buy_draw := false
+## Set by a cost effect that couldn't be paid in full (e.g. an on-buy
+## "⤵ ➡ 🂠" with an empty hand): the rest of that effect list is skipped.
+var cost_unpaid := false
 
 
 func resolve(target: GameRules.Target) -> PlayerState:

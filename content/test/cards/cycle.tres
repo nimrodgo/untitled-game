@@ -13,6 +13,13 @@ as_cost = true
 script = ExtResource("3_uuref")
 amount = 2
 
+[sub_resource type="Resource" id="Resource_on_buy_cycle0"]
+script = ExtResource("2_flflq")
+as_cost = true
+
+[sub_resource type="Resource" id="Resource_on_buy_cycle1"]
+script = ExtResource("3_uuref")
+
 [resource]
 script = ExtResource("4_q4p4f")
 id = &"cycle"
@@ -20,4 +27,5 @@ card_set = 4
 display_name = "Cycle"
 on_play = Array[ExtResource("1_8f72b")]([SubResource("Resource_dl4so"), SubResource("Resource_fm583")])
 on_play_text = "⤵ ➡ 🂠🂠"
-on_buy_text = "TBD"
+on_buy_text = "⤵ ➡ 🂠"
+on_buy = Array[ExtResource("1_8f72b")]([SubResource("Resource_on_buy_cycle0"), SubResource("Resource_on_buy_cycle1")])

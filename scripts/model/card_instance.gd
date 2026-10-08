@@ -1,13 +1,22 @@
 class_name CardInstance
 extends RefCounted
-## A specific copy of a card in someone's deck, with its (at most one) enhancement.
+## A specific copy of a card in someone's deck, with its enhancements (at most
+## one, unless the card allows any number: CardData.unlimited_enhancements).
 
 static var _next_uid: int = 1
 
 var uid: int
 var data: CardData
-## null = not enhanced. A card never holds more than one.
-var enhancement: EnhancementData
+## In the order they were added. Empty = not enhanced.
+var enhancements: Array[EnhancementData] = []
+## The first enhancement, or null. Setting it replaces all of them (null clears).
+var enhancement: EnhancementData:
+	get:
+		return enhancements[0] if not enhancements.is_empty() else null
+	set(value):
+		enhancements.clear()
+		if value:
+			enhancements.append(value)
 ## Stays in your hand at the end of this turn.
 var retain := false
 
@@ -18,24 +27,28 @@ func _init(card_data: CardData) -> void:
 	_next_uid += 1
 
 
+func add_enhancement(e: EnhancementData) -> void:
+	enhancements.append(e)
+
+
 func is_instant() -> bool:
-	return data.instant or (enhancement != null and enhancement.make_instant)
+	return data.instant or enhancements.any(func(e: EnhancementData): return e.make_instant)
 
 
 func is_curse() -> bool:
-	return data.curse or (enhancement != null and enhancement.counts_as_curse)
+	return data.curse or enhancements.any(func(e: EnhancementData): return e.counts_as_curse)
 
 
-## Kept in hand at the end of the turn (picked by an effect, or by the enhancement).
+## Kept in hand at the end of the turn (picked by an effect, or by an enhancement).
 func is_retained() -> bool:
-	return retain or (enhancement != null and enhancement.retain)
+	return retain or enhancements.any(func(e: EnhancementData): return e.retain)
 
 
 func get_on_discard() -> Array[Effect]:
 	var out: Array[Effect] = []
 	out.append_array(data.on_discard)
-	if enhancement:
-		out.append_array(enhancement.on_discard)
+	for e in enhancements:
+		out.append_array(e.on_discard)
 	return out
 
 
@@ -47,8 +60,8 @@ func is_playable_kind() -> bool:
 func get_on_play() -> Array[Effect]:
 	var out: Array[Effect] = []
 	out.append_array(data.on_play)
-	if enhancement:
-		out.append_array(enhancement.extra_on_play)
+	for e in enhancements:
+		out.append_array(e.extra_on_play)
 	return out
 
 
@@ -60,7 +73,7 @@ func get_name() -> String:
 	return data.display_name
 
 
-## The card's own text. An enhancement never adds text: it shows as a corner icon.
+## The card's own text. Enhancements never add text: they show as corner icons.
 func play_text(vars: Dictionary = {}) -> String:
 	return data.get_play_text(vars)
 
