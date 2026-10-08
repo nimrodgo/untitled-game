@@ -1,7 +1,8 @@
 # Designing Content
 
-All content is Godot **Resources** (`.tres`). There are two ways to make them:
+All content is Godot **Resources** (`.tres`). There are three ways to make and edit them:
 
+- **Content tab (easiest):** the **Content** tab at the top of the editor, next to 2D / 3D / Script (the `addons/content_browser` plugin). It shows everything in `content/test/` as card-style tiles, one tab per kind, grouped by set, with search, a set filter and sorting. Click a tile to edit it on the right: names, costs, sets, texts (with an icon palette for 🪙 🂠 ⚡ …), every effect and its values (add / reorder / remove), trinket levels, enemy intents, encounter sets and slots, decks and pools (with counts). **New…**, **Duplicate** and **Delete…** (moves the file to the recycle bin and lists what still uses it) are there too. Every edit is saved to the `.tres` file about half a second after you stop typing; there is no undo, so use git. Anything it can't edit inline (textures) is one click away in the Inspector, which follows the selection.
 - **In the editor:** FileSystem → right-click a folder → **New Resource** → pick the type (e.g. `CardData`), then fill in the Inspector. Add effects with the array's **+** button → **New *XxxEffect***.
 - **From a script:** see `tools/build_test_content.gd`, which regenerates `content/test/`. If you edit test `.tres` files by hand, re-running that script **overwrites** your changes.
 
