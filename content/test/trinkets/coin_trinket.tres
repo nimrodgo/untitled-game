@@ -28,13 +28,13 @@ amount = 3
 
 [sub_resource type="Resource" id="Resource_lv3"]
 script = ExtResource("1_croky")
-upgrade_cost = 4
 effects = Array[ExtResource("2_vq3q8")]([SubResource("Resource_c3")])
 text = "⚡🪙🪙🪙"
 
 [resource]
 script = ExtResource("4_qvlun")
 id = &"coin_trinket"
-card_set = 2
 display_name = "Coin Trinket"
+cost = 3
 levels = Array[ExtResource("1_croky")]([SubResource("Resource_0m0jb"), SubResource("Resource_lv2"), SubResource("Resource_lv3")])
+card_set = 2

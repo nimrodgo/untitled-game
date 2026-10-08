@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_cnjvh"]
 [ext_resource type="Script" uid="uid://8karyx1sco5o" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_1aq3t"]
-[ext_resource type="Resource" path="res://content/test/curses/leaky_purse.tres" id="3_t6t46"]
+[ext_resource type="Resource" uid="uid://b7xlimiw8auk4" path="res://content/test/curses/leaky_purse.tres" id="3_t6t46"]
 [ext_resource type="Script" uid="uid://bs8xb6e8kjq6f" path="res://scripts/data/effects/add_card_effect.gd" id="4_dkrxd"]
 [ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="5_116md"]
 
@@ -17,9 +17,9 @@ card = ExtResource("3_t6t46")
 [resource]
 script = ExtResource("5_116md")
 id = &"risky_draw"
-card_set = 9
 display_name = "Risky Draw"
 cost = 0
 on_play = Array[ExtResource("1_cnjvh")]([SubResource("Resource_p2syd"), SubResource("Resource_qanq8")])
 on_play_text = "🂠🂠🂠. Add Leaky Purse into your deck"
 on_buy_text = "TBD"
+card_set = 9

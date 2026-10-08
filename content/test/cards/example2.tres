@@ -13,7 +13,6 @@ script = ExtResource("2_6pumn")
 [resource]
 script = ExtResource("3_lu33p")
 id = &"example2"
-card_set = 2
 display_name = "This is another card"
 cost = 0
 instant = true
@@ -21,3 +20,4 @@ on_play = Array[ExtResource("1_g4hb1")]([SubResource("Resource_krxac")])
 on_buy = Array[ExtResource("1_g4hb1")]([SubResource("Resource_h4sp4")])
 on_play_text = "⚡🪙"
 on_buy_text = "🪙"
+card_set = 2

@@ -18,8 +18,8 @@ amount = 1
 [resource]
 script = ExtResource("4_vaoqi")
 id = &"scheme"
-card_set = 3
 display_name = "Scheme"
 on_play = Array[ExtResource("1_3jvgk")]([SubResource("Resource_pwrlg"), SubResource("Resource_vcpoe")])
 on_play_text = "🂠🂠🂠. Put a card in your hand on top of the draw pile"
 on_buy_text = "TBD"
+card_set = 3

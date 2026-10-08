@@ -1,13 +1,13 @@
-[gd_resource type="Resource" script_class="EnemyData" format=3]
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://c7dsnwinvg1f5"]
 
-[ext_resource type="Script" path="res://scripts/data/enemy_intent.gd" id="1_bx61u"]
-[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_hxko8"]
-[ext_resource type="Resource" path="res://content/test/curses/leaky_purse.tres" id="3_0vssv"]
-[ext_resource type="Script" path="res://scripts/data/effects/add_card_effect.gd" id="4_s8eyl"]
-[ext_resource type="Script" path="res://scripts/data/effects/lose_coins_effect.gd" id="5_luphb"]
-[ext_resource type="Script" path="res://scripts/data/effects/snatch_shop_card_effect.gd" id="6_ejgby"]
-[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="7_yqv34"]
-[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="8_csfvc"]
+[ext_resource type="Script" uid="uid://uxmsbv8vrnsc" path="res://scripts/data/enemy_intent.gd" id="1_bx61u"]
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="2_hxko8"]
+[ext_resource type="Resource" uid="uid://b7xlimiw8auk4" path="res://content/test/curses/leaky_purse.tres" id="3_0vssv"]
+[ext_resource type="Script" uid="uid://bs8xb6e8kjq6f" path="res://scripts/data/effects/add_card_effect.gd" id="4_s8eyl"]
+[ext_resource type="Script" uid="uid://xmr04atmryoj" path="res://scripts/data/effects/lose_coins_effect.gd" id="5_luphb"]
+[ext_resource type="Script" uid="uid://c2bwmjsio3xu5" path="res://scripts/data/effects/snatch_shop_card_effect.gd" id="6_ejgby"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="7_yqv34"]
+[ext_resource type="Script" uid="uid://wehshrsqaulc" path="res://scripts/data/enemy_data.gd" id="8_csfvc"]
 
 [sub_resource type="Resource" id="Resource_tgojs"]
 script = ExtResource("4_s8eyl")

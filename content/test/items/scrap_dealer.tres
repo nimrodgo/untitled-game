@@ -11,9 +11,9 @@ amount = 2
 [resource]
 script = ExtResource("3_4go5s")
 id = &"scrap_dealer"
-card_set = 5
 display_name = "Scrap Dealer"
 cost = 4
 trigger = 16
 effects = Array[ExtResource("1_utcus")]([SubResource("Resource_fa46h")])
 description = "When you 🗑 a card, 🪙🪙"
+card_set = 5

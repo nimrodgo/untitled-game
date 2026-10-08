@@ -11,9 +11,9 @@ amount = 2
 [resource]
 script = ExtResource("3_dsrbd")
 id = &"grindstone"
-card_set = 4
 display_name = "Grindstone"
 cost = 5
 trigger = 15
 effects = Array[ExtResource("1_jaqoh")]([SubResource("Resource_70jlp")])
 description = "When you ⤵, 🪙🪙"
+card_set = 4

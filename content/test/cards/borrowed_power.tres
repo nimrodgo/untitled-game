@@ -10,9 +10,9 @@ script = ExtResource("2_ls072")
 [resource]
 script = ExtResource("3_2ib1a")
 id = &"borrowed_power"
-card_set = 7
 display_name = "Borrowed Power"
 cost = 2
 on_play = Array[ExtResource("1_ulyvd")]([SubResource("Resource_mnrv4")])
 on_play_text = "Activate the level 3 effect of a trinket in the shop"
 on_buy_text = "TBD"
+card_set = 7

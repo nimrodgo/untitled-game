@@ -10,7 +10,7 @@ script = ExtResource("2_hcqdb")
 [resource]
 script = ExtResource("3_8scpi")
 id = &"rebate"
-card_set = 8
 display_name = "Rebate"
 effects = Array[ExtResource("1_nl2s3")]([SubResource("Resource_0yqf7")])
 description = "🪙 when you buy a card"
+card_set = 8

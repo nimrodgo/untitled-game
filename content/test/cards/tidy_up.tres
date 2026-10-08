@@ -19,8 +19,8 @@ effects = Array[ExtResource("1_w7pht")]([SubResource("Resource_yrdoc")])
 [resource]
 script = ExtResource("5_333ra")
 id = &"tidy_up"
-card_set = 7
 display_name = "Tidy Up"
 on_play = Array[ExtResource("1_w7pht")]([SubResource("Resource_mj5uc"), SubResource("Resource_ij8h1")])
 on_play_text = "🪙. If your discard pile is empty, 🂠"
 on_buy_text = "TBD"
+card_set = 7

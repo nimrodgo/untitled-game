@@ -12,8 +12,8 @@ into = ExtResource("2_sd0ix")
 [resource]
 script = ExtResource("4_ne07u")
 id = &"hex"
-card_set = 9
 display_name = "Hex"
 on_play = Array[ExtResource("1_fdifk")]([SubResource("Resource_7hnpn")])
 on_play_text = "Transform any cards in your hand to Driftwood"
 on_buy_text = "TBD"
+card_set = 9

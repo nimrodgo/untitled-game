@@ -35,9 +35,9 @@ options = Array[ExtResource("2_hhvaa")]([SubResource("Resource_bhgsv"), SubResou
 [resource]
 script = ExtResource("6_d1xpf")
 id = &"patience"
-card_set = 2
 display_name = "Patience"
 instant = true
 on_play = Array[ExtResource("1_ayial")]([SubResource("Resource_uf1g5")])
 on_play_text = "⚡🪙🪙 OR Pass ➡ 🪙🪙🪙"
 on_buy_text = "TBD"
+card_set = 2

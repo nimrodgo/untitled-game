@@ -10,9 +10,9 @@ script = ExtResource("2_jolqb")
 [resource]
 script = ExtResource("3_vctfv")
 id = &"autopilot"
-card_set = 7
 display_name = "Autopilot"
 cost = 2
 on_play = Array[ExtResource("1_ogcsk")]([SubResource("Resource_0fl80")])
 on_play_text = "Play the top 2 cards in your deck"
 on_buy_text = "TBD"
+card_set = 7

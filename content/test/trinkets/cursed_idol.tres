@@ -31,7 +31,6 @@ amount = 4
 
 [sub_resource type="Resource" id="Resource_4kh4r"]
 script = ExtResource("1_mvuqc")
-upgrade_cost = 4
 effects = Array[ExtResource("2_7fgb8")]([SubResource("Resource_rilc1"), SubResource("Resource_04a47")])
 text = "⚡Gain Barnacle and 🪙🪙🪙🪙"
 
@@ -45,13 +44,13 @@ amount = 6
 
 [sub_resource type="Resource" id="Resource_ntuuk"]
 script = ExtResource("1_mvuqc")
-upgrade_cost = 5
 effects = Array[ExtResource("2_7fgb8")]([SubResource("Resource_nhl45"), SubResource("Resource_uq8qr")])
 text = "⚡Gain Barnacle and 6🪙"
 
 [resource]
 script = ExtResource("6_0ar5r")
 id = &"cursed_idol"
-card_set = 9
 display_name = "Cursed Idol"
+cost = 3
 levels = Array[ExtResource("1_mvuqc")]([SubResource("Resource_rkwke"), SubResource("Resource_4kh4r"), SubResource("Resource_ntuuk")])
+card_set = 9

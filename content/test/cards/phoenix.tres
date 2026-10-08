@@ -11,8 +11,8 @@ source = 2
 [resource]
 script = ExtResource("3_crkkc")
 id = &"phoenix"
-card_set = 5
 display_name = "Phoenix"
 on_play = Array[ExtResource("1_440kr")]([SubResource("Resource_h1l6m")])
 on_play_text = "Buy a card you 🔥 this encounter"
 on_buy_text = "TBD"
+card_set = 5

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CardData" format=3]
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://cg5x7ghfnypv0"]
 
 [ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_eff"]
 [ext_resource type="Script" uid="uid://dtw8gorwismdf" path="res://scripts/data/effects/pass_effect.gd" id="2_pass"]
@@ -15,9 +15,9 @@ all_hand = true
 [resource]
 script = ExtResource("4_card")
 id = &"hunker_down"
-card_set = 6
 display_name = "Hunker Down"
 cost = 2
 on_play = Array[ExtResource("1_eff")]([SubResource("Resource_pass"), SubResource("Resource_ret")])
 on_play_text = "Pass. 📌 your hand this turn"
 on_buy_text = "TBD"
+card_set = 6

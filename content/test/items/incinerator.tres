@@ -11,9 +11,9 @@ amount = 3
 [resource]
 script = ExtResource("3_agwne")
 id = &"incinerator"
-card_set = 5
 display_name = "Incinerator"
 cost = 5
 trigger = 17
 effects = Array[ExtResource("1_3d476")]([SubResource("Resource_5aosn")])
 description = "When you 🔥, 🪙🪙🪙"
+card_set = 5

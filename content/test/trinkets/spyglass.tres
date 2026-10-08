@@ -36,7 +36,7 @@ text = "⚡Look at the top 4 cards of your deck. ⤵ any of them"
 [resource]
 script = ExtResource("4_gc8do")
 id = &"spyglass"
-card_set = 4
 display_name = "Spyglass"
 cost = 3
 levels = Array[ExtResource("1_q4rni")]([SubResource("Resource_ecoja"), SubResource("Resource_dprfr"), SubResource("Resource_swdp8")])
+card_set = 4
