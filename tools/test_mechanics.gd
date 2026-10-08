@@ -20,6 +20,7 @@ func _init() -> void:
 	_deck_cycle_rules()
 	_shop_content_rules()
 	_more_ideas_rules()
+	_on_buy_rules()
 	print("\n%d checks, %d failed" % [checks, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -239,7 +240,7 @@ func _rules(_data: EncounterData) -> void:
 	e.play_card(_give(e, "echo"))
 	before = e.player.coins
 	e.play_card(_give(e, "snowball"))
-	_check(e.player.coins == before + 2 + 4, "Echo+P1: 2 then 4 (got %d)" % (e.player.coins - before))
+	_check(e.player.coins == before + 1 + 3, "Echo+Snowball: 1 then 3 (got %d)" % (e.player.coins - before))
 	_check(e.player.cards_played_this_turn == 3, "replays count as plays")
 
 	# Meditate with no other plays: extra round, destroyed.
@@ -978,12 +979,12 @@ func _shop_content_rules() -> void:
 	# {gain}: Snowball and Liquidate show their current coin gain.
 	e = _enc(["example1", "example1", "example1", "example1", "example1"])
 	var sb := _give(e, "snowball")
-	_check(e.card_text_vars(sb.data, sb)["gain"] == 2, "Snowball shows 2")
+	_check(e.card_text_vars(sb.data, sb)["gain"] == 1, "Snowball shows 1")
 	e.play_card(sb)
 	_wait_enemy(e)
-	_check(e.card_text_vars(sb.data)["gain"] == 4, "Snowball shows 4 after one play")
-	_check(sb.play_text(e.card_text_vars(sb.data, sb)).begins_with("🪙🪙🪙🪙 and"), "Snowball text shows 4 coin icons")
-	e.player.card_bonus[&"snowball"] = 5
+	_check(e.card_text_vars(sb.data)["gain"] == 3, "Snowball shows 3 after one play")
+	_check(sb.play_text(e.card_text_vars(sb.data, sb)).begins_with("🪙🪙🪙 and"), "Snowball text shows 3 coin icons")
+	e.player.card_bonus[&"snowball"] = 6
 	_check(sb.play_text(e.card_text_vars(sb.data, sb)).begins_with("7🪙 and"), "Snowball text shows 7🪙 past 5")
 	var lq := _give(e, "liquidate")
 	_check(e.card_text_vars(lq.data, lq)["gain"] == 3 * (e.player.hand.size() - 1), "Liquidate shows 3 x other cards")
@@ -1155,3 +1156,138 @@ func _more_ideas_rules() -> void:
 	coins = e.player.coins
 	e.change_coins(e.player, 1, "test")
 	_check(e.player.coins == coins + 3, "two Tip Jars: +1 each, they don't feed each other")
+
+
+## Buy card `id` from market slot 0 with plenty of coins; returns the bought instance.
+func _buy(e: Encounter, id: String) -> CardInstance:
+	e.shop.cards[0] = _card(id)
+	e.player.coins = 30
+	var before := {}
+	for c in e.player.all_cards() + e.player.removed + e.player.destroyed:
+		before[c] = true
+	_check(e.buy_card(0), "%s: can be bought" % id)
+	for c in e.player.all_cards() + e.player.removed + e.player.destroyed:
+		if not before.has(c) and c.data.id == StringName(id):
+			return c
+	return null
+
+
+func _on_buy_rules() -> void:
+	var deck := ["example1", "example1", "example1", "example1", "example1", "example1", "example1", "example1"]
+
+	# Snowball: base 1, +2 per play; its on-buy adds 1 to every Snowball this encounter.
+	var e := _enc(deck)
+	_buy(e, "snowball")
+	_check(int(e.player.card_bonus.get(&"snowball", 0)) == 1, "Snowball on-buy: bonus +1")
+	var sb := _give(e, "snowball")
+	var coins := e.player.coins
+	e.play_card(sb)
+	_check(e.player.coins == coins + 2, "Snowball after a buy: 1 + 1")
+
+	# Blank Slate: bought with one random enhancement, never Fleeting.
+	var seen := {}
+	var ok := true
+	for i in 25:
+		e = _enc(deck)
+		e.rng.seed = 1000 + i
+		var bs := _buy(e, "blank_slate")
+		ok = ok and bs != null and bs.enhancements.size() == 1 and not bs.enhancements[0].destroy_on_apply
+		if bs and not bs.enhancements.is_empty():
+			seen[bs.enhancements[0].id] = true
+	_check(ok, "Blank Slate on-buy: exactly one enhancement, never Fleeting")
+	_check(seen.size() >= 3, "Blank Slate on-buy: the enhancement varies (%d kinds in 25 buys)" % seen.size())
+
+	# Ember: removed the moment it's bought -> draws 2; only remove triggers it.
+	e = _enc(deck)
+	var hand := e.player.hand.size()
+	var em := _buy(e, "ember")
+	_check(em != null and e.player.removed.has(em) and not e.player.all_cards().has(em), "Ember on-buy: removed, not in the deck")
+	_check(e.player.hand.size() == hand + 2, "Ember on-buy: removing it draws 2")
+	_consistent(e, "Ember buy")
+	e = _enc(deck)
+	em = _give(e, "ember")
+	hand = e.player.hand.size()
+	e.trash_card(e.player, em, true)
+	_check(e.player.hand.size() == hand - 1, "Ember: destroying it draws nothing")
+	e = _enc(deck)
+	em = _give(e, "ember")
+	hand = e.player.hand.size()
+	e.trash_card(e.player, em, false)
+	_check(e.player.hand.size() == hand - 1 + 2, "Ember: removing it draws 2")
+
+	# Cycle: discard 1 -> draw 1; with an empty hand the buy works but nothing happens.
+	e = _enc(deck)
+	hand = e.player.hand.size()
+	_buy(e, "cycle")
+	_check(e.player.hand.size() == hand and e.player.discard.size() == 1, "Cycle on-buy: discard 1, draw 1")
+	e = _enc(deck)
+	e.player.discard.append_array(e.player.hand)
+	e.player.hand.clear()
+	var deck_size := e.player.draw_pile.size()
+	var cy := _buy(e, "cycle")
+	_check(cy != null and e.player.hand.is_empty() and e.player.draw_pile.size() == deck_size + 1,
+		"Cycle on-buy with an empty hand: bought, nothing drawn")
+
+	# Free Sample: draw 1. Sift: draw 1, discard 1.
+	e = _enc(deck)
+	hand = e.player.hand.size()
+	_buy(e, "free_sample")
+	_check(e.player.hand.size() == hand + 1, "Free Sample on-buy: draw 1")
+	e = _enc(deck)
+	hand = e.player.hand.size()
+	_buy(e, "sift")
+	_check(e.player.hand.size() == hand and e.player.discard.size() == 1, "Sift on-buy: draw 1, discard 1")
+
+	# Mimic: plays a random playable card from the hand; skips curses; nothing if none.
+	e = _enc(deck)
+	e.player.discard.append_array(e.player.hand)
+	e.player.hand.clear()
+	var ex2 := _give(e, "example2")
+	_give(e, "dead_weight")
+	e.shop.cards[0] = _card("mimic")
+	e.player.coins = 30
+	var price := e.card_price(e.player, e.shop.cards[0].cost)
+	var played := e.player.cards_played_this_turn
+	e.buy_card(0)
+	_check(e.player.coins == 30 - price + 1 and e.player.discard.has(ex2) and e.player.cards_played_this_turn == played + 1,
+		"Mimic on-buy: plays the only playable card (example2: +1)")
+	_check(e.active == e.player and not e.is_busy(), "Mimic on-buy: the enemy gets no extra answer")
+	e = _enc(deck)
+	e.player.discard.append_array(e.player.hand)
+	e.player.hand.clear()
+	_give(e, "dead_weight")
+	played = e.player.cards_played_this_turn
+	_buy(e, "mimic")
+	_check(e.player.cards_played_this_turn == played and e.player.hand.size() == 1, "Mimic on-buy: only curses -> nothing")
+
+	# Rush Order: drawn when bought (counts as a draw); Murk -> bottom of the deck.
+	e = _enc(deck)
+	var drawn := e.player.cards_drawn_this_turn
+	var ro := _buy(e, "rush_order")
+	_check(e.player.hand.has(ro) and e.player.cards_drawn_this_turn == drawn + 1, "Rush Order on-buy: drawn")
+	e = _enc(deck)
+	e.player.next_buy_to_hand = 1
+	ro = _buy(e, "rush_order")
+	_check(e.player.hand.has(ro) and e.player.next_buy_to_hand == 1, "Rush Order on-buy: a pending Rush Order is kept")
+	e = _enc(deck)
+	e.player.draw_locked = true
+	ro = _buy(e, "rush_order")
+	_check(e.player.draw_pile[0] == ro, "Rush Order on-buy: can't draw -> bottom of the deck")
+
+	# Spark / Tinker: refresh a trinket.
+	for id in ["spark", "tinker"]:
+		e = _enc(deck)
+		var t := TrinketInstance.new(_trinket("coin_trinket"))
+		t.used = true
+		e.player.trinkets.append(t)
+		_buy(e, id)
+		_check(not t.used, "%s on-buy: refreshes a used trinket" % id)
+
+	# Every card with an on-buy text other than TBD has on-buy effects.
+	var missing: Array = []
+	for f in DirAccess.get_files_at("res://content/test/cards"):
+		if f.ends_with(".tres"):
+			var cd: CardData = load("res://content/test/cards/" + f)
+			if cd.on_buy_text != "" and cd.on_buy_text != "TBD" and cd.on_buy.is_empty():
+				missing.append(cd.id)
+	_check(missing.is_empty(), "every written on-buy has effects %s" % str(missing))

@@ -20,7 +20,7 @@ To play your content, point an `EncounterData` at your pools and enemy, then set
 | `on_play` | [] | Effects when played |
 | `on_buy` | [] | Effects once, when bought. **Every card should have an on-buy**; placeholder ones use `on_buy_text = "TBD"` and no effects |
 | `playable` | true | false = can't be played (curses) |
-| `on_discard` / `on_destroy` / `on_turn_end_in_hand` | [] | Card hooks (see [effects-reference](effects-reference.md#card-hooks-carddata)) |
+| `on_discard` / `on_destroy` / `on_remove` / `on_turn_end_in_hand` | [] | Card hooks (see [effects-reference](effects-reference.md#card-hooks-carddata)) |
 | `unlimited_enhancements` | false | The card can hold any number of enhancements, the same one more than once too (Blank Slate) |
 | `curse` / `permanent` | false | Curse styling + "curse" filters; permanent = stays between encounters (flag only for now) |
 | `on_play_text` / `on_buy_text` | "" | Custom text. Leave it empty to auto-generate from effects. |
@@ -169,6 +169,7 @@ Cards, items, trinkets and curses come from `tools/build_test_content.gd` (see t
 | Hunker Down | Retain card, cost 2: "Pass. 📌 your hand this turn" |
 | More ideas (2026-10-08) | Placeholder names and costs, "TBD" on-buys, only in the .tres (not in `build_test_content.gd`): **Stonewall** (Utility, 3, ⚡ cancel the enemy's next action this turn), **Overclock** (Utility, 3, use the level 3 effect of a trinket you own), **Hindsight** (Coins, 3, 🪙 per card in your discard pile), **Both Ends** (Draw, 2, draw the top and the bottom card), **Moving Goalposts** (Utility, 4, target −3), **Blank Slate** (Utility, 2, does nothing; any number of enhancements) and the item **Tip Jar** (Coins, 4, +1 🪙 on every other gain). Not in the TEST Encounter pools; the themed encounters sell them through their sets. |
 | On-buy placeholders | Every card without a real on-buy shows a "TBD" buy strip (`on_buy_text = "TBD"`) |
+| Nimrod's on-buys (2026-10-08) | Blank Slate (randomly enhance this), Cycle (⤵ ➡ 🂠), Ember (🗑 this; Ember now draws 🂠🂠 when **removed**, not destroyed), Free Sample (🂠), Mimic (play a random card from your hand), Rush Order (🂠 this), Sift (🂠⤵), Snowball (+1 to all Snowballs; Snowball now starts at 🪙), Spark and Tinker (↺ a trinket). The tests check that every on-buy text other than "TBD" has effects. |
 | Trinkets (7) | Coin Trinket + the 6 trinket ideas, 3 levels each |
 | Enemy | TEST Moray: Pinch (steal 1) → Toll (you lose 1) → Snatch (priciest market card). 3 actions per round. |
 | Encounter | TEST Encounter: 3 rounds, target 10, 3 card slots, 1 item slot, 1 trinket slot, 0 upgrade slots. Uses explicit pools, no `card_sets`. It is not in `encounter_pool`, but the tests and the simulator use it. |

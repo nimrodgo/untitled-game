@@ -75,8 +75,8 @@ flowchart TD
 
 **Buy a card:**
 1. Pay the cost. The `BEFORE_CARD_BUY` trigger fires, and items can change where the card goes.
-2. The card's **on-buy** effects resolve.
-3. The card goes to its destination. By default it goes to the **bottom of the draw pile**, never your hand, unless something like Express Delivery says otherwise.
+2. The card's **on-buy** effects resolve. A cost on an on-buy that can't be paid ("⤵ ➡ 🂠" with an empty hand) doesn't block the purchase: the rest of that on-buy is just skipped.
+3. The card goes to its destination. By default it goes to the **bottom of the draw pile**, never your hand, unless something like Express Delivery says otherwise. An on-buy "🂠 this" (Rush Order) **draws** it instead (it counts as a draw; if you can't draw, it goes to the bottom as usual). If its on-buy removed or destroyed it (Ember: "🗑 this"), it goes nowhere.
 4. `CARD_BOUGHT` fires for you and `OPPONENT_CARD_BOUGHT` fires for the enemy. Then the enemy may respond.
 
 **Play a card:** it leaves your hand → its on-play effects resolve (including any enhancement effects) → it goes to the **discard pile** → `CARD_PLAYED` / `OPPONENT_CARD_PLAYED` fire → the enemy may respond, unless the card is instant.
@@ -102,7 +102,7 @@ Some effects make you decide something while they resolve: pick cards to discard
 
 | Term | Meaning |
 |---|---|
-| **Remove** 🗑 | Out of the deck for this encounter (`PlayerState.removed`) |
+| **Remove** 🗑 | Out of the deck for this encounter (`PlayerState.removed`). Fires the card's `on_remove` (destroying doesn't). |
 | **Destroy** 🔥 | Out permanently (`PlayerState.destroyed`). Fires the card's `on_destroy`. |
 | **Discard** ⤵ | From the hand to the discard pile, unless the text says otherwise. Fires `on_discard` and `CARD_DISCARDED`. The end-of-round cleanup is **not** a discard. |
 | **Retain** | The card stays in your hand at the end of the turn. You then draw a **full** new hand of 5 on top of it. |

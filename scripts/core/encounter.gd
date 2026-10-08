@@ -144,9 +144,16 @@ func is_busy() -> bool:
 
 
 func can_play(card: CardInstance) -> bool:
-	if not is_player_turn() or not player.hand.has(card) or not card.data.playable:
+	if not is_player_turn() or not player.hand.has(card):
 		return false
-	var ctx := _ctx(player, card)
+	return can_pay_card(player, card)
+
+
+## The card is playable and every cost on it can be paid right now (no turn check).
+func can_pay_card(p: PlayerState, card: CardInstance) -> bool:
+	if not card.data.playable:
+		return false
+	var ctx := _ctx(p, card)
 	for e in card.get_on_play():
 		if e and not e.can_pay(ctx):
 			return false
@@ -547,6 +554,8 @@ func trash_card(p: PlayerState, c: CardInstance, destroy: bool) -> void:
 	ctx.from_pile = from
 	if destroy and not c.data.on_destroy.is_empty():
 		await _run(c.data.on_destroy, ctx)
+	elif not destroy and not c.data.on_remove.is_empty():
+		await _run(c.data.on_remove, ctx)
 	await _fire(GameRules.Trigger.CARD_DESTROYED if destroy else GameRules.Trigger.CARD_REMOVED, p, ctx)
 	if from == GameRules.PILE_HAND:
 		await _fire(GameRules.Trigger.CARD_TRASHED_FROM_HAND, p, ctx)
@@ -595,10 +604,17 @@ func buy_instance(p: PlayerState, card: CardInstance, cost: int, zone_override :
 	var drawn := false
 	if zone_override >= 0:
 		dest = zone_override as GameRules.Zone
+	elif ctx.buy_draw and not p.draw_locked:
+		# The card's own on-buy draws it ("🂠 this"); a pending Rush Order stays.
+		drawn = true
+		dest = GameRules.Zone.HAND
 	elif p.next_buy_to_hand > 0 and not p.draw_locked:
 		p.next_buy_to_hand -= 1
 		drawn = true
 		dest = GameRules.Zone.HAND
+	# Its on-buy may have removed / destroyed it already (Ember: "🗑 this").
+	if p.removed.has(card) or p.destroyed.has(card):
+		place = false
 	if place:
 		if drawn:
 			await draw_specific(p, card)
@@ -950,9 +966,13 @@ func _fire(trigger: GameRules.Trigger, p: PlayerState, ctx: EffectContext) -> vo
 
 
 func _run(effects: Array, ctx: EffectContext) -> void:
+	ctx.cost_unpaid = false
 	for e in effects:
 		if e and not is_over:
 			await e.apply(ctx)
+			if ctx.cost_unpaid:
+				break
+	ctx.cost_unpaid = false
 	_absorb(ctx)
 
 

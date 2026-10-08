@@ -11,6 +11,9 @@ script = ExtResource("2_4h4eq")
 [sub_resource type="Resource" id="Resource_7xbf8"]
 script = ExtResource("3_i6ltj")
 
+[sub_resource type="Resource" id="Resource_on_buy_tinke0"]
+script = ExtResource("2_4h4eq")
+
 [resource]
 script = ExtResource("4_tqo8e")
 id = &"tinker"
@@ -19,3 +22,4 @@ display_name = "Tinker"
 on_play = Array[ExtResource("1_u8owc")]([SubResource("Resource_dxenn"), SubResource("Resource_7xbf8")])
 on_play_text = "↺ a trinket. 🂠"
 on_buy_text = "↺ a trinket"
+on_buy = Array[ExtResource("1_u8owc")]([SubResource("Resource_on_buy_tinke0")])
