@@ -50,6 +50,9 @@ var pending_choice: ChoiceRequest
 ## If valid, called with a ChoiceRequest and must return the picks
 ## synchronously (used by the simulator / tests).
 var auto_chooser: Callable
+## If valid, called with this encounter once in start(), after the market is stocked
+## and the deck shuffled, before the first hand is drawn (test runs: ContentTest).
+var on_setup: Callable
 
 ## >0 while an action is resolving (no new actions can start).
 var _busy := 0
@@ -87,6 +90,8 @@ func start() -> void:
 	shop.trinket_weight = _trinket_weight
 	shop.setup(data, rng)
 	_shuffle(player.draw_pile)
+	if on_setup.is_valid():
+		on_setup.call(self)
 	log_line("[b]%s[/b] — have %d coins after %d rounds." % [data.display_name, coin_target(), data.rounds])
 	_start_async()
 

@@ -40,6 +40,19 @@ It answers choices with `SimBot.choose` (gets rid of curses / weakest cards, kee
 - The **Sets** tab edits `scripts/data/card_sets.gd` through `card_sets_file.gd`: it rewrites only the `enum Id`, `_INFO` and `ALWAYS_SOLD` blocks and leaves the rest of the file alone. After a save it recompiles `CardSets` and the data scripts that export `CardSets.Id`, so the Inspector's set menus pick up a new set without restarting the editor.
 - Excluded from the web export (`export_presets.cfg`).
 
+### Testing pieces
+
+From the Content tab, **▶ Test this** on a card, curse, charm, trinket or enhancement runs the main scene with it added on top of the starting loadout; on an encounter it plays that encounter, on an enemy it swaps that enemy into the encounter. **+ Test kit** adds the piece to the test bar instead (cards stack ×N, trinkets get a level), and **▶ Play test** runs the whole kit. The bar also picks the encounter (or random, as Main does) and has these options:
+
+| Option | Effect |
+|---|---|
+| Start with them | Cards go into the starting deck, charms and trinkets into your slots (off: only the market option applies) |
+| Cards in opening hand | The test cards are in your first hand. Enhancements go on the test cards, or on a random starting card if there are none |
+| In round 1 market | Round 1's market starts with the test pieces in its first slots (to test on-buy effects); later rounds restock normally |
+| + coins | Extra starting coins |
+
+Enemy charms in the kit go to the enemy. How it works: the tab writes `user://content_test.json` and presses Play; `encounter_screen.gd` reads it through `scripts/core/content_test.gd` (debug builds only), deletes the file, and keeps the test in memory so **Play again** repeats it. A normal F5 run has no file and plays as usual. The run shows a coral **TEST** strip at the top and a line in the log. The only engine hook is `Encounter.on_setup`, called in `start()` after the market is stocked and the deck shuffled, before the first draw.
+
 ## Playtesting on a phone
 
 ### Option A: GitHub Pages (from anywhere)

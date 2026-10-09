@@ -17,6 +17,8 @@ extends Control
 
 
 const LARGE_W := 340.0
+## Test runs from the editor's Content tab.
+const ContentTest := preload("res://scripts/core/content_test.gd")
 
 var enc: Encounter
 var pending_enh_slot := -1
@@ -82,10 +84,19 @@ func _ready() -> void:
 
 	if not encounter_pool.is_empty():
 		encounter_data = encounter_pool.pick_random()
+	# A test run from the editor's Content tab (see ContentTest).
+	ContentTest.load_pending()
+	if ContentTest.is_active():
+		encounter_data = ContentTest.encounter(encounter_data)
 	if encounter_data == null or loadout == null:
 		push_error("Assign encounter_pool (or encounter_data) and loadout on the Main node.")
 		return
-	enc = Encounter.new(encounter_data, loadout)
+	if ContentTest.is_active():
+		enc = Encounter.new(encounter_data, ContentTest.loadout(loadout))
+		enc.on_setup = func(e: Encounter): ContentTest.setup(e)
+		_show_test_banner()
+	else:
+		enc = Encounter.new(encounter_data, loadout)
 	enc.logged.connect(func(t: String): _log_text += t + "\n")
 	enc.changed.connect(_refresh)
 	enc.enemy_turn_pending.connect(_on_enemy_pending)
@@ -95,6 +106,19 @@ func _ready() -> void:
 	await get_tree().process_frame
 	_hand.spawn_point = _pile.target_center()
 	enc.start()
+
+
+## A small strip at the top while a Content-tab test is running.
+func _show_test_banner() -> void:
+	var l := Label.new()
+	l.text = "TEST  ·  " + ContentTest.summary()
+	l.add_theme_font_size_override("font_size", 13)
+	l.add_theme_color_override("font_color", Palette.CORAL)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	l.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	l.position.y = 2
+	add_child(l)
 
 
 # ================================================================== flow
