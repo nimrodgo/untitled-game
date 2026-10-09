@@ -2,7 +2,7 @@
 
 All content is Godot **Resources** (`.tres`). There are three ways to make and edit them:
 
-- **Content tab (easiest):** the **Content** tab at the top of the editor, next to 2D / 3D / Script (the `addons/content_browser` plugin). It shows everything in `content/test/` as card-style tiles, one tab per kind, grouped by set, with search, a set filter and sorting. Click a tile to edit it on the right: names, costs, sets, texts (with an icon palette for 🪙 🂠 ⚡ …), every effect and its values (add / reorder / remove), trinket levels, enemy intents, encounter sets and slots, decks and pools (with counts). **New…**, **Duplicate** and **Delete…** (moves the file to the recycle bin and lists what still uses it) are there too. Every edit is saved to the `.tres` file about half a second after you stop typing; there is no undo, so use git. Anything it can't edit inline (textures) is one click away in the Inspector, which follows the selection.
+- **Content tab (easiest):** the **Content** tab at the top of the editor, next to 2D / 3D / Script (the `addons/content_browser` plugin). It shows everything in `content/test/` as card-style tiles, one tab per kind, grouped by set, with search, a set filter and sorting. Click a tile to edit it on the right: names, costs, sets, texts (with an icon palette for 🪙 🂠 ⚡ …), every effect and its values (add / reorder / remove), trinket levels, enemy intents, encounter sets and slots, decks and pools (with counts). A **Sets** tab adds and edits card sets (see [Card sets](#card-sets)). **New…**, **Duplicate** and **Delete…** (moves the file to the recycle bin and lists what still uses it) are there too. Every edit is saved to the `.tres` file about half a second after you stop typing; there is no undo, so use git. Anything it can't edit inline (textures) is one click away in the Inspector, which follows the selection.
 - **In the editor:** FileSystem → right-click a folder → **New Resource** → pick the type (e.g. `CardData`), then fill in the Inspector. Add effects with the array's **+** button → **New *XxxEffect***.
 - **From a script:** see `tools/build_test_content.gd`, which regenerates `content/test/`. If you edit test `.tres` files by hand, re-running that script **overwrites** your changes.
 
@@ -103,6 +103,8 @@ Intent text is auto-phrased from the player's point of view, for example "You lo
 ## Card sets
 
 Every card, item, trinket, enhancement and curse has exactly one `card_set` (enum `CardSets.Id` in `scripts/data/card_sets.gd`). The set tints the tile (`CardSets.color`) and decides what an encounter sells. **The enum numbers are stored in the `.tres` files: only ever append new ids.** Names and colors are placeholders.
+
+**Adding or editing a set:** use the **Sets** tab of the Content tab. **New…** appends a set to `CardSets.Id` (next free number, key made from the name, e.g. `DEEP_SEA`) with a name and color in `_INFO`; selecting a set edits its name, color, description (the enum comment) and whether it's in `ALWAYS_SOLD`. It rewrites `scripts/data/card_sets.gd` for you and never renames keys or removes sets. The tab also shows how many pieces each set has and which encounters sell it, so the table below may lag behind it.
 
 | Set | Pieces | Theme |
 |---|---|---|

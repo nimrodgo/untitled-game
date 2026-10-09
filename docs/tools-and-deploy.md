@@ -37,6 +37,7 @@ It answers choices with `SimBot.choose` (gets rid of curses / weakest cards, kee
 - The content scripts aren't `@tool`, so in the editor their methods can't run. Tiles show your custom text as written; when a text field is empty, the tile shows an `auto:` summary of the effects instead of the game's generated wording.
 - Edits are written with `ResourceSaver`, so a file gets re-serialized in Godot's normal format the first time you edit it (expect some reordering in the git diff).
 - Files changed outside the editor (git, a text editor, the generator scripts) are reloaded when you switch back to the tab, or with **Reload from disk**.
+- The **Sets** tab edits `scripts/data/card_sets.gd` through `card_sets_file.gd`: it rewrites only the `enum Id`, `_INFO` and `ALWAYS_SOLD` blocks and leaves the rest of the file alone. After a save it recompiles `CardSets` and the data scripts that export `CardSets.Id`, so the Inspector's set menus pick up a new set without restarting the editor.
 - Excluded from the web export (`export_presets.cfg`).
 
 ## Playtesting on a phone

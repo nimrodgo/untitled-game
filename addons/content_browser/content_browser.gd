@@ -26,7 +26,15 @@ const CATS := [
 	{"name": "Enemy items", "one": "Enemy item", "dir": "enemy_items", "script": "res://scripts/data/item_data.gd"},
 	{"name": "Encounters", "one": "Encounter", "dir": "encounters", "script": "res://scripts/data/encounter_data.gd"},
 	{"name": "Loadouts", "one": "Loadout", "dir": "loadouts", "script": "res://scripts/data/loadout_data.gd"},
+	# Not resources: the card sets themselves, stored in scripts/data/card_sets.gd.
+	{"name": "Sets", "one": "Set", "dir": "", "script": ""},
 ]
+## Scripts that use CardSets.Id in their exports: recompiled after a set is added so the
+## Inspector's set menus list it too.
+const SET_USERS := ["res://scripts/data/card_data.gd", "res://scripts/data/item_data.gd",
+	"res://scripts/data/trinket_data.gd", "res://scripts/data/enhancement_data.gd",
+	"res://scripts/data/encounter_data.gd"]
+const SetsFile := preload("res://addons/content_browser/card_sets_file.gd")
 ## Classes whose resources live in their own files. A property of one of these types is a
 ## reference (picked from the library); anything else is an owned sub-resource edited inline.
 const REF_DIRS := {
@@ -64,6 +72,10 @@ var _grid_queued := false
 var _panel_edit := false
 var _built := false
 var _del_target: Resource
+var _sets_file = SetsFile.new()
+var _sets_dirty := false
+var _sets_mtime := 0
+var _sel_set := -1        # selected set id on the Sets tab (-1 = none)
 
 var _tabs: TabBar
 var _search: LineEdit
@@ -98,6 +110,7 @@ func _ready() -> void:
 		ei.get_inspector().property_edited.connect(_on_inspector_edited)
 		ei.get_resource_filesystem().filesystem_changed.connect(_check_disk)
 	_scan_classes()
+	_load_sets()
 	_build_ui()
 	_load_all()
 	_refresh_grid()
@@ -136,9 +149,7 @@ func _build_ui() -> void:
 	_search.text_changed.connect(func(_t: String): _refresh_grid())
 	bar.add_child(_search)
 	_set_filter = OptionButton.new()
-	_set_filter.add_item("All sets", 0)
-	for id in _set_ids():
-		_set_filter.add_item(_set_name(id), id)
+	_rebuild_set_filter()
 	_set_filter.item_selected.connect(func(_i: int): _refresh_grid())
 	bar.add_child(_set_filter)
 	_sort = OptionButton.new()
@@ -237,7 +248,7 @@ func _scan_classes() -> void:
 func _load_all() -> void:
 	_lib.clear()
 	for c in CATS:
-		if not _lib.has(c["dir"]):
+		if c["dir"] != "" and not _lib.has(c["dir"]):
 			_lib[c["dir"]] = _load_dir(c["dir"])
 
 
@@ -271,6 +282,11 @@ func _check_disk(force := false) -> void:
 		_prop_cache.clear()
 		_scan_classes()
 	var changed := false
+	var sm := FileAccess.get_modified_time(SetsFile.PATH)
+	if (force or sm != _sets_mtime) and not _sets_dirty:
+		_load_sets()
+		_rebuild_set_filter()
+		changed = true
 	for dir in _lib.keys():
 		var files := _files_in(dir)
 		var known := PackedStringArray()
@@ -327,6 +343,8 @@ func _touch(top_res: Resource, from_panel := true) -> void:
 
 ## Writes every pending edit to disk now.
 func flush() -> void:
+	if _sets_dirty:
+		_save_sets()
 	if _pending.is_empty():
 		return
 	var saved := PackedStringArray()
@@ -385,6 +403,9 @@ func _refresh_grid() -> void:
 		return
 	_clear(_grid_box)
 	_tiles.clear()
+	if _is_sets_tab():
+		_refresh_sets_grid()
+		return
 	var all: Array = _lib.get(CATS[_cat]["dir"], [])
 	var list := _visible(all)
 	_count.text = "%d of %d" % [list.size(), all.size()]
@@ -473,6 +494,9 @@ func _on_tile_input(ev: InputEvent, r: Resource) -> void:
 
 func _select(r: Resource) -> void:
 	flush()
+	if _sel_set >= 0:
+		_sel_set = -1
+		_queue_grid()
 	var prev := _selected
 	_selected = r
 	for x in [prev, r]:
@@ -521,16 +545,23 @@ func _flow() -> HFlowContainer:
 # ------------------------------------------------------------------------------ tiles
 
 func _make_tile(r: Resource, w: float, big: bool) -> Control:
-	var d := _parts(r)
+	var panel := _tile_from(_parts(r), w, big, r == _selected and not big, r.resource_path.get_file())
+	if not big:
+		panel.gui_input.connect(_on_tile_input.bind(r))
+	return panel
+
+
+## A tile from _parts()-style data (title, cost, tag, body, buy, footer, flavor, bg, badge).
+func _tile_from(d: Dictionary, w: float, big: bool, selected: bool, tip: String) -> Control:
 	# Text scale follows the tile width; the big preview keeps text readable, not huge.
 	var k := minf(w / TILE_W, 1.3 * _s) if big else w / TILE_W
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(w, 0.0 if big else w * 1.4)
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	panel.tooltip_text = r.resource_path.get_file()
+	panel.tooltip_text = tip
 	panel.set_meta("bg", d["bg"])
 	panel.set_meta("k", k)
-	_restyle(panel, r == _selected and not big)
+	_restyle(panel, selected)
 	var vb := VBoxContainer.new()
 	vb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vb.add_theme_constant_override("separation", int(4 * k))
@@ -578,8 +609,6 @@ func _make_tile(r: Resource, w: float, big: bool) -> Control:
 		vb.add_child(_buy_strip(d["buy"], k))
 	if big and d["flavor"] != "":
 		vb.add_child(_rich("[i]%s[/i]" % d["flavor"], 12 * k, Palette.MUTED, true))
-	if not big:
-		panel.gui_input.connect(_on_tile_input.bind(r))
 	return panel
 
 
@@ -815,6 +844,9 @@ func _build_detail() -> void:
 	_fields_box = null
 	_preview_holder = null
 	_title = null
+	if _sel_set >= 0:
+		_build_set_detail()
+		return
 	var r := _selected
 	if r == null:
 		_detail.add_child(_muted("Click a tile to see it here and edit it.\n\nEvery change is saved to its .tres file right away (use git to undo)."))
@@ -863,7 +895,17 @@ func _build_detail() -> void:
 
 
 func _refresh_preview() -> void:
-	if _selected == null or _preview_holder == null or not is_instance_valid(_preview_holder):
+	if _preview_holder == null or not is_instance_valid(_preview_holder):
+		return
+	if _sel_set >= 0:
+		var st = _sets_file.find_id(_sel_set)
+		if st:
+			_clear(_preview_holder)
+			_preview_holder.add_child(_make_set_tile(st, 300 * _s, true))
+			if _title and is_instance_valid(_title):
+				_title.text = st["name"]
+		return
+	if _selected == null:
 		return
 	_clear(_preview_holder)
 	_preview_holder.add_child(_make_tile(_selected, 300 * _s, true))
@@ -958,7 +1000,7 @@ func _int_field(obj: Object, p: Dictionary, v, box: VBoxContainer, top_res: Reso
 	var hint := int(p["hint"])
 	if hint == PROPERTY_HINT_ENUM:
 		var opt := OptionButton.new()
-		for e in _enum_items(p["hint_string"]):
+		for e in (_set_items() if n == "card_set" else _enum_items(p["hint_string"])):
 			opt.add_item(e[0], e[1])
 		var idx := opt.get_item_index(int(v))
 		if idx >= 0:
@@ -1054,8 +1096,8 @@ func _array_field(obj: Object, p: Dictionary, v, box: VBoxContainer, top_res: Re
 	var arr: Array = v if v is Array else []
 	if et == TYPE_INT and eh == PROPERTY_HINT_ENUM:
 		var flow := HFlowContainer.new()
-		for e in _enum_items(ecls):
-			if String(e[0]).to_upper() == "NONE":
+		for e in (_set_items() if n == "card_sets" else _enum_items(ecls)):
+			if String(e[0]).to_upper() == "NONE" or (n == "card_sets" and int(e[1]) == 0):
 				continue
 			var cb := CheckBox.new()
 			cb.text = e[0]
@@ -1247,6 +1289,9 @@ func _on_new_confirmed() -> void:
 	var nm := _new_name.text.strip_edges()
 	if nm == "":
 		return
+	if _is_sets_tab():
+		_add_set(nm)
+		return
 	var c: Dictionary = CATS[_cat]
 	var r := Resource.new()
 	r.set_script(load(c["script"]))
@@ -1349,6 +1394,210 @@ func _delete(r: Resource) -> void:
 		ei.get_resource_filesystem().scan()
 	_refresh_grid()
 	_set_status("Moved %s to the recycle bin." % p.get_file())
+
+
+# ------------------------------------------------------------------------------ card sets
+
+func _is_sets_tab() -> bool:
+	return CATS[_cat]["dir"] == ""
+
+
+func _load_sets() -> void:
+	if _sets_file.load_file():
+		_sets_mtime = FileAccess.get_modified_time(SetsFile.PATH)
+	else:
+		_set_status(_sets_file.error)
+
+
+func _save_sets() -> void:
+	_sets_dirty = false
+	var text: String = _sets_file.save_file()
+	if text == "":
+		_set_status(_sets_file.error)
+		return
+	_sets_mtime = FileAccess.get_modified_time(SetsFile.PATH)
+	if ei:
+		# Recompile CardSets (and the scripts whose exports use it) in the editor.
+		var sc = load(SetsFile.PATH)
+		if sc is Script:
+			sc.source_code = text
+			sc.reload(true)
+		for path in SET_USERS:
+			var u = load(path)
+			if u is Script:
+				u.reload(true)
+		_prop_cache.clear()
+		ei.get_resource_filesystem().update_file(SetsFile.PATH)
+	_set_status("Saved card_sets.gd")
+
+
+func _rebuild_set_filter() -> void:
+	var cur := _set_filter.get_selected_id() if _set_filter.item_count > 0 else 0
+	_set_filter.clear()
+	_set_filter.add_item("All sets", 0)
+	for id in _set_ids():
+		_set_filter.add_item(_set_name(id), id)
+	_set_filter.select(maxi(_set_filter.get_item_index(cur), 0))
+
+
+func _sets_changed() -> void:
+	_sets_dirty = true
+	if _save_timer and _save_timer.is_inside_tree():
+		_save_timer.start()
+	_rebuild_set_filter()
+	_refresh_preview()
+	_queue_grid()
+
+
+func _add_set(nm: String) -> void:
+	var st: Dictionary = _sets_file.add(nm)
+	_save_sets()
+	_rebuild_set_filter()
+	_selected = null
+	_sel_set = int(st["id"])
+	_refresh_grid()
+	_build_detail.call_deferred()
+	_set_status("Added set %s (CardSets.Id.%s = %d)" % [st["name"], st["key"], st["id"]])
+
+
+func _refresh_sets_grid() -> void:
+	var q := _search.text.strip_edges().to_lower()
+	var flow := _flow()
+	var n := 0
+	for st in _sets_file.sets:
+		if int(st["id"]) == 0:
+			continue
+		if q != "" and ("%s %s %s" % [st["name"], st["note"], st["key"]]).to_lower().find(q) < 0:
+			continue
+		var t := _make_set_tile(st, TILE_W * _s * _zoom.value, false)
+		t.gui_input.connect(_on_set_tile_input.bind(int(st["id"])))
+		flow.add_child(t)
+		n += 1
+	_count.text = "%d sets" % n
+	_grid_box.add_child(flow)
+	_grid_box.add_child(_muted("New… adds a set. Sets can't be deleted, because their numbers are stored in the content files: rename or reuse one instead."))
+
+
+## How many pieces of each kind are in set `id`, and which encounters sell it.
+func _set_usage(id: int) -> Dictionary:
+	var out := {}
+	for dir in ["cards", "curses", "items", "trinkets", "enhancements"]:
+		var n := 0
+		for r in _lib.get(dir, []):
+			if int(_g(r, "card_set", 0)) == id:
+				n += 1
+		out[dir] = n
+	var encs := []
+	for r in _lib.get("encounters", []):
+		var cs = _g(r, "card_sets", [])
+		if cs is Array and cs.has(id):
+			encs.append(_name(r))
+	out["encounters"] = encs
+	return out
+
+
+func _make_set_tile(st: Dictionary, w: float, big: bool) -> Control:
+	var id := int(st["id"])
+	var u := _set_usage(id)
+	var lines := []
+	if String(st["note"]) != "":
+		lines.append(st["note"])
+	var counts := []
+	for pair in [["cards", "card"], ["curses", "curse"], ["items", "item"], ["trinkets", "trinket"], ["enhancements", "upgrade"]]:
+		var c: int = u[pair[0]]
+		if c > 0:
+			counts.append("%d %s%s" % [c, pair[1], "" if c == 1 else "s"])
+	lines.append("[b]%s[/b]" % (_join(counts, " · ") if not counts.is_empty() else "Empty"))
+	var always: bool = _sets_file.always.has(st["key"])
+	if always:
+		lines.append("Sold in every encounter that lists sets")
+	elif not u["encounters"].is_empty():
+		lines.append("Sold in: " + _join(u["encounters"], ", "))
+	else:
+		lines.append("[color=#9fc3cf]No encounter sells it yet[/color]")
+	var d := {"title": st["name"], "cost": -1, "tag": "Always sold" if always else "",
+		"body": _join(lines, "\n"), "buy": "", "footer": "", "flavor": "", "bg": st["color"], "badge": ""}
+	return _tile_from(d, w, big, id == _sel_set and not big, "CardSets.Id.%s = %d" % [st["key"], id])
+
+
+func _on_set_tile_input(ev: InputEvent, id: int) -> void:
+	var mb := ev as InputEventMouseButton
+	if mb and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+		flush()
+		_selected = null
+		_sel_set = id
+		_queue_grid()
+		_build_detail.call_deferred()
+
+
+func _build_set_detail() -> void:
+	var st = _sets_file.find_id(_sel_set)
+	if st == null:
+		_detail.add_child(_muted("That set no longer exists."))
+		return
+	var id := int(st["id"])
+	_title = Label.new()
+	_title.text = st["name"]
+	_title.add_theme_font_size_override("font_size", int(20 * _s))
+	_detail.add_child(_title)
+	_detail.add_child(_muted("CardSets.Id.%s  ·  stored as %d in the content files" % [st["key"], id]))
+	var btns := HFlowContainer.new()
+	_btn(btns, "Show its cards", _show_set_pieces.bind(id, 0))
+	_btn(btns, "Items", _show_set_pieces.bind(id, 2))
+	_btn(btns, "Trinkets", _show_set_pieces.bind(id, 3))
+	_btn(btns, "Enhancements", _show_set_pieces.bind(id, 4))
+	_detail.add_child(btns)
+	_preview_holder = CenterContainer.new()
+	_detail.add_child(_preview_holder)
+	_refresh_preview()
+	_detail.add_child(HSeparator.new())
+	_fields_box = VBoxContainer.new()
+	_fields_box.size_flags_horizontal = SIZE_EXPAND_FILL
+	_fields_box.add_theme_constant_override("separation", int(4 * _s))
+	_detail.add_child(_fields_box)
+
+	var name_le := LineEdit.new()
+	name_le.text = st["name"]
+	name_le.text_changed.connect(func(t: String):
+		st["name"] = t
+		_sets_changed())
+	_row(_fields_box, "display_name", name_le)
+	var cp := ColorPickerButton.new()
+	cp.color = st["color"]
+	cp.edit_alpha = false
+	cp.custom_minimum_size.y = 24 * _s
+	cp.color_changed.connect(func(c: Color):
+		st["color"] = c
+		_sets_changed())
+	_row(_fields_box, "color", cp)
+	var note_le := LineEdit.new()
+	note_le.text = st["note"]
+	note_le.placeholder_text = "What the set is about (a comment in card_sets.gd)"
+	note_le.text_changed.connect(func(t: String):
+		st["note"] = t.replace("\n", " ").strip_edges()
+		_sets_changed())
+	_row(_fields_box, "description", note_le)
+	var al := CheckBox.new()
+	al.text = "Sold in every encounter (like Utility and Coins)"
+	al.button_pressed = _sets_file.always.has(st["key"])
+	al.toggled.connect(func(on: bool):
+		if on and not _sets_file.always.has(st["key"]):
+			_sets_file.always.append(st["key"])
+		elif not on:
+			_sets_file.always.erase(st["key"])
+		_sets_changed())
+	_fields_box.add_child(al)
+	_fields_box.add_child(_muted("To put a piece in this set, pick it in that piece's Card Set field. To sell the set, tick it in an encounter's Card Sets."))
+
+
+func _show_set_pieces(id: int, tab: int) -> void:
+	_set_filter.select(maxi(_set_filter.get_item_index(id), 0))
+	_sel_set = -1
+	if _cat == tab:
+		_refresh_grid()
+	else:
+		_tabs.current_tab = tab
+	_build_detail.call_deferred()
 
 
 # ------------------------------------------------------------------------------ text helpers
@@ -1601,20 +1850,39 @@ func _is_file_res(x) -> bool:
 	return x is Resource and x.resource_path != "" and not x.resource_path.contains("::")
 
 
+## Set ids, names and colors come from card_sets.gd as last read / written by this
+## panel (so a set added here shows up at once), falling back to CardSets.
 func _set_ids() -> Array:
 	var out := []
-	for v in CardSets.Id.values():
-		if int(v) != 0:
-			out.append(int(v))
+	for st in _sets_file.sets:
+		if int(st["id"]) != 0:
+			out.append(int(st["id"]))
+	if out.is_empty():
+		for v in CardSets.Id.values():
+			if int(v) != 0:
+				out.append(int(v))
+	return out
+
+
+func _set_items() -> Array:
+	var out := [["No set", 0]]
+	for id in _set_ids():
+		out.append([_set_name(id), id])
 	return out
 
 
 func _set_name(id: int) -> String:
+	var st = _sets_file.find_id(id)
+	if st:
+		return st["name"]
 	var info = CardSets._INFO.get(id)
 	return info[0] if info else "Set %d" % id
 
 
 func _set_color(id: int) -> Color:
+	var st = _sets_file.find_id(id)
+	if st:
+		return st["color"]
 	var info = CardSets._INFO.get(id)
 	return info[1] if info else Palette.PANEL
 
