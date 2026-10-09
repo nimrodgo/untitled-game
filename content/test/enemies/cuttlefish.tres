@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://dtnfbbr7q13we" path="res://scripts/data/effects/discard_random_effect.gd" id="3_7fl0m"]
 [ext_resource type="Script" uid="uid://cpogkm2ysngib" path="res://scripts/data/effects/steal_coins_effect.gd" id="4_aikjv"]
 [ext_resource type="Script" uid="uid://dbya0a1rrhnay" path="res://scripts/data/effects/draw_lock_effect.gd" id="5_hdlly"]
-[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="6_qvadr"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/charm_data.gd" id="6_qvadr"]
 [ext_resource type="Script" uid="uid://wehshrsqaulc" path="res://scripts/data/enemy_data.gd" id="7_uc53m"]
 
 [sub_resource type="Resource" id="Resource_0qdi3"]

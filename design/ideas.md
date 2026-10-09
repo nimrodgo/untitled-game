@@ -62,7 +62,7 @@
 - Draw 1 card. Draw a card from the bottom of your deck
 - Reduce encounter target by 3
 - This card can have infinite upgrades (does nothing at first, gets on-play effects from enhancements)
-## Item Ideas
+## Charm Ideas
 - The first card you play each turn is destroyed
 - When you remove a card gain 2 coins
 - When you destroy a card gain 3 coins

@@ -9,7 +9,7 @@
 [ext_resource type="Resource" path="res://content/test/curses/dead_weight.tres" id="7_e8fx1"]
 [ext_resource type="Resource" uid="uid://blp5arycf7mlw" path="res://content/test/curses/driftwood.tres" id="8_uifrx"]
 [ext_resource type="Script" uid="uid://3ixj6y1hac5i" path="res://scripts/data/effects/add_random_curse_effect.gd" id="9_yd0xp"]
-[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="10_cfnne"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/charm_data.gd" id="10_cfnne"]
 [ext_resource type="Script" uid="uid://wehshrsqaulc" path="res://scripts/data/enemy_data.gd" id="11_86p16"]
 
 [sub_resource type="Resource" id="Resource_njlf4"]

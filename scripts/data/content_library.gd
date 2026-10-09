@@ -1,6 +1,6 @@
 class_name ContentLibrary
 extends RefCounted
-## Every card, item, trinket and enhancement under CONTENT_DIR, so an encounter only has to
+## Every card, charm, trinket and enhancement under CONTENT_DIR, so an encounter only has to
 ## name its card sets (EncounterData.card_sets) instead of listing each piece.
 ## Curses (content/test/curses) are never sold, so they are not loaded here.
 
@@ -13,8 +13,8 @@ static func cards() -> Array:
 	return _load("cards")
 
 
-static func items() -> Array:
-	return _load("items")
+static func charms() -> Array:
+	return _load("charms")
 
 
 static func trinkets() -> Array:

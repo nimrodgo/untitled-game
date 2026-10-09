@@ -16,7 +16,7 @@ const PILE_DISCARD := 4
 ## "Remove / destroy" pick from the deck, hand or discard unless stated otherwise.
 const PILES_ALL := PILE_HAND | PILE_DRAW | PILE_DISCARD
 
-## Moments that passive items can react to.
+## Moments that passive charms can react to.
 enum Trigger {
 	ENCOUNTER_START,
 	ROUND_START,
@@ -24,7 +24,7 @@ enum Trigger {
 	BEFORE_CARD_BUY,       ## Fires before a card is placed; can change its destination.
 	CARD_BOUGHT,
 	CARD_PLAYED,
-	ITEM_BOUGHT,
+	CHARM_BOUGHT,
 	TRINKET_USED,
 	OPPONENT_CARD_BOUGHT,
 	OPPONENT_CARD_PLAYED,
@@ -37,7 +37,7 @@ enum Trigger {
 	CARD_REMOVED,          ## A card was removed for the encounter.
 	CARD_DESTROYED,        ## A card was destroyed permanently.
 	CARD_TRASHED_FROM_HAND, ## A card in your hand was removed or destroyed.
-	SHOP_BUY,              ## Any purchase: a card, an item (not the item just bought), a trinket or upgrade, an enhancement.
+	SHOP_BUY,              ## Any purchase: a card, a charm (not the charm just bought), a trinket or upgrade, an enhancement.
 }
 
 ## Terminology: a TURN is your whole round (draw a hand, act until you pass).
@@ -56,7 +56,7 @@ const MAX_TRINKETS := 3
 
 ## Which purchases use up your one action for the turn.
 const CARD_BUY_IS_ACTION := true
-const ITEM_BUY_IS_ACTION := true
+const CHARM_BUY_IS_ACTION := true
 const TRINKET_BUY_IS_ACTION := true
 const ENHANCEMENT_BUY_IS_ACTION := true
 ## Selling a trinket (drag it onto the market) is a free action.

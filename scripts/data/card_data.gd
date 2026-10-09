@@ -37,7 +37,7 @@ extends Resource
 ## This card can hold any number of enhancements (normally only one), including
 ## the same one more than once.
 @export var unlimited_enhancements: bool = false
-## Which set this belongs to (see CardSets). One set per card/item/trinket.
+## Which set this belongs to (see CardSets). One set per card/charm/trinket.
 @export var card_set: CardSets.Id = CardSets.Id.NONE
 @export var art: Texture2D
 @export var tags: PackedStringArray = []

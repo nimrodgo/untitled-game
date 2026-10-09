@@ -49,9 +49,9 @@ static func take_turn(enc: Encounter) -> void:
 			if v > best_value:
 				best_value = v
 				best = enc.buy_card.bind(slot)
-		for slot in enc.shop.items.size():
-			if enc.can_buy_item(slot) and future > 0.4 and me.coins >= enc.item_price(enc.shop.items[slot]) + 3:
-				best = enc.buy_item.bind(slot)
+		for slot in enc.shop.charms.size():
+			if enc.can_buy_charm(slot) and future > 0.4 and me.coins >= enc.charm_price(enc.shop.charms[slot]) + 3:
+				best = enc.buy_charm.bind(slot)
 				break
 
 	if best.is_valid():

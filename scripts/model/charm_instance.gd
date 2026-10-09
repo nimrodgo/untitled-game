@@ -1,13 +1,13 @@
-class_name ItemInstance
+class_name CharmInstance
 extends RefCounted
 
-var data: ItemData
+var data: CharmData
 var uses_this_round := 0
 var uses_this_encounter := 0
 
 
-func _init(item_data: ItemData) -> void:
-	data = item_data
+func _init(charm_data: CharmData) -> void:
+	data = charm_data
 
 
 func can_trigger() -> bool:

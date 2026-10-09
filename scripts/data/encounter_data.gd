@@ -10,7 +10,7 @@ extends Resource
 @export var enemy: EnemyData
 
 @export_group("Shop")
-## Just name the sets: every card, item, trinket and enhancement of these sets, plus Utility
+## Just name the sets: every card, charm, trinket and enhancement of these sets, plus Utility
 ## and Coins (CardSets.ALWAYS_SOLD), is sold here (see ContentLibrary). Leave
 ## empty to use only the pools below.
 @export var card_sets: Array[CardSets.Id] = []
@@ -18,11 +18,11 @@ extends Resource
 ## duplicates make a card more likely. The market restocks from the pool at the
 ## start of every round (bought slots stay empty until then).
 @export var card_pool: Array[CardData] = []
-@export var item_pool: Array[ItemData] = []
+@export var charm_pool: Array[CharmData] = []
 @export var trinket_pool: Array[TrinketData] = []
 @export var enhancement_pool: Array[EnhancementData] = []
 @export var card_slots: int = 5
-@export var item_slots: int = 1
+@export var charm_slots: int = 1
 @export var trinket_slots: int = 1
 @export var enhancement_slots: int = 1
 ## Legacy: refill a card slot immediately when it's bought (off = restock per round).
@@ -43,11 +43,11 @@ func get_card_pool() -> Array[CardData]:
 	return out
 
 
-func get_item_pool() -> Array[ItemData]:
-	var out: Array[ItemData] = []
-	for c in _from_sets(ContentLibrary.items()):
+func get_charm_pool() -> Array[CharmData]:
+	var out: Array[CharmData] = []
+	for c in _from_sets(ContentLibrary.charms()):
 		out.append(c)
-	out.append_array(item_pool)
+	out.append_array(charm_pool)
 	return out
 
 

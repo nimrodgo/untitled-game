@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dyr446y3ejoay"]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://dyr446y3ejoay"]
 
 [ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_eff"]
 [ext_resource type="Script" uid="uid://dluv2ln5einag" path="res://scripts/data/effects/set_buy_destination_effect.gd" id="2_dest"]
-[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="3_item"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/charm_data.gd" id="3_charm"]
 
 [sub_resource type="Resource" id="Resource_top"]
 script = ExtResource("2_dest")
@@ -10,7 +10,7 @@ destination = 1
 optional = true
 
 [resource]
-script = ExtResource("3_item")
+script = ExtResource("3_charm")
 id = &"top_shelf"
 display_name = "Top Shelf"
 trigger = 3

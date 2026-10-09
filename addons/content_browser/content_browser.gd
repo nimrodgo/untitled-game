@@ -8,7 +8,7 @@ extends VBoxContainer
 ##
 ## Editing is generic: the panel is built from each resource's exported properties, so new
 ## fields and new effect types show up here without touching this script. Arrays of effects
-## (and trinket levels, enemy intents...) are edited inline; arrays of cards / items / ...
+## (and trinket levels, enemy intents...) are edited inline; arrays of cards / charms / ...
 ## that live in their own files (decks, pools) are edited as reference lists with counts.
 ##
 ## The content scripts are not @tool, so in the editor their methods can't run (Godot gives
@@ -19,11 +19,11 @@ const ROOT := "res://content/test/"
 const CATS := [
 	{"name": "Cards", "one": "Card", "dir": "cards", "script": "res://scripts/data/card_data.gd"},
 	{"name": "Curses", "one": "Curse", "dir": "curses", "script": "res://scripts/data/card_data.gd"},
-	{"name": "Items", "one": "Item", "dir": "items", "script": "res://scripts/data/item_data.gd"},
+	{"name": "Charms", "one": "Charm", "dir": "charms", "script": "res://scripts/data/charm_data.gd"},
 	{"name": "Trinkets", "one": "Trinket", "dir": "trinkets", "script": "res://scripts/data/trinket_data.gd"},
 	{"name": "Enhancements", "one": "Enhancement", "dir": "enhancements", "script": "res://scripts/data/enhancement_data.gd"},
 	{"name": "Enemies", "one": "Enemy", "dir": "enemies", "script": "res://scripts/data/enemy_data.gd"},
-	{"name": "Enemy items", "one": "Enemy item", "dir": "enemy_items", "script": "res://scripts/data/item_data.gd"},
+	{"name": "Enemy charms", "one": "Enemy charm", "dir": "enemy_charms", "script": "res://scripts/data/charm_data.gd"},
 	{"name": "Encounters", "one": "Encounter", "dir": "encounters", "script": "res://scripts/data/encounter_data.gd"},
 	{"name": "Loadouts", "one": "Loadout", "dir": "loadouts", "script": "res://scripts/data/loadout_data.gd"},
 	# Not resources: the card sets themselves, stored in scripts/data/card_sets.gd.
@@ -31,7 +31,7 @@ const CATS := [
 ]
 ## Scripts that use CardSets.Id in their exports: recompiled after a set is added so the
 ## Inspector's set menus list it too.
-const SET_USERS := ["res://scripts/data/card_data.gd", "res://scripts/data/item_data.gd",
+const SET_USERS := ["res://scripts/data/card_data.gd", "res://scripts/data/charm_data.gd",
 	"res://scripts/data/trinket_data.gd", "res://scripts/data/enhancement_data.gd",
 	"res://scripts/data/encounter_data.gd"]
 const SetsFile := preload("res://addons/content_browser/card_sets_file.gd")
@@ -39,7 +39,7 @@ const SetsFile := preload("res://addons/content_browser/card_sets_file.gd")
 ## reference (picked from the library); anything else is an owned sub-resource edited inline.
 const REF_DIRS := {
 	"CardData": ["cards", "curses"],
-	"ItemData": ["items", "enemy_items"],
+	"CharmData": ["charms", "enemy_charms"],
 	"TrinketData": ["trinkets"],
 	"EnhancementData": ["enhancements"],
 	"EnemyData": ["enemies"],
@@ -642,7 +642,7 @@ func _parts(r: Resource) -> Dictionary:
 	var cls := String(s.get_global_name()) if s else ""
 	match cls:
 		"CardData": _card_parts(r, d)
-		"ItemData": _item_parts(r, d)
+		"CharmData": _charm_parts(r, d)
 		"TrinketData": _trinket_parts(r, d)
 		"EnhancementData": _enh_parts(r, d)
 		"EnemyData": _enemy_parts(r, d)
@@ -689,7 +689,7 @@ func _card_parts(r: Resource, d: Dictionary) -> void:
 	d["bg"] = Palette.CARD_CURSE if curse else _bg_for_set(r, Palette.CARD)
 
 
-func _item_parts(r: Resource, d: Dictionary) -> void:
+func _charm_parts(r: Resource, d: Dictionary) -> void:
 	d["cost"] = _cost(r)
 	var bits := [_enum_label(r, "trigger")]
 	var lpe := int(_g(r, "limit_per_encounter", 0))
@@ -711,7 +711,7 @@ func _item_parts(r: Resource, d: Dictionary) -> void:
 	if cb != 0:
 		flags.append("+%d 🪙 on every gain" % cb)
 	d["footer"] = _join(flags, " · ")
-	d["bg"] = _bg_for_set(r, Palette.CARD_ITEM)
+	d["bg"] = _bg_for_set(r, Palette.CARD_CHARM)
 
 
 func _trinket_parts(r: Resource, d: Dictionary) -> void:
@@ -784,9 +784,9 @@ func _enemy_parts(r: Resource, d: Dictionary) -> void:
 			lines.append("%s[b]%s[/b] [color=#9fc3cf]%s[/color]  %s" % [
 				"▶ " if i == start else "", it.get("display_name"), _enum_label(it, "kind"), desc])
 	d["body"] = _join(lines, "\n")
-	var items = _g(r, "items", [])
-	if items is Array and not items.is_empty():
-		d["footer"] = "Items: " + _names(items)
+	var charms = _g(r, "charms", [])
+	if charms is Array and not charms.is_empty():
+		d["footer"] = "Charms: " + _names(charms)
 	var c = _g(r, "color", Palette.CORAL)
 	d["bg"] = c.darkened(0.55) if c is Color else Palette.PANEL
 
@@ -804,9 +804,9 @@ func _encounter_parts(r: Resource, d: Dictionary) -> void:
 		lines.append("Sets: %s [color=#9fc3cf](+ Utility, Coins)[/color]" % _join(names, ", "))
 	else:
 		lines.append("Sets: none (pools only)")
-	lines.append("Market: %d cards · %d items · %d trinkets · %d upgrades" % [
-		int(_g(r, "card_slots", 0)), int(_g(r, "item_slots", 0)), int(_g(r, "trinket_slots", 0)), int(_g(r, "enhancement_slots", 0))])
-	for pool in ["card_pool", "item_pool", "trinket_pool", "enhancement_pool"]:
+	lines.append("Market: %d cards · %d charms · %d trinkets · %d upgrades" % [
+		int(_g(r, "card_slots", 0)), int(_g(r, "charm_slots", 0)), int(_g(r, "trinket_slots", 0)), int(_g(r, "enhancement_slots", 0))])
+	for pool in ["card_pool", "charm_pool", "trinket_pool", "enhancement_pool"]:
 		var arr = _g(r, pool, [])
 		if arr is Array and not arr.is_empty():
 			lines.append("%s: %s" % [pool.capitalize(), _names(arr)])
@@ -826,7 +826,7 @@ func _loadout_parts(r: Resource, d: Dictionary) -> void:
 	var lines := []
 	if deck is Array:
 		lines.append(_counted(deck))
-	for key in ["items", "trinkets"]:
+	for key in ["charms", "trinkets"]:
 		var arr = _g(r, key, [])
 		if arr is Array and not arr.is_empty():
 			lines.append("%s: %s" % [key.capitalize(), _names(arr)])
@@ -1481,7 +1481,7 @@ func _refresh_sets_grid() -> void:
 ## How many pieces of each kind are in set `id`, and which encounters sell it.
 func _set_usage(id: int) -> Dictionary:
 	var out := {}
-	for dir in ["cards", "curses", "items", "trinkets", "enhancements"]:
+	for dir in ["cards", "curses", "charms", "trinkets", "enhancements"]:
 		var n := 0
 		for r in _lib.get(dir, []):
 			if int(_g(r, "card_set", 0)) == id:
@@ -1503,7 +1503,7 @@ func _make_set_tile(st: Dictionary, w: float, big: bool) -> Control:
 	if String(st["note"]) != "":
 		lines.append(st["note"])
 	var counts := []
-	for pair in [["cards", "card"], ["curses", "curse"], ["items", "item"], ["trinkets", "trinket"], ["enhancements", "upgrade"]]:
+	for pair in [["cards", "card"], ["curses", "curse"], ["charms", "charm"], ["trinkets", "trinket"], ["enhancements", "upgrade"]]:
 		var c: int = u[pair[0]]
 		if c > 0:
 			counts.append("%d %s%s" % [c, pair[1], "" if c == 1 else "s"])
@@ -1543,7 +1543,7 @@ func _build_set_detail() -> void:
 	_detail.add_child(_muted("CardSets.Id.%s  ·  stored as %d in the content files" % [st["key"], id]))
 	var btns := HFlowContainer.new()
 	_btn(btns, "Show its cards", _show_set_pieces.bind(id, 0))
-	_btn(btns, "Items", _show_set_pieces.bind(id, 2))
+	_btn(btns, "Charms", _show_set_pieces.bind(id, 2))
 	_btn(btns, "Trinkets", _show_set_pieces.bind(id, 3))
 	_btn(btns, "Enhancements", _show_set_pieces.bind(id, 4))
 	_detail.add_child(btns)

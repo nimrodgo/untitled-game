@@ -3,7 +3,7 @@ extends RefCounted
 ## The encounter's shop. Slots hold data or null (empty).
 
 var cards: Array = []
-var items: Array = []
+var charms: Array = []
 var trinkets: Array = []
 var enhancements: Array = []
 
@@ -11,7 +11,7 @@ var _data: EncounterData
 var _card_pool: Array[CardData] = []
 var _trinket_pool: Array[TrinketData] = []
 var _rng: RandomNumberGenerator
-var _item_bag: Array = []
+var _charm_bag: Array = []
 var _enh_pool: Array = []
 ## TrinketData -> weight (0 = never shown, 1 = normal, 2 = twice as likely).
 ## The encounter sets this so owned trinkets show up more often (buying one
@@ -24,13 +24,13 @@ func setup(data: EncounterData, rng: RandomNumberGenerator) -> void:
 	_rng = rng
 	_card_pool = data.get_card_pool()
 	_trinket_pool = data.get_trinket_pool()
-	_item_bag = _shuffled(data.get_item_pool())
+	_charm_bag = _shuffled(data.get_charm_pool())
 	_enh_pool = data.get_enhancement_pool()
-	cards.clear(); items.clear(); trinkets.clear(); enhancements.clear()
+	cards.clear(); charms.clear(); trinkets.clear(); enhancements.clear()
 	for i in data.card_slots:
 		cards.append(_random_card())
-	for i in data.item_slots:
-		items.append(_item_bag.pop_back() if not _item_bag.is_empty() else null)
+	for i in data.charm_slots:
+		charms.append(_charm_bag.pop_back() if not _charm_bag.is_empty() else null)
 	for i in data.trinket_slots:
 		trinkets.append(null)
 	restock_trinkets()
@@ -40,13 +40,13 @@ func setup(data: EncounterData, rng: RandomNumberGenerator) -> void:
 
 
 ## New round: fresh cards, trinkets and enhancements in every slot; sold-out
-## item slots are refilled from what's left in their pool.
+## charm slots are refilled from what's left in their pool.
 func restock() -> void:
 	for i in cards.size():
 		cards[i] = _random_card()
-	for i in items.size():
-		if items[i] == null and not _item_bag.is_empty():
-			items[i] = _item_bag.pop_back()
+	for i in charms.size():
+		if charms[i] == null and not _charm_bag.is_empty():
+			charms[i] = _charm_bag.pop_back()
 	restock_trinkets()
 	_roll_enhancements()
 
@@ -121,9 +121,9 @@ func restock_card_slot(slot: int) -> void:
 	cards[slot] = _random_card()
 
 
-func take_item(slot: int) -> ItemData:
-	var it: ItemData = items[slot]
-	items[slot] = null
+func take_charm(slot: int) -> CharmData:
+	var it: CharmData = charms[slot]
+	charms[slot] = null
 	return it
 
 

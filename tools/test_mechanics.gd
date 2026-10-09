@@ -13,7 +13,7 @@ var checks := 0
 func _init() -> void:
 	var data: EncounterData = load(ENC)
 	_smoke_every_card(data)
-	_smoke_every_item_and_trinket(data)
+	_smoke_every_charm_and_trinket(data)
 	_rules(data)
 	_encounter_rules()
 	_enhancement_rules()
@@ -35,8 +35,8 @@ func _card(id: String) -> CardData:
 	return null
 
 
-func _item(id: String) -> ItemData:
-	return load("res://content/test/items/%s.tres" % id)
+func _charm(id: String) -> CharmData:
+	return load("res://content/test/charms/%s.tres" % id)
 
 
 func _trinket(id: String) -> TrinketData:
@@ -127,10 +127,10 @@ func _smoke_every_card(data: EncounterData) -> void:
 		_check(e.is_over, "%s: encounter finishes" % cd.id)
 
 
-func _smoke_every_item_and_trinket(data: EncounterData) -> void:
-	for it in data.get_item_pool():
+func _smoke_every_charm_and_trinket(data: EncounterData) -> void:
+	for it in data.get_charm_pool():
 		var e := _enc(["example2", "dead_weight", "example1", "sift", "driftwood", "prune", "spring", "example2", "hold", "study"])
-		e.player.items.append(ItemInstance.new(it))
+		e.player.charms.append(CharmInstance.new(it))
 		var steps := 0
 		while not e.is_over and steps < 300:
 			if e.active == e.enemy:
@@ -138,8 +138,8 @@ func _smoke_every_item_and_trinket(data: EncounterData) -> void:
 			else:
 				SimBot.take_turn(e)
 			steps += 1
-		_check(e.is_over, "item %s: encounter finishes" % it.id)
-		_consistent(e, "item %s" % it.id)
+		_check(e.is_over, "charm %s: encounter finishes" % it.id)
+		_consistent(e, "charm %s" % it.id)
 	for td in data.get_trinket_pool():
 		for lv in td.levels.size():
 			var e := _enc(["example2", "dead_weight", "example1", "example1", "example2", "example2", "example1"])
@@ -268,25 +268,25 @@ func _rules(_data: EncounterData) -> void:
 	e.pass_turn()
 	_check(e.round_num == 2, "cleanup doesn't trigger Spring (no crash)")
 
-	# Items.
+	# Charms.
 	e = _enc(["example1", "example1", "example1", "example1", "example1", "example1", "example1"])
-	e.player.items.append(ItemInstance.new(_item("big_hands")))
+	e.player.charms.append(CharmInstance.new(_charm("big_hands")))
 	e.pass_turn()
 	_check(e.player.hand.size() == 6 and e.player.cards_drawn_this_turn == 0, "Big Hands: 6 cards, not counted as drawn")
 	e = _enc(["example1", "example1", "example1", "example1", "example1"])
-	e.player.items.append(ItemInstance.new(_item("grindstone")))
+	e.player.charms.append(CharmInstance.new(_charm("grindstone")))
 	before = e.player.coins
 	e.play_card(_give(e, "sift"))
 	_check(e.player.coins == before + 4, "Grindstone: +2 per discard")
 	e = _enc(["example1", "example1", "example1", "example1", "example1"])
-	e.player.items.append(ItemInstance.new(_item("shredder")))
+	e.player.charms.append(CharmInstance.new(_charm("shredder")))
 	e.play_card(_give(e, "sift"))
 	_check(e.player.removed.size() == 2, "Shredder: both discarded cards are removed")
 	e = _enc(["example1", "example1", "example1", "example1", "example1"], true, true)
 	e.shop.cards[0] = _card("all_in")
 	var base_price: int = e.shop.cards[0].cost
 	_check(e.card_price(e.player, base_price) == base_price, "no discount without Needful")
-	e.player.items.append(ItemInstance.new(_item("needful")))
+	e.player.charms.append(CharmInstance.new(_charm("needful")))
 	_check(e.card_price(e.player, base_price) == 0, "Needful: market cards cost 0")
 	e.player.coins = 0
 	_check(e.can_buy_card(0), "Needful: buy with 0 coins")
@@ -298,24 +298,24 @@ func _rules(_data: EncounterData) -> void:
 				curse_n += 1
 	_check(e.player.coins == 0 and curse_n == 1, "Needful: free buy adds exactly one random curse (%d)" % curse_n)
 	e = _enc(["example2", "example2", "example2", "example2", "example2"])
-	e.player.items.append(ItemInstance.new(_item("furnace")))
+	e.player.charms.append(CharmInstance.new(_charm("furnace")))
 	c = _in_hand(e, "example2")
 	e.play_card(c)
 	var c2 := _in_hand(e, "example2")
 	e.play_card(c2)
 	_check(e.player.destroyed.has(c) and not e.player.destroyed.has(c2), "Furnace destroys only the first play")
 	e = _enc(["example2", "example2", "example2", "example2", "example2"])
-	e.player.items.append(ItemInstance.new(_item("echo_chamber")))
+	e.player.charms.append(CharmInstance.new(_charm("echo_chamber")))
 	before = e.player.coins
 	e.play_card(_in_hand(e, "example2"))
 	e.play_card(_in_hand(e, "example2"))
 	_check(e.player.coins == before + 3, "Echo Chamber: first card twice (+%d)" % (e.player.coins - before))
 	e = _enc(["dead_weight", "example1", "example1", "example1", "example1", "dead_weight"])
-	e.player.items.append(ItemInstance.new(_item("cursed_luck")))
+	e.player.charms.append(CharmInstance.new(_charm("cursed_luck")))
 	e.pass_turn()
 	_check(e.player.coins == 10 + 2 * _count_id(e.player.hand, "dead_weight"), "Cursed Luck fires on opening-hand curses")
 	e = _enc(["example1", "example1", "example1", "example1", "example1", "example2", "example2"], false)
-	e.player.items.append(ItemInstance.new(_item("second_look")))
+	e.player.charms.append(CharmInstance.new(_charm("second_look")))
 	e.play_card(_in_hand(e, "example1"))   # draw 2
 	_check(e.pending_choice != null and e.pending_choice.kind == ChoiceRequest.Kind.OPTIONS, "Second Look offers a redraw")
 	e.submit_choice([1])   # keep
@@ -323,7 +323,7 @@ func _rules(_data: EncounterData) -> void:
 	e.submit_choice([0])   # redraw
 	_check(e.pending_choice == null, "used -> disabled for the turn")
 	e = _enc(["example1", "example1", "example1", "example1", "example1", "example2"], false)
-	e.player.items.append(ItemInstance.new(_item("pocket")))
+	e.player.charms.append(CharmInstance.new(_charm("pocket")))
 	e.pass_turn()
 	_check(e.pending_choice != null and e.pending_choice.min_count == 0, "Pocket: optional retain at end of turn")
 	var keep: CardInstance = e.pending_choice.candidates[0]
@@ -377,7 +377,7 @@ func _rules(_data: EncounterData) -> void:
 ## half of everything paid (free action), maxed ones leave the shop.
 func _trinket_shop_rules() -> void:
 	var e := _enc(["example1", "example1", "example1", "example1", "example1"], true, true)
-	_check(e.shop.trinkets.size() == 1 and e.shop.items.size() == 1, "shop: 1 trinket slot, 1 item slot")
+	_check(e.shop.trinkets.size() == 1 and e.shop.charms.size() == 1, "shop: 1 trinket slot, 1 charm slot")
 	_check(e.shop.trinkets[0] != null, "shop: the trinket slot is filled")
 	e.player.coins = 50
 	# Buy a new one (Forge: 3 levels) into slot 0.
@@ -490,7 +490,7 @@ func _encounter_rules() -> void:
 		allowed.append(CardSets.Id.COINS)
 		var only_allowed := true
 		var seen := {}
-		for pool in [data.get_card_pool(), data.get_item_pool(), data.get_trinket_pool()]:
+		for pool in [data.get_card_pool(), data.get_charm_pool(), data.get_trinket_pool()]:
 			for r in pool:
 				seen[r.card_set] = true
 				if not allowed.has(r.card_set):
@@ -500,7 +500,7 @@ func _encounter_rules() -> void:
 		for s in allowed:
 			all_present = all_present and seen.has(s)
 		_check(all_present, "%s: every one of its 4 sets is for sale" % file)
-		_check(data.trinket_slots == 1 and data.item_slots == 1, "%s: 1 trinket slot, 1 item slot" % file)
+		_check(data.trinket_slots == 1 and data.charm_slots == 1, "%s: 1 trinket slot, 1 charm slot" % file)
 		_check(data.enemy != null and data.enemy.intents.size() == 3, "%s: enemy with 3 intents" % file)
 		# A bot plays it end to end without hanging.
 		var lo: LoadoutData = load(LO)
@@ -570,7 +570,7 @@ func _encounter_rules() -> void:
 	# C. Barracuda: Toll on buys (once a round), snatches.
 	e = _enc(DECK5, true, true, ENC_DIR % "toll_booth")
 	e.player.coins = 40
-	_check(e.enemy.items.size() == 1 and e.enemy.items[0].data.id == &"toll", "Barracuda owns the Toll")
+	_check(e.enemy.charms.size() == 1 and e.enemy.charms[0].data.id == &"toll", "Barracuda owns the Toll")
 	var s1 := _first_card_slot(e)
 	var cost1: int = e.shop.cards[s1].cost
 	var before := e.player.coins
@@ -769,7 +769,7 @@ func _enhancement_rules() -> void:
 	e = _enc(DECK5 + DECK5)
 	c = _give_enh(e, "example1", "tainted")
 	_check(c.is_curse() and not c.data.curse, "Tainted: counts as a curse")
-	e.player.items.append(ItemInstance.new(_item("cursed_luck")))
+	e.player.charms.append(CharmInstance.new(_charm("cursed_luck")))
 	before = e.player.coins
 	e.player.hand.erase(c)
 	e.player.discard.append(c)
@@ -909,12 +909,12 @@ func _wait_enemy(e: Encounter) -> void:
 func _shop_content_rules() -> void:
 	# Needful: the whole shop is free, and every purchase adds a curse.
 	var e := _enc(["example1", "example1", "example1", "example1", "example1"], true, true)
-	e.player.items.append(ItemInstance.new(_item("needful")))
+	e.player.charms.append(CharmInstance.new(_charm("needful")))
 	e.player.coins = 0
-	e.shop.items[0] = _item("rebate")
-	_check(e.item_price(e.shop.items[0]) == 0 and e.can_buy_item(0), "Needful: items cost 0")
-	e.buy_item(0)
-	_check(e.player.coins == 0 and _curses_owned(e) == 1, "Needful: buying an item adds a curse")
+	e.shop.charms[0] = _charm("rebate")
+	_check(e.charm_price(e.shop.charms[0]) == 0 and e.can_buy_charm(0), "Needful: charms cost 0")
+	e.buy_charm(0)
+	_check(e.player.coins == 0 and _curses_owned(e) == 1, "Needful: buying a charm adds a curse")
 	_wait_enemy(e)
 	e.shop.trinkets[0] = _trinket("forge")
 	_check(e.trinket_buy_cost(e.shop.trinkets[0]) == 0 and e.buy_trinket(0), "Needful: trinkets cost 0")
@@ -927,13 +927,13 @@ func _shop_content_rules() -> void:
 	_wait_enemy(e)
 	# Buying Needful itself doesn't curse you.
 	e = _enc(["example1", "example1", "example1", "example1", "example1"], true, true)
-	e.shop.items[0] = _item("needful")
+	e.shop.charms[0] = _charm("needful")
 	e.player.coins = 10
-	e.buy_item(0)
+	e.buy_charm(0)
 	_check(e.player.coins == 5 and _curses_owned(e) == 0, "Needful: buying it costs 5 and adds no curse")
 	# Enhancements are free too.
 	e = _enc(["example1", "example1", "example1", "example1", "example1"])
-	e.player.items.append(ItemInstance.new(_item("needful")))
+	e.player.charms.append(CharmInstance.new(_charm("needful")))
 	e.player.coins = 0
 	e.shop.enhancements.append(_enh("gilded"))
 	var slot := e.shop.enhancements.size() - 1
@@ -943,12 +943,12 @@ func _shop_content_rules() -> void:
 
 	# Top Shelf: you may put a bought card on top of the deck.
 	e = _enc(["example1", "example1", "example1", "example1", "example1", "example2", "example2"])
-	e.player.items.append(ItemInstance.new(_item("top_shelf")))
+	e.player.charms.append(CharmInstance.new(_charm("top_shelf")))
 	e.shop.cards[0] = _card("spark")
 	e.buy_card(0)
 	_check(e.player.draw_pile.back().data.id == &"spark", "Top Shelf: accepted -> top of the deck")
 	e = _enc(["example1", "example1", "example1", "example1", "example1", "example2", "example2"], false)
-	e.player.items.append(ItemInstance.new(_item("top_shelf")))
+	e.player.charms.append(CharmInstance.new(_charm("top_shelf")))
 	e.shop.cards[0] = _card("spark")
 	e.buy_card(0)
 	_check(e.pending_choice != null and e.pending_choice.kind == ChoiceRequest.Kind.OPTIONS, "Top Shelf: asks")
@@ -960,7 +960,7 @@ func _shop_content_rules() -> void:
 	e.buy_card(0)
 	_check(e.shop.cards[0] == null, "without Stockroom the bought slot stays empty")
 	e = _enc(["example1", "example1", "example1", "example1", "example1"])
-	e.player.items.append(ItemInstance.new(_item("stockroom")))
+	e.player.charms.append(CharmInstance.new(_charm("stockroom")))
 	e.buy_card(0)
 	_check(e.shop.cards[0] != null, "Stockroom: the bought slot restocks")
 
@@ -1131,14 +1131,14 @@ func _more_ideas_rules() -> void:
 
 	# Tip Jar: +1 on every gain from another source (once per gain, not per coin).
 	e = _enc(deck)
-	e.player.items.append(ItemInstance.new(_item("tip_jar")))
+	e.player.charms.append(CharmInstance.new(_charm("tip_jar")))
 	coins = e.player.coins
 	e.change_coins(e.player, 2, "test")
 	_check(e.player.coins == coins + 3, "Tip Jar: +2 becomes +3")
 	e.change_coins(e.player, -2, "test")
 	_check(e.player.coins == coins + 1, "Tip Jar: losing coins gets no bonus")
 	e = _enc(deck)
-	e.player.items.append(ItemInstance.new(_item("tip_jar")))
+	e.player.charms.append(CharmInstance.new(_charm("tip_jar")))
 	for i in 3:
 		e.player.hand.append(CardInstance.new(_card("dead_weight")))
 	var lq := _give(e, "liquidate")
@@ -1147,12 +1147,12 @@ func _more_ideas_rules() -> void:
 	e.play_card(lq)
 	_check(e.player.coins == coins + 3 * others + 1, "Tip Jar: Liquidate's total is one gain (+1)")
 	e = _enc(deck)
-	e.player.items.append(ItemInstance.new(_item("tip_jar")))
+	e.player.charms.append(CharmInstance.new(_charm("tip_jar")))
 	e.player.trinkets.append(TrinketInstance.new(_trinket("coin_trinket")))
 	coins = e.player.coins
 	e.use_trinket(0)
 	_check(e.player.coins == coins + 2, "Tip Jar: trinket gain +1")
-	e.player.items.append(ItemInstance.new(_item("tip_jar")))
+	e.player.charms.append(CharmInstance.new(_charm("tip_jar")))
 	coins = e.player.coins
 	e.change_coins(e.player, 1, "test")
 	_check(e.player.coins == coins + 3, "two Tip Jars: +1 each, they don't feed each other")

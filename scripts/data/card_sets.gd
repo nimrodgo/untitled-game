@@ -1,6 +1,6 @@
 class_name CardSets
 extends RefCounted
-## Card sets: every card, item and trinket belongs to exactly one set, grouped
+## Card sets: every card, charm and trinket belongs to exactly one set, grouped
 ## by mechanic. Sets have no gameplay effect (yet); for now they only tint the
 ## tile. Names and colors are placeholders.
 ##

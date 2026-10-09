@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/data/card_data.gd" id="1_02fx6"]
 [ext_resource type="Resource" path="res://content/test/enemies/hagfish.tres" id="2_hx2b2"]
 [ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="3_hedte"]
-[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="4_nah6l"]
+[ext_resource type="Script" path="res://scripts/data/charm_data.gd" id="4_nah6l"]
 [ext_resource type="Script" path="res://scripts/data/encounter_data.gd" id="5_xkohc"]
 [ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="6_xoeon"]
 

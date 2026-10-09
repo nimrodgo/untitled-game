@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bxapf30q2j1yl"]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://bxapf30q2j1yl"]
 
 [ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_q81en"]
 [ext_resource type="Script" uid="uid://ceofe1ut0iw7x" path="res://scripts/data/effects/replay_effect.gd" id="2_3nkke"]
-[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="3_heqlf"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/charm_data.gd" id="3_heqlf"]
 
 [sub_resource type="Resource" id="Resource_vai53"]
 script = ExtResource("2_3nkke")

@@ -3,7 +3,7 @@ extends RefCounted
 ## Everything an effect needs to know when it resolves.
 
 var encounter: Encounter
-var owner: PlayerState          ## Whoever owns the card/item/trinket.
+var owner: PlayerState          ## Whoever owns the card/charm/trinket.
 var opponent: PlayerState
 var card: CardInstance          ## The card involved, if any (may be null).
 var source_name: String = ""    ## For the log.
@@ -15,8 +15,8 @@ var grant_extra_action := false
 var pass_after := false
 ## True while the start-of-turn hand is being drawn.
 var opening_draw := false
-## An item effect set this when the player declined an optional ability, so
-## the item isn't marked as used.
+## A charm effect set this when the player declined an optional ability, so
+## the charm isn't marked as used.
 var declined := false
 ## The pile a card came from (GameRules.PILE_*), for trash triggers.
 var from_pile := 0

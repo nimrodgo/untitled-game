@@ -4,5 +4,5 @@ extends Resource
 
 @export var starting_deck: Array[CardData] = []
 @export var starting_coins: int = 3
-@export var items: Array[ItemData] = []
+@export var charms: Array[CharmData] = []
 @export var trinkets: Array[TrinketData] = []

@@ -31,7 +31,7 @@
 
 1. Add it to `GameRules.Trigger`. **Append it at the end**, because saved `.tres` files store the number.
 2. Call `_fire(GameRules.Trigger.X, side, _ctx(side))` at the right point in `Encounter`.
-3. Add a phrase for it in `ItemData.get_description()`.
+3. Add a phrase for it in `CharmData.get_description()`.
 
 ## Add a new stat or text placeholder
 
@@ -64,8 +64,8 @@ godot --headless --path . --script res://tools/simulate.gd -- res://content/test
 | Area | Note |
 |---|---|
 | Run layer | No map, gold, persistent deck or loadout from the run yet. `gold_reward`, `CardData.art`, `tags` and `EnemyData.portrait` are unused. |
-| Doc drift | `ItemData`'s header comment says items are bought "as a free action", but `ITEM_BUY_IS_ACTION = true`. |
-| Item text | `ENEMY_ACTED` has no phrase in `ItemData.get_description()`. Write a custom description for items with that trigger. |
+| Doc drift | `CharmData`'s header comment says charms are bought "as a free action", but `CHARM_BUY_IS_ACTION = true`. |
+| Charm text | `ENEMY_ACTED` has no phrase in `CharmData.get_description()`. Write a custom description for charms with that trigger. |
 | Extra action | Ignored for trinket, trinket-upgrade and enhancement purchases (see [effects-reference.md](effects-reference.md#where-context-output-effects-work)). |
 | Instant + enemy | Instant cards never trigger an enemy response, even with `ExtraActionEffect`. |
 | Copies | `PlayCopyEffect` / replays resolve the original card's effects with that card as "this card", so copying "🔥 this ➡ …" destroys the original. |
@@ -74,7 +74,7 @@ godot --headless --path . --script res://tools/simulate.gd -- res://content/test
 | `StealCoinsEffect` | Ignores `target`. It always takes from the opponent. |
 | Test content | `tools/build_test_content.gd` is out of sync with the hand-edited `.tres` files, so regenerating overwrites those edits (see [tools-and-deploy.md](tools-and-deploy.md#headless-tools-tools)). Prefer editing the `.tres` files directly. |
 | Enhancements | Only a card **in your hand** can be enhanced; there is no picker for the deck or discard pile. Prices (3) and names are placeholders. Fleeting ("immediately 🔥") is implemented as destroy-after-play, which is still to be confirmed. |
-| Card sets | Retain has only 2 pieces. Market and Draw have no trinkets, Coins has no item. Toll Booth only sells the Coin Trinket, so Borrowed Power (Utility) is dead there. |
+| Card sets | Retain has only 2 pieces. Market and Draw have no trinkets, Coins has no charm. Toll Booth only sells the Coin Trinket, so Borrowed Power (Utility) is dead there. |
 | Balance | The greedy bot wins about 55% at target 10 on the TEST Encounter. On the themed encounters it wins roughly 16–24% (Hag's Hex, Loan Shark) to 64–86% (Ink Cloud, Toll Booth, Clutter). It undervalues curse synergy, so treat these as a floor; the targets are untuned. |
 | UI | Everything is built in code with placeholder colors and no art. Emoji rely on the `Icons` SVG set. |
 

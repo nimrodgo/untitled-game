@@ -11,7 +11,7 @@ var discard: Array[CardInstance] = []
 ## Removed for this encounter only / destroyed permanently (both out of play).
 var removed: Array[CardInstance] = []
 var destroyed: Array[CardInstance] = []
-var items: Array[ItemInstance] = []
+var charms: Array[CharmInstance] = []
 var trinkets: Array[TrinketInstance] = []
 var intent_index := 0   ## Enemy only.
 var cards_bought := 0

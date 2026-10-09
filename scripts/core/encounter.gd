@@ -5,7 +5,7 @@ extends RefCounted
 ##
 ## Structure: `rounds` rounds; each round is one TURN for you. You draw a hand,
 ## then take ACTIONS one at a time: any number of FREE ones (instant cards,
-## using a trinket) and normal ones (play a card, buy a card/item/trinket/
+## using a trinket) and normal ones (play a card, buy a card/charm/trinket/
 ## upgrade, upgrade a trinket). PASS ends your turn and the round.
 ## The enemy doesn't play cards: it answers each of your normal actions with
 ## its next scripted intent (always visible), up to actions_per_round times.
@@ -69,8 +69,8 @@ func _init(encounter_data: EncounterData, loadout: LoadoutData) -> void:
 	player.coins = loadout.starting_coins
 	for c in loadout.starting_deck:
 		player.draw_pile.append(CardInstance.new(c))
-	for it in loadout.items:
-		player.items.append(ItemInstance.new(it))
+	for it in loadout.charms:
+		player.charms.append(CharmInstance.new(it))
 	for t in loadout.trinkets:
 		player.trinkets.append(TrinketInstance.new(t))
 
@@ -79,8 +79,8 @@ func _init(encounter_data: EncounterData, loadout: LoadoutData) -> void:
 	if ed:
 		enemy.coins = ed.starting_coins
 		enemy.intent_index = ed.start_intent
-		for it in ed.items:
-			enemy.items.append(ItemInstance.new(it))
+		for it in ed.charms:
+			enemy.charms.append(CharmInstance.new(it))
 
 
 func start() -> void:
@@ -168,10 +168,10 @@ func can_buy_card(slot: int) -> bool:
 
 
 ## What buying anything from the market with base cost `base` costs `p` right
-## now (items such as Needful override it). The lowest override wins.
+## now (charms such as Needful override it). The lowest override wins.
 func shop_price(p: PlayerState, base: int) -> int:
 	var price := base
-	for it in p.items:
+	for it in p.charms:
 		var o: int = it.data.shop_price_override
 		if o >= 0 and o < price:
 			price = o
@@ -183,7 +183,7 @@ func card_price(p: PlayerState, base: int) -> int:
 	return shop_price(p, base)
 
 
-func item_price(it: ItemData) -> int:
+func charm_price(it: CharmData) -> int:
 	return shop_price(player, it.cost)
 
 
@@ -191,11 +191,11 @@ func enhancement_price(e: EnhancementData) -> int:
 	return shop_price(player, e.cost)
 
 
-func can_buy_item(slot: int) -> bool:
-	if not is_player_turn() or slot < 0 or slot >= shop.items.size():
+func can_buy_charm(slot: int) -> bool:
+	if not is_player_turn() or slot < 0 or slot >= shop.charms.size():
 		return false
-	var it: ItemData = shop.items[slot]
-	return it != null and player.coins >= item_price(it)
+	var it: CharmData = shop.charms[slot]
+	return it != null and player.coins >= charm_price(it)
 
 
 ## Buying a trinket you already own upgrades it (for its next upgrade cost);
@@ -285,10 +285,10 @@ func buy_card(slot: int) -> bool:
 	return true
 
 
-func buy_item(slot: int) -> bool:
-	if not can_buy_item(slot):
+func buy_charm(slot: int) -> bool:
+	if not can_buy_charm(slot):
 		return false
-	_buy_item(slot)
+	_buy_charm(slot)
 	return true
 
 
@@ -456,10 +456,10 @@ func change_coins(p: PlayerState, delta: int, source: String = "") -> void:
 	var real := p.coins - before
 	if real != 0:
 		_log_coins(p, real, source)
-	# Items like Tip Jar: every gain from another source gives a bit more (the
+	# Charms like Tip Jar: every gain from another source gives a bit more (the
 	# bonus itself doesn't count as a new gain, so bonuses never chain).
 	if real > 0:
-		for it in p.items:
+		for it in p.charms:
 			var bonus: int = it.data.coin_gain_bonus
 			if bonus > 0:
 				p.coins += bonus
@@ -628,12 +628,12 @@ func buy_instance(p: PlayerState, card: CardInstance, cost: int, zone_override :
 	_absorb(ctx)
 
 
-## Take the card in a market slot for `p` to buy. If `p` owns an item that
+## Take the card in a market slot for `p` to buy. If `p` owns a charm that
 ## restocks bought slots, the slot gets a new random card right away.
 func take_market_card(p: PlayerState, slot: int) -> CardData:
 	var cd: CardData = shop.take_card(slot)
 	if shop.cards[slot] == null:
-		for it in p.items:
+		for it in p.charms:
 			if it.data.restock_bought_cards:
 				shop.restock_card_slot(slot)
 				log_line("  [color=#7fe3d0]%s[/color] restocks the market slot." % it.data.display_name)
@@ -753,19 +753,19 @@ func _buy_enhancement(slot: int, card: CardInstance) -> void:
 	await _finish_action_if(GameRules.ENHANCEMENT_BUY_IS_ACTION, false)
 
 
-func _buy_item(slot: int) -> void:
+func _buy_charm(slot: int) -> void:
 	_busy += 1
 	_begin_action()
-	var it := shop.take_item(slot)
-	player.coins -= item_price(it)
-	# Items you already own react to the purchase; the new one doesn't (buying
+	var it := shop.take_charm(slot)
+	player.coins -= charm_price(it)
+	# Charms you already own react to the purchase; the new one doesn't (buying
 	# Needful doesn't curse you).
 	await _fire(GameRules.Trigger.SHOP_BUY, player, _ctx(player))
-	player.items.append(ItemInstance.new(it))
-	log_line("You buy item [color=#7fe3d0]%s[/color]." % it.display_name)
-	await _fire(GameRules.Trigger.ITEM_BOUGHT, player, _ctx(player))
+	player.charms.append(CharmInstance.new(it))
+	log_line("You buy charm [color=#7fe3d0]%s[/color]." % it.display_name)
+	await _fire(GameRules.Trigger.CHARM_BOUGHT, player, _ctx(player))
 	_busy -= 1
-	await _finish_action_if(GameRules.ITEM_BUY_IS_ACTION, _act_extra)
+	await _finish_action_if(GameRules.CHARM_BUY_IS_ACTION, _act_extra)
 
 
 func _buy_trinket(slot: int) -> void:
@@ -830,7 +830,7 @@ func _start_round() -> void:
 		shop.restock()
 		log_line("  The market restocks.")
 	for p in [player, enemy]:
-		for it in p.items:
+		for it in p.charms:
 			it.uses_this_round = 0
 	for t in player.trinkets:
 		t.used = false
@@ -951,7 +951,7 @@ func _finish_action(extra: bool) -> void:
 
 
 func _fire(trigger: GameRules.Trigger, p: PlayerState, ctx: EffectContext) -> void:
-	for it in p.items.duplicate():
+	for it in p.charms.duplicate():
 		if is_over:
 			return
 		if it.data.trigger == trigger and it.can_trigger():

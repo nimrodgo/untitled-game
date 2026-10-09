@@ -5,8 +5,8 @@ extends Control
 ## Interaction model (communicated with motion/highlights, not text):
 ## - Drag a card out of your hand to play it (it glows gold once releasing
 ##   would play it, then pops in the middle of the table).
-## - Drag a market card onto your deck to buy it; drag items / trinkets onto
-##   your Items / Trinkets slots. Valid targets pulse; the hovered one glows.
+## - Drag a market card onto your deck to buy it; drag charms / trinkets onto
+##   your Charms / Trinkets slots. Valid targets pulse; the hovered one glows.
 ## - Tap anything to inspect it (popup with the same actions as buttons).
 
 @export var encounter_data: EncounterData
@@ -37,13 +37,13 @@ var _intent_desc: RichTextLabel
 var _intent_cross: Control
 var _shop_panel: DropTarget      ## the market; also where you drag a trinket to sell it
 var _sell_drag := {}
-var _shop_row: VBoxContainer        ## market lines: cards, then items/trinkets
+var _shop_row: VBoxContainer        ## market lines: cards, then charms/trinkets
 var _shop_cards_row: HBoxContainer  ## the card group (for enemy snatch fx)
 var _table_hint: Button        ## only shown while picking a card to upgrade (tap = cancel)
 var _trinkets_panel: DropTarget
 var _trinkets_box: VBoxContainer
-var _items_panel: DropTarget
-var _items_box: VBoxContainer
+var _charms_panel: DropTarget
+var _charms_box: VBoxContainer
 var _rotate_overlay: Control
 var _hand: HandView
 var _pile: PileView
@@ -226,15 +226,15 @@ func _refresh() -> void:
 		_enemy_pips.add_child(pip)
 	_intent_bubble.modulate = Color.WHITE if enc.enemy_actions_left > 0 else Color(1, 1, 1, 0.4)
 	_clear(_enemy_chips)
-	for it in enc.enemy.items:
-		var item: ItemInstance = it
-		_enemy_chips.add_child(_chip(item.data.display_name, CardSets.color(item.data.card_set), false,
-			func(): _show_popup(_item_view(item.data, false), "", [], "Enemy item")))
+	for it in enc.enemy.charms:
+		var charm: CharmInstance = it
+		_enemy_chips.add_child(_chip(charm.data.display_name, CardSets.color(charm.data.card_set), false,
+			func(): _show_popup(_charm_view(charm.data, false), "", [], "Enemy charm")))
 
 	# Market.
 	_fill_shop()
 
-	# Your trinkets / items.
+	# Your trinkets / charms.
 	_clear(_trinkets_box)
 	for i in me.trinkets.size():
 		var t := me.trinkets[i]
@@ -247,13 +247,13 @@ func _refresh() -> void:
 	# The limit is always visible: MAX_TRINKETS frames, the free ones empty.
 	for i in range(me.trinkets.size(), GameRules.MAX_TRINKETS):
 		_trinkets_box.add_child(_empty_gear_slot(50.0))
-	_clear(_items_box)
-	for it in me.items:
-		var item: ItemInstance = it
-		_items_box.add_child(_chip(item.data.display_name, CardSets.color(item.data.card_set), false,
-			func(): _show_popup(_item_view(item.data, false), "", [], "Passive — always on")))
-	if me.items.is_empty():
-		_items_box.add_child(_empty_gear_slot())
+	_clear(_charms_box)
+	for it in me.charms:
+		var charm: CharmInstance = it
+		_charms_box.add_child(_chip(charm.data.display_name, CardSets.color(charm.data.card_set), false,
+			func(): _show_popup(_charm_view(charm.data, false), "", [], "Passive — always on")))
+	if me.charms.is_empty():
+		_charms_box.add_child(_empty_gear_slot())
 
 	# Hand (dimmed while the enemy acts).
 	var views: Array[CardView] = []
@@ -326,14 +326,14 @@ func _empty_gear_slot(height := 44.0) -> Control:
 
 # ================================================================ market
 
-## The whole market, always on screen: cards on the top row, items /
+## The whole market, always on screen: cards on the top row, charms /
 ## trinkets / upgrades on the bottom row. Tiles are sized to the space.
 func _fill_shop() -> void:
 	_clear(_shop_row)
 	_shop_cards_row = null
 	var shop := enc.shop
-	var gear_n := shop.items.size() + shop.trinkets.size() + shop.enhancements.size()
-	var gear_groups := int(shop.items.size() > 0) + int(shop.trinkets.size() > 0) + int(shop.enhancements.size() > 0)
+	var gear_n := shop.charms.size() + shop.trinkets.size() + shop.enhancements.size()
+	var gear_groups := int(shop.charms.size() > 0) + int(shop.trinkets.size() > 0) + int(shop.enhancements.size() > 0)
 
 	# Space available inside the market panel.
 	var vp := get_viewport_rect().size
@@ -367,20 +367,20 @@ func _fill_shop() -> void:
 					"cb": func(): _buy_with_fx(func(): return enc.buy_card(s), make.call(), _pile)}]))
 			row.add_child(v)
 
-	if shop.items.size() > 0:
-		var row := _market_group(gear_line, "ITEMS", Palette.KELP)
-		for slot in shop.items.size():
-			var it: ItemData = shop.items[slot]
+	if shop.charms.size() > 0:
+		var row := _market_group(gear_line, "CHARMS", Palette.KELP)
+		for slot in shop.charms.size():
+			var it: CharmData = shop.charms[slot]
 			if it == null:
 				row.add_child(_empty_slot(gear_tile)); continue
 			var s := slot
-			var v := _item_view(it, true, gear_tile)
-			v.set_enabled(enc.can_buy_item(s))
-			var make := func(): return _item_view(it, true, gear_tile)
-			_attach_buy_drag(v, func(): return enc.buy_item(s), _items_panel, make)
-			v.tapped.connect(func(): _show_popup(_item_view(it, true, CardView.LARGE), "", [
-				{"label": "%d" % enc.item_price(it), "icon": "🛍", "enabled": enc.can_buy_item(s),
-					"cb": func(): _buy_with_fx(func(): return enc.buy_item(s), make.call(), _items_panel)}]))
+			var v := _charm_view(it, true, gear_tile)
+			v.set_enabled(enc.can_buy_charm(s))
+			var make := func(): return _charm_view(it, true, gear_tile)
+			_attach_buy_drag(v, func(): return enc.buy_charm(s), _charms_panel, make)
+			v.tapped.connect(func(): _show_popup(_charm_view(it, true, CardView.LARGE), "", [
+				{"label": "%d" % enc.charm_price(it), "icon": "🛍", "enabled": enc.can_buy_charm(s),
+					"cb": func(): _buy_with_fx(func(): return enc.buy_charm(s), make.call(), _charms_panel)}]))
 			row.add_child(v)
 
 	if shop.trinkets.size() > 0:
@@ -472,7 +472,7 @@ func _fly_to_target(ghost: Control, target: DropTarget) -> void:
 			tw.tween_property(target, "self_modulate", Color.WHITE, 0.25))
 
 
-## Market tiles: drag onto `target` (deck / items / trinkets) and release to buy.
+## Market tiles: drag onto `target` (deck / charms / trinkets) and release to buy.
 func _attach_buy_drag(v: CardView, buy: Callable, target: DropTarget, make_ghost: Callable) -> void:
 	v.gui_input.connect(func(e: InputEvent): _on_shop_tile_input(e, v, buy, target, make_ghost))
 
@@ -818,10 +818,10 @@ func _card_vars(cd: CardData, c: CardInstance = null) -> Dictionary:
 	return enc.card_text_vars(cd, c) if enc else {}
 
 
-func _item_view(it: ItemData, show_cost: bool, sz: Vector2 = CardView.SMALL) -> CardView:
-	var price := (enc.item_price(it) if enc else it.cost) if show_cost else -1
+func _charm_view(it: CharmData, show_cost: bool, sz: Vector2 = CardView.SMALL) -> CardView:
+	var price := (enc.charm_price(it) if enc else it.cost) if show_cost else -1
 	var v := CardView.make(it.display_name, price, it.get_description(), CardSets.color(it.card_set), sz,
-		"ITEM" if sz == CardView.LARGE else "", "", "", it.cost if show_cost else -1)
+		"CHARM" if sz == CardView.LARGE else "", "", "", it.cost if show_cost else -1)
 	_attach_hover(v, it.get_description(), _mentioned_in(it.effects))
 	return v
 
@@ -1204,7 +1204,7 @@ func _build_ui() -> void:
 	main.add_theme_constant_override("separation", 12)
 	margin.add_child(main)
 
-	# ================= LEFT COLUMN: status, enemy, your trinkets & items
+	# ================= LEFT COLUMN: status, enemy, your trinkets & charms
 	var left := VBoxContainer.new()
 	left.custom_minimum_size.x = 290
 	left.add_theme_constant_override("separation", 10)
@@ -1291,7 +1291,7 @@ func _build_ui() -> void:
 	_enemy_chips.add_theme_constant_override("separation", 6)
 	ev.add_child(_enemy_chips)
 
-	# Your trinkets and items: also the drop targets for buying them.
+	# Your trinkets and charms: also the drop targets for buying them.
 	var gear := HBoxContainer.new()
 	gear.add_theme_constant_override("separation", 8)
 	gear.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -1299,9 +1299,9 @@ func _build_ui() -> void:
 	_trinkets_panel = _gear_panel("TRINKETS", Palette.GOLD)
 	_trinkets_box = _trinkets_panel.get_meta("box")
 	gear.add_child(_trinkets_panel)
-	_items_panel = _gear_panel("ITEMS", Palette.KELP)
-	_items_box = _items_panel.get_meta("box")
-	gear.add_child(_items_panel)
+	_charms_panel = _gear_panel("CHARMS", Palette.KELP)
+	_charms_box = _charms_panel.get_meta("box")
+	gear.add_child(_charms_panel)
 
 	var left_bottom := HBoxContainer.new()
 	left_bottom.add_theme_constant_override("separation", 8)

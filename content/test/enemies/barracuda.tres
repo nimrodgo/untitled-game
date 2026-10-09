@@ -4,8 +4,8 @@
 [ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="2_3kidt"]
 [ext_resource type="Script" uid="uid://c2bwmjsio3xu5" path="res://scripts/data/effects/snatch_shop_card_effect.gd" id="3_hw8yt"]
 [ext_resource type="Script" uid="uid://cpogkm2ysngib" path="res://scripts/data/effects/steal_coins_effect.gd" id="4_bxyjc"]
-[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="5_2uqvd"]
-[ext_resource type="Resource" uid="uid://cf5uu2pdjvjuo" path="res://content/test/enemy_items/toll.tres" id="6_2wn2l"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/charm_data.gd" id="5_2uqvd"]
+[ext_resource type="Resource" uid="uid://cf5uu2pdjvjuo" path="res://content/test/enemy_charms/toll.tres" id="6_2wn2l"]
 [ext_resource type="Script" uid="uid://wehshrsqaulc" path="res://scripts/data/enemy_data.gd" id="7_o5cb1"]
 
 [sub_resource type="Resource" id="Resource_6adii"]
@@ -43,5 +43,5 @@ description = "Remove the priciest market card"
 script = ExtResource("7_o5cb1")
 display_name = "Barracuda"
 intents = Array[ExtResource("1_6uksu")]([SubResource("Resource_25376"), SubResource("Resource_ty106"), SubResource("Resource_oei35")])
-items = Array[ExtResource("5_2uqvd")]([ExtResource("6_2wn2l")])
+charms = Array[ExtResource("5_2uqvd")]([ExtResource("6_2wn2l")])
 color = Color(0.49803922, 0.54901963, 0.5529412, 1)

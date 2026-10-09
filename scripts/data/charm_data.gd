@@ -1,9 +1,9 @@
-class_name ItemData
+class_name CharmData
 extends Resource
-## A passive item. Bought as a free action; fires its effects on a trigger.
+## A passive charm. Bought as a free action; fires its effects on a trigger.
 
 @export var id: StringName
-@export var display_name: String = "New Item"
+@export var display_name: String = "New Charm"
 @export var cost: int = 3
 @export var trigger: GameRules.Trigger = GameRules.Trigger.CARD_BOUGHT
 @export var effects: Array[Effect] = []
@@ -13,7 +13,7 @@ extends Resource
 @export var limit_per_round: int = 0
 @export_multiline var description: String = ""
 @export var icon: Texture2D
-## Passive: while you own this, everything in the market (cards, items,
+## Passive: while you own this, everything in the market (cards, charms,
 ## trinkets, trinket upgrades, enhancements) costs this much (-1 = off).
 ## The market shows the normal price struck through next to the new one.
 @export var shop_price_override: int = -1
@@ -23,7 +23,7 @@ extends Resource
 ## Passive: while you own this, every time you gain coins from anything else,
 ## you gain this many more (0 = off). One bonus per gain, not per coin.
 @export var coin_gain_bonus: int = 0
-## Which set this belongs to (see CardSets). One set per card/item/trinket.
+## Which set this belongs to (see CardSets). One set per card/charm/trinket.
 @export var card_set: CardSets.Id = CardSets.Id.NONE
 
 
@@ -38,7 +38,7 @@ func get_description() -> String:
 		GameRules.Trigger.BEFORE_CARD_BUY: when = "When you buy a card"
 		GameRules.Trigger.CARD_BOUGHT: when = "After you buy a card"
 		GameRules.Trigger.CARD_PLAYED: when = "When you play a card"
-		GameRules.Trigger.ITEM_BOUGHT: when = "When you buy an item"
+		GameRules.Trigger.CHARM_BOUGHT: when = "When you buy a charm"
 		GameRules.Trigger.TRINKET_USED: when = "When you use a trinket"
 		GameRules.Trigger.OPPONENT_CARD_BOUGHT: when = "When your opponent buys a card"
 		GameRules.Trigger.OPPONENT_CARD_PLAYED: when = "When your opponent plays a card"
