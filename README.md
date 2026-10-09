@@ -17,7 +17,7 @@ Godot **4.6.3**, GDScript, GL Compatibility.
 ## Controls
 - **Play:** drag a card out of your hand and let go. It glows gold once releasing would play it.
 - **Buy a card:** drag it from the market onto your deck (bottom right).
-- **Buy an item / trinket:** drag it onto your Items / Trinkets slots (left). Valid targets pulse while you drag.
+- **Buy a charm / trinket:** drag it onto your Charms / Trinkets slots (left). Valid targets pulse while you drag.
 - **Upgrade (enhancement):** tap the upgrade tile, pay, then tap a card in your hand.
 - **Inspect:** tap anything (cards, market tiles, gear, the enemy's intent, your deck) for details and buttons.
 - **Card layout:** the main text is what the card does when played; the gold strip with the bag icon at the
@@ -32,15 +32,15 @@ Everything else lives in [`docs/`](docs/README.md):
 |---|---|
 | [game-rules.md](docs/game-rules.md) | How an encounter plays out: rounds, actions, enemy, market, win condition, tunables |
 | [architecture.md](docs/architecture.md) | Code layers, classes, signals |
-| [content-design.md](docs/content-design.md) | Making cards, items, trinkets, enhancements, enemies, encounters; card sets |
+| [content-design.md](docs/content-design.md) | Making cards, charms, trinkets, enhancements, enemies, encounters; card sets |
 | [effects-reference.md](docs/effects-reference.md) | Every effect primitive, trigger, zone and text placeholder |
 | [ui.md](docs/ui.md) | Screen layout, drag and drop, card visuals |
 | [tools-and-deploy.md](docs/tools-and-deploy.md) | Simulator, content generators, tests, phone playtest, GitHub Pages deploy |
 | [extending.md](docs/extending.md) | Adding mechanics, known gaps |
 
-Ideas for future cards and items are in [`design/ideas.md`](design/ideas.md).
+Ideas for future cards and charms are in [`design/ideas.md`](design/ideas.md).
 
-**Editing content:** open the **Content** tab at the top of the Godot editor (next to 2D / 3D / Script) to browse every card, item, trinket, enhancement, enemy, encounter and loadout as tiles and edit them in place. Edits save to the `.tres` files automatically.
+**Editing content:** open the **Content** tab at the top of the Godot editor (next to 2D / 3D / Script) to browse every card, charm, trinket, enhancement, enemy, encounter and loadout as tiles and edit them in place. Edits save to the `.tres` files automatically.
 
 ## Headless tools (from the project folder)
 ```

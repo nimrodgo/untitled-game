@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/data/card_data.gd" id="1_yjrcb"]
 [ext_resource type="Resource" path="res://content/test/enemies/cuttlefish.tres" id="2_r467u"]
 [ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="3_wr7ye"]
-[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="4_vjlss"]
+[ext_resource type="Script" path="res://scripts/data/charm_data.gd" id="4_vjlss"]
 [ext_resource type="Script" path="res://scripts/data/encounter_data.gd" id="5_f0g6p"]
 [ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="6_u244h"]
 

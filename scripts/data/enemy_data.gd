@@ -11,7 +11,7 @@ extends Resource
 @export var actions_per_round: int = 3
 ## Index of the first intent (lets two copies of an enemy be out of phase).
 @export var start_intent: int = 0
-## Passive items the enemy starts with (it can never buy more).
-@export var items: Array[ItemData] = []
+## Passive charms the enemy starts with (it can never buy more).
+@export var charms: Array[CharmData] = []
 @export var portrait: Texture2D
 @export var color: Color = Color("ff7f6a")

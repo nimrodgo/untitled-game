@@ -1,7 +1,7 @@
 class_name OfferRedrawEffect
 extends Effect
-## For CARD_DRAWN items: you may discard the card just drawn to draw another.
-## Declining (or the start-of-turn draw) doesn't use up the item.
+## For CARD_DRAWN charms: you may discard the card just drawn to draw another.
+## Declining (or the start-of-turn draw) doesn't use up the charm.
 
 
 func apply(ctx: EffectContext) -> void:

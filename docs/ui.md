@@ -9,11 +9,11 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 │ Round 1/3     [ 7 / 10 ] ▓▓▓▓▓░░       │  CARDS                                          │
 │ ┌ Enemy ──────────────────────────┐   │  [card] [card] [card]                           │
 │ │ (M) TEST Moray   2 coins  ●●○   │   │                                                 │
-│ │ ┌ NEXT · STEAL ───────────────┐ │   │  ITEMS            TRINKETS        (UPGRADES)    │
-│ │ │ Pinch  Steal 1 🪙           │ │   │  [item] [item]    [trinket]                     │
+│ │ ┌ NEXT · STEAL ───────────────┐ │   │  CHARMS           TRINKETS        (UPGRADES)    │
+│ │ │ Pinch  Steal 1 🪙           │ │   │  [charm] [charm]   [trinket]                    │
 │ │ └─────────────────────────────┘ │   ├─────────────────────────────────────────────────┤
 │ └─────────────────────────────────┘   │        ╭hand fanned 5 cards╮     [deck] [Pass]  │
-│ TRINKETS ▢▢▢ (3 frames)  ITEMS [ + ]  │                                                 │
+│ TRINKETS ▢▢▢ (3 frames)  CHARMS [ + ] │                                                 │
 │ [Log] [Fullscreen] [Exit*]            │                                                 │
 └───────────────────────────────────────┴─────────────────────────────────────────────────┘
 * Exit is hidden on web.
@@ -21,7 +21,7 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 
 - The Trinkets panel always shows **3 frames** (the trinket limit): owned trinkets fill them, the rest are empty dashed "+" slots. A market trinket you can't fit is greyed out. A market trinket you **already own** is shown as its **next level**, tinted purple, at the upgrade price.
 - Market tiles **resize to fit the screen**. Cards take about 58% of the market's height when there's a gear row. `_fill_shop()` does the math.
-- Tile color is the piece's **set color** (`CardSets.color`); upgrade tiles blend it with purple. A discounted market tile (Needful: cards, items, trinkets, upgrades) shows its normal price in red, struck through, next to the new price.
+- Tile color is the piece's **set color** (`CardSets.color`); upgrade tiles blend it with purple. A discounted market tile (Needful: cards, charms, trinkets, upgrades) shows its normal price in red, struck through, next to the new price.
 - If the screen is in portrait, a **"Please rotate"** overlay covers everything (`_check_orientation`).
 - **Fullscreen** on the web also tries `screen.orientation.lock('landscape')`.
 
@@ -31,7 +31,7 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 |---|---|---|
 | Drag a hand card out of the hand area | Play it | The card grows and turns gold once releasing would play it, then pops above the hand |
 | Drag a market card onto the **deck** | Buy it | The deck pulses while you drag and glows on hover. The card shrinks as it flies in. |
-| Drag an item or trinket onto its **slot panel** | Buy it (a trinket you own: upgrade it) | Same, with the Items or Trinkets panel |
+| Drag a charm or trinket onto its **slot panel** | Buy it (a trinket you own: upgrade it) | Same, with the Charms or Trinkets panel |
 | Drag one of your **trinkets onto the market** | Sell it (free action) | The market panel pulses, glows gold on hover; the dragged tile shows the coins you'd get (+N) |
 | Tap anything | Inspect popup, with action buttons (Play / Buy / Upgrade / Use) | — |
 | Tap the deck | Deck viewer (the draw pile is sorted so it doesn't reveal the order), hand, played cards, discard | — |
@@ -49,7 +49,7 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 | File | Class | Role |
 |---|---|---|
 | `encounter_screen.gd` | — | Builds the layout, refreshes on `changed`, handles market drag, popups, the log, the end overlay, and the enemy timer |
-| `card_view.gd` | `CardView` | One tile type for cards, items, trinkets, upgrades and intents. `CardView.make(title, cost, body, bg, size, tag, footer, buy_text)`. Sizes are `SMALL` 124×184, `HAND` 144×200, `LARGE` 360×500. Text scales with size. |
+| `card_view.gd` | `CardView` | One tile type for cards, charms, trinkets, upgrades and intents. `CardView.make(title, cost, body, bg, size, tag, footer, buy_text)`. Sizes are `SMALL` 124×184, `HAND` 144×200, `LARGE` 360×500. Text scales with size. |
 | `hand_view.gd` | `HandView` | Fan layout, hover lift, drag to play, deal-in from the deck. It tracks card `uid`s to animate only new cards. |
 | `pile_view.gd` | `PileView` | Deck stack with a count and discard count. It's a drop target and can be tapped. |
 | `drop_target.gd` | `DropTarget` | A panel with `IDLE` / `ACTIVE` (pulsing) / `HOVER` (gold) states |
@@ -71,7 +71,7 @@ The whole UI is **built in code** (`scripts/ui/encounter_screen.gd`, attached to
 └───────────────────────────────┘
 ```
 
-**Colors:** cards `CARD` (blue), curses `CARD_CURSE` (dark red), items `CARD_ITEM` (green), trinkets `CARD_TRINKET` (brown-gold), upgrades `CARD_ENH` (purple).
+**Colors:** cards `CARD` (blue), curses `CARD_CURSE` (dark red), charms `CARD_CHARM` (green), trinkets `CARD_TRINKET` (brown-gold), upgrades `CARD_ENH` (purple).
 
 The deck viewer also lists **Removed 🗑** and **Destroyed 🔥** cards once there are any.
 

@@ -2,7 +2,7 @@
 
 All content is Godot **Resources** (`.tres`). There are three ways to make and edit them:
 
-- **Content tab (easiest):** the **Content** tab at the top of the editor, next to 2D / 3D / Script (the `addons/content_browser` plugin). It shows everything in `content/test/` as card-style tiles, one tab per kind, grouped by set, with search, a set filter and sorting. Click a tile to edit it on the right: names, costs, sets, texts (with an icon palette for 🪙 🂠 ⚡ …), every effect and its values (add / reorder / remove), trinket levels, enemy intents, encounter sets and slots, decks and pools (with counts). A **Sets** tab adds and edits card sets (see [Card sets](#card-sets)). **New…**, **Duplicate** and **Delete…** (moves the file to the recycle bin and lists what still uses it) are there too. Every edit is saved to the `.tres` file about half a second after you stop typing; there is no undo, so use git. Anything it can't edit inline (textures) is one click away in the Inspector, which follows the selection.
+- **Content tab (easiest):** the **Content** tab at the top of the editor, next to 2D / 3D / Script (the `addons/content_browser` plugin). It shows everything in `content/test/` as card-style tiles, one tab per kind, grouped by set, with search, a set filter and sorting. Click a tile to edit it on the right: names, costs, sets, texts (with an icon palette for 🪙 🂠 ⚡ …), every effect and its values (add / reorder / remove), trinket levels, enemy intents, encounter sets and slots, decks and pools (with counts). **▶ Test this** plays the game with that piece added on top of the starting loadout, and **+ Test kit** collects several pieces in the test bar under the toolbar to play them together (see [tools-and-deploy.md](tools-and-deploy.md#testing-pieces)). A **Sets** tab adds and edits card sets (see [Card sets](#card-sets)). **New…**, **Duplicate** and **Delete…** (moves the file to the recycle bin and lists what still uses it) are there too. Every edit is saved to the `.tres` file about half a second after you stop typing; there is no undo, so use git. Anything it can't edit inline (textures) is one click away in the Inspector, which follows the selection.
 - **In the editor:** FileSystem → right-click a folder → **New Resource** → pick the type (e.g. `CardData`), then fill in the Inspector. Add effects with the array's **+** button → **New *XxxEffect***.
 - **From a script:** see `tools/build_test_content.gd`, which regenerates `content/test/`. If you edit test `.tres` files by hand, re-running that script **overwrites** your changes.
 
@@ -30,7 +30,7 @@ To play your content, point an `EncounterData` at your pools and enemy, then set
 
 If you write custom text, the auto "INSTANT" tag is hidden. Put ⚡ in the text instead.
 
-### ItemData — a passive item
+### CharmData — a passive charm
 
 | Field | Default | Notes |
 |---|---|---|
@@ -38,7 +38,7 @@ If you write custom text, the auto "INSTANT" tag is hidden. Put ⚡ in the text 
 | `trigger` | `CARD_BOUGHT` | When it fires (see [triggers](effects-reference.md#triggers)) |
 | `effects` | [] | |
 | `limit_per_encounter` / `limit_per_round` | 0 | 0 = unlimited |
-| `shop_price_override` | -1 | While you own it, **everything** in the market (cards, items, trinkets, trinket upgrades, enhancements) costs this much (-1 = off; the lowest override wins). Needful uses 0. |
+| `shop_price_override` | -1 | While you own it, **everything** in the market (cards, charms, trinkets, trinket upgrades, enhancements) costs this much (-1 = off; the lowest override wins). Needful uses 0. |
 | `restock_bought_cards` | false | While you own it, a market card slot you buy from gets a new random card right away (Stockroom) |
 | `coin_gain_bonus` | 0 | While you own it, every time you gain coins from anything else (cards, trinkets, on-buys, enhancements, sales), you gain this many more. Once per gain, not per coin (Liquidate's total is one gain); bonuses never trigger each other (Tip Jar: 1) |
 | `description` | "" | Auto: "*When…* (*limit*): *effects*" |
@@ -75,7 +75,7 @@ One enhancement per set, built by `tools/build_enhancements.gd` into `content/te
 | `intents` | [] | Loop in order |
 | `actions_per_round` | 3 | How many of your actions it answers each round |
 | `start_intent` | 0 | Offsets the cycle, so two copies can be out of phase |
-| `items` | [] | Passive; it never buys more |
+| `charms` | [] | Passive; it never buys more |
 | `portrait`, `color` | —, coral | The portrait isn't rendered yet. It shows an initial in `color`. |
 
 `EnemyIntent`: `display_name`, `kind` (ATTACK / STEAL / SHOP / CURSE / BUFF / OTHER, shown as a label), `effects`, optional `description`, `icon`.
@@ -89,20 +89,20 @@ Intent text is auto-phrased from the player's point of view, for example "You lo
 | `coin_target` | 15 | Win threshold |
 | `gold_reward` | 10 | Shown on victory. Not used yet. |
 | `enemy` | — | |
-| `card_sets` | [] | **Just name the sets**: every card, item, trinket and enhancement of these sets, plus Utility and Coins (`CardSets.ALWAYS_SOLD`), is sold. They are found automatically (`ContentLibrary`, everything under `content/test/`) |
+| `card_sets` | [] | **Just name the sets**: every card, charm, trinket and enhancement of these sets, plus Utility and Coins (`CardSets.ALWAYS_SOLD`), is sold. They are found automatically (`ContentLibrary`, everything under `content/test/`) |
 | `card_pool` | [] | Extra cards on top of the sets (or the whole pool if `card_sets` is empty). Duplicates raise the odds |
-| `item_pool`, `trinket_pool`, `enhancement_pool` | [] | Same for items / trinkets / upgrades; each is drawn without repeats |
-| `card_slots` / `item_slots` / `trinket_slots` / `enhancement_slots` | 5 / 1 / 1 / 1 | A pool with no slots is hidden from the market |
+| `charm_pool`, `trinket_pool`, `enhancement_pool` | [] | Same for charms / trinkets / upgrades; each is drawn without repeats |
+| `card_slots` / `charm_slots` / `trinket_slots` / `enhancement_slots` | 5 / 1 / 1 / 1 | A pool with no slots is hidden from the market |
 | `refill_card_slots` | false | Legacy: refills a card slot right after it's bought |
 | `rng_seed` | 0 | 0 = random |
 
 ### LoadoutData — what the player starts with
 
-`starting_deck`, `starting_coins` (3), `items`, `trinkets`. Later this will come from the run.
+`starting_deck`, `starting_coins` (3), `charms`, `trinkets`. Later this will come from the run.
 
 ## Card sets
 
-Every card, item, trinket, enhancement and curse has exactly one `card_set` (enum `CardSets.Id` in `scripts/data/card_sets.gd`). The set tints the tile (`CardSets.color`) and decides what an encounter sells. **The enum numbers are stored in the `.tres` files: only ever append new ids.** Names and colors are placeholders.
+Every card, charm, trinket, enhancement and curse has exactly one `card_set` (enum `CardSets.Id` in `scripts/data/card_sets.gd`). The set tints the tile (`CardSets.color`) and decides what an encounter sells. **The enum numbers are stored in the `.tres` files: only ever append new ids.** Names and colors are placeholders.
 
 **Adding or editing a set:** use the **Sets** tab of the Content tab. **New…** appends a set to `CardSets.Id` (next free number, key made from the name, e.g. `DEEP_SEA`) with a name and color in `_INFO`; selecting a set edits its name, color, description (the enum comment) and whether it's in `ALWAYS_SOLD`. It rewrites `scripts/data/card_sets.gd` for you and never renames keys or removes sets. The tab also shows how many pieces each set has and which encounters sell it, so the table below may lag behind it.
 
@@ -118,7 +118,7 @@ Every card, item, trinket, enhancement and curse has exactly one `card_set` (enu
 | Market | 8 | Buying, restocking, recovering cards, market manipulation |
 | Curse Synergy | 12 | Gaining, moving and cashing in curses |
 
-`ContentLibrary` (`scripts/data/content_library.gd`) scans `res://content/test/{cards,items,trinkets,enhancements}` at runtime, so moving a piece to another set or adding a new `.tres` needs no script re-run. Curses are not scanned. Gotcha: a static func called `set_name` on a `class_name` script collides with `Resource.set_name`; use `display_name`.
+`ContentLibrary` (`scripts/data/content_library.gd`) scans `res://content/test/{cards,charms,trinkets,enhancements}` at runtime, so moving a piece to another set or adding a new `.tres` needs no script re-run. Curses are not scanned. Gotcha: a static func called `set_name` on a `class_name` script collides with `Resource.set_name`; use `display_name`.
 
 ## Writing card text
 
@@ -148,8 +148,8 @@ Every card, item, trinket, enhancement and curse has exactly one `card_set` (enu
 | A card that draws | `on_play: [DrawCardsEffect amount=2]` |
 | A free coin card | `instant = true`, `on_play: [GainCoinsEffect 1]`, text `⚡Gain 1 🪙` |
 | A payoff for drawing | `GainCoinsPerStatEffect stat=cards_drawn_this_turn per=1` |
-| "Bought cards go to hand" item | trigger `BEFORE_CARD_BUY`, `SetBuyDestinationEffect destination=HAND` |
-| A "first time only" item | `limit_per_encounter = 1` |
+| "Bought cards go to hand" charm | trigger `BEFORE_CARD_BUY`, `SetBuyDestinationEffect destination=HAND` |
+| A "first time only" charm | `limit_per_encounter = 1` |
 | An enemy that taxes you | Intent with `LoseCoinsEffect target=OPPONENT` |
 | "Discard a card to draw 2" | `DiscardCardsEffect amount=1 as_cost=true`, `DrawCardsEffect 2` |
 | "X OR Y" | `ChooseOneEffect` with two `EffectOption`s |
@@ -161,23 +161,23 @@ Every card, item, trinket, enhancement and curse has exactly one `card_set` (enu
 
 ## Current test content (`content/test/`)
 
-Cards, items, trinkets and curses come from `tools/build_test_content.gd` (see the warning in [tools-and-deploy.md](tools-and-deploy.md#headless-tools-tools)). Names and costs of the ideas.md content are **placeholders**.
+Cards, charms, trinkets and curses come from `tools/build_test_content.gd` (see the warning in [tools-and-deploy.md](tools-and-deploy.md#headless-tools-tools)). Names and costs of the ideas.md content are **placeholders**.
 
 | Kind | What |
 |---|---|
 | Nimrod's cards | This is a card (`example1`), This is another card (`example2`), Draw Synergy (`drawful`) |
-| Idea cards (44) | Every card idea from `design/ideas.md`, plus Pawn (listed under items, meant as a card). P1 is **Snowball** (dummy name). All in the market pool. |
+| Idea cards (44) | Every card idea from `design/ideas.md`, plus Pawn (listed under charms, meant as a card). P1 is **Snowball** (dummy name). All in the market pool. |
 | Curses (`content/test/curses/`) | C1 **Dead Weight** (does nothing), C2 **Barnacle** (permanent), C3 **Driftwood** (play: remove this), C4 **Leaky Purse** (end of turn in hand: lose 2 🪙). Dummy names; the ids match (`dead_weight`, `barnacle`, `driftwood`, `leaky_purse`). Not in the market. |
-| Items (17, + Tip Jar below) | Rebate, Express Delivery, the 11 item ideas, Shredder ("when you discard, remove it"), Needful (the whole shop costs 0, every purchase adds a random curse to your deck), **Top Shelf** (Market: when you buy a card you may put it on top of your deck) and **Stockroom** (Market: bought card slots restock) |
+| Charms (17, + Tip Jar below) | Rebate, Express Delivery, the 11 charm ideas, Shredder ("when you discard, remove it"), Needful (the whole shop costs 0, every purchase adds a random curse to your deck), **Top Shelf** (Market: when you buy a card you may put it on top of your deck) and **Stockroom** (Market: bought card slots restock) |
 | Hunker Down | Retain card, cost 2: "Pass. 📌 your hand this turn" |
-| More ideas (2026-10-08) | Placeholder names and costs, "TBD" on-buys, only in the .tres (not in `build_test_content.gd`): **Stonewall** (Utility, 3, ⚡ cancel the enemy's next action this turn), **Overclock** (Utility, 3, use the level 3 effect of a trinket you own), **Hindsight** (Coins, 3, 🪙 per card in your discard pile), **Both Ends** (Draw, 2, draw the top and the bottom card), **Moving Goalposts** (Utility, 4, target −3), **Blank Slate** (Utility, 2, does nothing; any number of enhancements) and the item **Tip Jar** (Coins, 4, +1 🪙 on every other gain). Not in the TEST Encounter pools; the themed encounters sell them through their sets. |
+| More ideas (2026-10-08) | Placeholder names and costs, "TBD" on-buys, only in the .tres (not in `build_test_content.gd`): **Stonewall** (Utility, 3, ⚡ cancel the enemy's next action this turn), **Overclock** (Utility, 3, use the level 3 effect of a trinket you own), **Hindsight** (Coins, 3, 🪙 per card in your discard pile), **Both Ends** (Draw, 2, draw the top and the bottom card), **Moving Goalposts** (Utility, 4, target −3), **Blank Slate** (Utility, 2, does nothing; any number of enhancements) and the charm **Tip Jar** (Coins, 4, +1 🪙 on every other gain). Not in the TEST Encounter pools; the themed encounters sell them through their sets. |
 | On-buy placeholders | Every card without a real on-buy shows a "TBD" buy strip (`on_buy_text = "TBD"`) |
 | Nimrod's on-buys (2026-10-08) | Blank Slate (randomly enhance this), Cycle (⤵ ➡ 🂠), Ember (🗑 this; Ember now draws 🂠🂠 when **removed**, not destroyed), Free Sample (🂠), Mimic (play a random card from your hand), Rush Order (🂠 this), Sift (🂠⤵), Snowball (+1 to all Snowballs; Snowball now starts at 🪙), Spark and Tinker (↺ a trinket). The tests check that every on-buy text other than "TBD" has effects. |
 | Trinkets (7) | Coin Trinket + the 6 trinket ideas, 3 levels each |
 | Enemy | TEST Moray: Pinch (steal 1) → Toll (you lose 1) → Snatch (priciest market card). 3 actions per round. |
-| Encounter | TEST Encounter: 3 rounds, target 10, 3 card slots, 1 item slot, 1 trinket slot, 0 upgrade slots. Uses explicit pools, no `card_sets`. It is not in `encounter_pool`, but the tests and the simulator use it. |
+| Encounter | TEST Encounter: 3 rounds, target 10, 3 card slots, 1 charm slot, 1 trinket slot, 0 upgrade slots. Uses explicit pools, no `card_sets`. It is not in `encounter_pool`, but the tests and the simulator use it. |
 | Enhancements (8) | One per set except Curses (`content/test/enhancements/`, built by `tools/build_enhancements.gd`): Gilded (Coins), Insight (Draw), Boomerang (Discard), Fleeting (Trim), Anchored (Retain), Hasty (Utility), Franchise (Market), Tainted (Curse Synergy). Placeholder names, price 3 each. |
 | Loadout | 5× example2 + 3× example1, 3 coins |
-| 5 themed encounters | Built by `tools/build_encounters.gd`; each just lists its two `card_sets` and the shop pools fill themselves by `card_set`. Each sells two sets + Utility + Coins, 3 rounds, target 10, 3 card / 1 item / 1 trinket slot. **Hag's Hex** (Trim + Curse Synergy, Sea Hag), **Ink Cloud** (Draw + Discard, Cuttlefish), **Toll Booth** (Market + Draw, Barracuda + the Toll item), **Loan Shark** (Curse Synergy + Market), **Clutter** (Discard + Trim, Hagfish). Enemies in `content/test/enemies/`, the Toll passive in `content/test/enemy_items/`. Names are placeholders. |
+| 5 themed encounters | Built by `tools/build_encounters.gd`; each just lists its two `card_sets` and the shop pools fill themselves by `card_set`. Each sells two sets + Utility + Coins, 3 rounds, target 10, 3 card / 1 charm / 1 trinket slot. **Hag's Hex** (Trim + Curse Synergy, Sea Hag), **Ink Cloud** (Draw + Discard, Cuttlefish), **Toll Booth** (Market + Draw, Barracuda + the Toll charm), **Loan Shark** (Curse Synergy + Market), **Clutter** (Discard + Trim, Hagfish). Enemies in `content/test/enemies/`, the Toll passive in `content/test/enemy_charms/`. Names are placeholders. |
 
 With the idea cards in the pool the greedy bot wins about 55% at target 10 (it plays the new cards badly, so treat it as a floor).

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="LoadoutData" format=3]
 
-[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1_ntv7m"]
+[ext_resource type="Script" path="res://scripts/data/charm_data.gd" id="1_ntv7m"]
 [ext_resource type="Script" path="res://scripts/data/loadout_data.gd" id="2_5e4hs"]
 [ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_4k74b"]
 [ext_resource type="Resource" path="res://content/test/cards/example2.tres" id="4_535rg"]

@@ -1,7 +1,7 @@
 class_name ReplayEffect
 extends Effect
 ## NEXT_CARD: the next card you play this turn is played an additional time.
-## THIS_CARD: play ctx.card's effect again now (for items on CARD_PLAYED).
+## THIS_CARD: play ctx.card's effect again now (for charms on CARD_PLAYED).
 
 enum Mode { NEXT_CARD, THIS_CARD }
 

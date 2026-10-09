@@ -9,5 +9,5 @@ extends Resource
 @export var levels: Array[TrinketLevel] = []
 @export_multiline var description: String = ""
 @export var icon: Texture2D
-## Which set this belongs to (see CardSets). One set per card/item/trinket.
+## Which set this belongs to (see CardSets). One set per card/charm/trinket.
 @export var card_set: CardSets.Id = CardSets.Id.NONE

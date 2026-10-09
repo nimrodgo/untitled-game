@@ -11,13 +11,19 @@ An aquatic roguelike deckbuilder where **every encounter is a shop**. You don't 
 | Repo | `github.com/nimrodgo/untitled-game` → Pages: `nimrodgo.github.io/untitled-game` |
 | Entry scene | `scenes/main.tscn` (one `Control` running `encounter_screen.gd`; its `encounter_pool` holds the 5 encounters) |
 
+## Terminology
+
+- **Items** is the umbrella word for everything you can own or buy: **cards**, **charms** and **trinkets**. (Enhancements/upgrades and curses are not called items.)
+- **Charms** are the passive pieces that fire on a trigger (code: `CharmData`, `CharmInstance`, `content/test/charms/`). They used to be called "items" in the code and docs; there is no `ItemData` any more.
+- **Trinkets** are the pieces you activate yourself (once per turn); **cards** go in your deck.
+
 ## Docs map
 
 | File | Read it when you want to… |
 |---|---|
 | [game-rules.md](game-rules.md) | understand exactly how an encounter plays out (turns, actions, enemy, market, win) |
 | [architecture.md](architecture.md) | find your way around the code: layers, classes, signals, data flow |
-| [content-design.md](content-design.md) | make cards, items, trinkets, upgrades, enemies and encounters |
+| [content-design.md](content-design.md) | make cards, charms, trinkets, upgrades, enemies and encounters |
 | [effects-reference.md](effects-reference.md) | look up every effect primitive, trigger, zone and text placeholder |
 | [ui.md](ui.md) | change the screen: layout, drag & drop, card visuals, animations |
 | [tools-and-deploy.md](tools-and-deploy.md) | run the simulator, regenerate content, playtest on a phone, deploy |
@@ -33,7 +39,7 @@ An aquatic roguelike deckbuilder where **every encounter is a shop**. You don't 
 
 - **Communicate visually, not with labels.** Play and buy are shown through motion, glow and layout, not with hint text.
 - **Card anatomy:** the main text is the **on-play** effect. A gold strip with a 🛍 bag icon at the bottom is the **on-buy** effect. Neither gets a "Play:" or "On buy:" label.
-- **Whole market on one screen**, with no tabs: cards on the top row, items / trinkets / upgrades on the second row.
+- **Whole market on one screen**, with no tabs: cards on the top row, charms / trinkets / upgrades on the second row.
 - **Trinkets are once per turn implicitly.** Never write "once per turn" or "(free)" on a trinket.
 - **Landscape, mobile-friendly, drag-first.**
 - **All real content is designed by Nimrod.** Test content only uses his cards.
@@ -50,9 +56,9 @@ scripts/
   model/                 runtime state: PlayerState, ShopState, *Instance
   ui/                    code-built UI: screen, hand, card tiles, fx, icons
   sim/                   SimBot (greedy player for the simulator)
-content/test/            current test content (.tres): cards, items, trinkets, enhancements, curses,
-                         enemies, enemy_items, encounters, loadouts (see tools-and-deploy.md for the generators)
-design/                  ideas.md (card / item ideas) and inspirations/*.json (icon glossaries of other
+content/test/            current test content (.tres): cards, charms, trinkets, enhancements, curses,
+                         enemies, enemy_charms, encounters, loadouts (see tools-and-deploy.md for the generators)
+design/                  ideas.md (card / charm ideas) and inspirations/*.json (icon glossaries of other
                          games, reference only: nothing loads them)
 assets/app_icons/        PWA icons for the installable web build
 tools/                   headless scripts: simulate, build content, HTTPS server

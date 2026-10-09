@@ -1,6 +1,6 @@
 class_name SetBuyDestinationEffect
 extends Effect
-## Only meaningful on a BEFORE_CARD_BUY item trigger (or a card's on-buy):
+## Only meaningful on a BEFORE_CARD_BUY charm trigger (or a card's on-buy):
 ## changes where the bought card goes.
 ## `optional`: the owner is asked each time ("you may place it on top...").
 

@@ -37,7 +37,7 @@ Each effect implements these methods:
 | `DiscardCardsEffect` | `amount`=1, `all_hand`, `as_cost`, `draw_that_many` | You pick cards in your hand to discard, or the whole hand. `as_cost`: "Discard 1 ⤵ ➡ …" is unplayable without enough **other** cards; where nothing checks that first (an on-buy, Cycle), not discarding enough sets `ctx.cost_unpaid` and the rest of the list is skipped. `draw_that_many`: "Discard your hand. Draw that many". |
 | `DiscardRandomEffect` | `amount`=1 | Discards random cards from the target's hand (enemy intents: set `target = OPPONENT`) |
 | `DiscardFromDeckEffect` | `look`=1 | Look at the top N cards of your deck; discard any of them (in order, optional) |
-| `OfferRedrawEffect` | — | For a `CARD_DRAWN` item: you may discard the card just drawn to draw another. Declining, or the start-of-turn draw, doesn't use up the item. |
+| `OfferRedrawEffect` | — | For a `CARD_DRAWN` charm: you may discard the card just drawn to draw another. Declining, or the start-of-turn draw, doesn't use up the charm. |
 | `DrawLockEffect` | — | The **target** can't draw additional cards this turn (an enemy intent with `target = OPPONENT` locks *your* draws) |
 | `NextTurnDrawEffect` | `amount`=1 | Draw N extra at the start of your next turn |
 | `DrawThisCardEffect` | — | Draws the card this effect belongs to into your hand from wherever it is (e.g. the discard pile). Nothing while draws are locked. Used by the Boomerang enhancement. Text "🂠 this card". |
@@ -46,7 +46,7 @@ Each effect implements these methods:
 
 | Class | Fields | Does |
 |---|---|---|
-| `TrashCardsEffect` | `destroy`=true, `what`=CHOOSE, `amount`=1, `piles`=all, `curses_only`, `coins_per_card`, `gain_cost_as_coins`, `as_cost` | **Remove** 🗑 (for this encounter, `destroy=false`) or **destroy** 🔥 (permanently). `what`: `SELF` (this card / the played card for items), `CHOOSE` (exactly `amount` from `piles`, fewer only if there aren't enough), `ALL_OTHER_HAND`, `DRAW_PILE` ("your deck"). |
+| `TrashCardsEffect` | `destroy`=true, `what`=CHOOSE, `amount`=1, `piles`=all, `curses_only`, `coins_per_card`, `gain_cost_as_coins`, `as_cost` | **Remove** 🗑 (for this encounter, `destroy=false`) or **destroy** 🔥 (permanently). `what`: `SELF` (this card / the played card for charms), `CHOOSE` (exactly `amount` from `piles`, fewer only if there aren't enough), `ALL_OTHER_HAND`, `DRAW_PILE` ("your deck"). |
 | `MoveCardsEffect` | `from_piles`, `to_zone`, `curses_only`, `amount`=0 | Move cards between piles (no triggers). `amount=0` = all matching cards; otherwise you choose. |
 | `TransformCardsEffect` | `into` | Choose any number of cards in your hand; each becomes `into` (upgrades are lost) |
 | `AddCardEffect` | `card`, `amount`=1, `zone`=DRAW_BOTTOM | Creates new copies of a card (curses: "Add C3 to the bottom of your deck", "Gain C2") |
@@ -60,17 +60,17 @@ Each effect implements these methods:
 | Class | Fields | Does |
 |---|---|---|
 | `PlayTopCardsEffect` | `amount`=2 | Play the top N cards of your deck. Unplayable ones go to the discard pile. |
-| `ReplayEffect` | `mode`=NEXT_CARD, `times`=1 | `NEXT_CARD`: the next card you play this turn is played an additional time. `THIS_CARD` (items on `CARD_PLAYED`): play the card that was just played again. |
+| `ReplayEffect` | `mode`=NEXT_CARD, `times`=1 | `NEXT_CARD`: the next card you play this turn is played an additional time. `THIS_CARD` (charms on `CARD_PLAYED`): play the card that was just played again. |
 | `PlayRandomFromHandEffect` | — | Plays a random card from your hand that you could play right now (curses and unpayable costs skipped); nothing if none (Mimic's on-buy) |
 | `PlayCopyEffect` | `source`=LAST_PLAYED | Resolve another card's on-play: `LAST_PLAYED` this turn, or a card you choose from those `DESTROYED` this encounter |
 
-All of these **count as playing a card** (cards-played count, `CARD_PLAYED` items).
+All of these **count as playing a card** (cards-played count, `CARD_PLAYED` charms).
 
 ### Market and trinkets
 
 | Class | Fields | Does |
 |---|---|---|
-| `BuyCardEffect` | `source`=MARKET, `free`, `zone`=-1, `play_then_destroy` | Buy a card you choose (and can afford) as part of this effect. `source`: `MARKET`, `REMOVED` or `DESTROYED` this encounter. It's a real buy: on-buy, `BEFORE_CARD_BUY` / `CARD_BOUGHT` items. `zone` overrides the destination (`DRAW_TOP` for "place it on top"). `play_then_destroy`: play it right away, then destroy it. |
+| `BuyCardEffect` | `source`=MARKET, `free`, `zone`=-1, `play_then_destroy` | Buy a card you choose (and can afford) as part of this effect. `source`: `MARKET`, `REMOVED` or `DESTROYED` this encounter. It's a real buy: on-buy, `BEFORE_CARD_BUY` / `CARD_BOUGHT` charms. `zone` overrides the destination (`DRAW_TOP` for "place it on top"). `play_then_destroy`: play it right away, then destroy it. |
 | `NextBuyToHandEffect` | `amount`=1 | The next card you buy is drawn immediately |
 | `SetBuyDestinationEffect` | `destination`=HAND, `optional`, `draw` | Sets `ctx.buy_destination` (buy triggers / on-buy only). `optional`: asks the player each time ("you may…", Top Shelf). `draw`: "🂠 this", the bought card is drawn (counts as a draw; can't-draw sends it to its normal place; a pending Rush Order stays pending) (Rush Order's on-buy) |
 | `RandomEnhanceEffect` | — | Attaches a random enhancement (any except destroy-only ones like Fleeting) to this card, if it can take one (Blank Slate's on-buy) |
@@ -97,8 +97,8 @@ All of these **count as playing a card** (cards-played count, `CARD_PLAYED` item
 
 | Effect | Works on | Ignored on |
 |---|---|---|
-| `SetBuyDestinationEffect` | `BEFORE_CARD_BUY` items, a card's own `on_buy` | Everything else |
-| `ExtraActionEffect` | Non-instant card `on_play`, card `on_buy`, buy / play items | Trinkets, trinket/enhancement purchases |
+| `SetBuyDestinationEffect` | `BEFORE_CARD_BUY` charms, a card's own `on_buy` | Everything else |
+| `ExtraActionEffect` | Non-instant card `on_play`, card `on_buy`, buy / play charms | Trinkets, trinket/enhancement purchases |
 | `PassEffect` | Any of your cards, trinkets, options | Enemy intents |
 
 ## Card hooks (`CardData`)
@@ -114,7 +114,7 @@ All of these **count as playing a card** (cards-played count, `CARD_PLAYED` item
 
 ## Triggers
 
-These are the item `trigger` values in `GameRules.Trigger`. The engine fires each one for the side named below. New ones are appended at the end of the enum.
+These are the charm `trigger` values in `GameRules.Trigger`. The engine fires each one for the side named below. New ones are appended at the end of the enum.
 
 | Trigger | Fires | Side |
 |---|---|---|
@@ -132,13 +132,13 @@ These are the item `trigger` values in `GameRules.Trigger`. The engine fires eac
 | `OPPONENT_CARD_BOUGHT` | Same moment | the other side |
 | `CARD_PLAYED` | After on-play resolves (also replays and copies) | player |
 | `OPPONENT_CARD_PLAYED` | Same moment | enemy |
-| `ITEM_BOUGHT` | After an item purchase | player |
-| `SHOP_BUY` | After **any** purchase: a card (after `CARD_BOUGHT`), an item (before the new item is added, so it doesn't react to itself), a trinket or trinket upgrade, an enhancement. Used by Needful | player |
+| `CHARM_BOUGHT` | After a charm purchase | player |
+| `SHOP_BUY` | After **any** purchase: a card (after `CARD_BOUGHT`), a charm (before the new charm is added, so it doesn't react to itself), a trinket or trinket upgrade, an enhancement. Used by Needful | player |
 | `TRINKET_USED` | After a trinket resolves | player |
 | `ROUND_END` | When you pass, before cleanup | both |
 | `ENEMY_ACTED` | After each intent | both |
 
-Only **items** listen to triggers. An item fires if `can_trigger()` passes (its per-round and per-encounter limits). "The first card you play each turn…" = `CARD_PLAYED` with `limit_per_round = 1`.
+Only **charms** listen to triggers. A charm fires if `can_trigger()` passes (its per-round and per-encounter limits). "The first card you play each turn…" = `CARD_PLAYED` with `limit_per_round = 1`.
 
 ## Zones (`GameRules.Zone`)
 

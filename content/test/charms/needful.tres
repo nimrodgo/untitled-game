@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://do7is8pqqkij"]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://do7is8pqqkij"]
 
 [ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_g3il5"]
 [ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="2_tev7c"]
@@ -7,7 +7,7 @@
 [ext_resource type="Resource" uid="uid://blp5arycf7mlw" path="res://content/test/curses/driftwood.tres" id="5_qjfph"]
 [ext_resource type="Resource" uid="uid://b7xlimiw8auk4" path="res://content/test/curses/leaky_purse.tres" id="6_1octo"]
 [ext_resource type="Script" uid="uid://3ixj6y1hac5i" path="res://scripts/data/effects/add_random_curse_effect.gd" id="7_awu7w"]
-[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="8_rqu7c"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/charm_data.gd" id="8_rqu7c"]
 
 [sub_resource type="Resource" id="Resource_md6ye"]
 script = ExtResource("7_awu7w")

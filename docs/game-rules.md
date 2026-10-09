@@ -20,7 +20,7 @@ Have **coins ≥ `coin_target`** after the last round. Effects can lower the tar
 ```mermaid
 flowchart TD
     A[Round starts] --> B[Market restocks<br/>skipped in round 1]
-    B --> C[Reset item round-uses and trinkets]
+    B --> C[Reset charm round-uses and trinkets]
     C --> D[Draw up to 5]
     D --> E[Reset 'this turn' stats<br/>opening hand doesn't count as drawn]
     E --> F[Enemy action pips refill]
@@ -40,7 +40,7 @@ flowchart TD
 | Free (the enemy doesn't respond) | Normal (the enemy responds if it has pips left) |
 |---|---|
 | Play an **instant** (⚡) card | Play a non-instant card |
-| Use a **trinket** (once per turn each) | Buy a card, item, trinket (or its upgrade) or upgrade (enhancement) |
+| Use a **trinket** (once per turn each) | Buy a card, charm, trinket (or its upgrade) or upgrade (enhancement) |
 | **Sell** a trinket | |
 
 - Which purchases count as actions is set by the `*_IS_ACTION` flags in `GameRules` (all `true` right now).
@@ -52,7 +52,7 @@ flowchart TD
 
 - **It doesn't play cards or buy anything.** It walks through `EnemyData.intents` in order and loops back to the start. `start_intent` sets where it begins.
 - **It answers each normal action with its next intent**, up to `actions_per_round` times per round (default 3). The pips on its panel show how many are left.
-- It can start with **passive items**, which fire on triggers the same way yours do.
+- It can start with **passive charms**, which fire on triggers the same way yours do.
 - It affects the market through intents such as `SnatchShopCardEffect`.
 - Intent effects resolve with the **enemy as owner**, so `target = OPPONENT` means **you**.
 
@@ -61,20 +61,20 @@ flowchart TD
 | Row | Starting stock | Restock (start of each round after the first) |
 |---|---|---|
 | Cards | `card_slots` random picks from the card pool (duplicates make a card more likely) | **Every** card slot is rerolled |
-| Items | Drawn from a shuffled "bag" of the item pool (no repeats) | Only **empty** slots refill, from what's left in the bag |
+| Charms | Drawn from a shuffled "bag" of the charm pool (no repeats) | Only **empty** slots refill, from what's left in the bag |
 | Trinkets | A weighted pick from the trinket pool (no repeats on screen) | **Every** slot is rerolled |
 | Upgrades (enhancements) | A pick from the enhancement pool (no repeats on screen) | **Every** slot is rerolled |
 
 - Buying **doesn't refill** the slot during the round. The legacy flag `refill_card_slots` changes that.
-- **What the pools contain:** an encounter lists its `card_sets`; it sells every card, item, trinket and enhancement of those sets **plus Utility and Coins** (`CardSets.ALWAYS_SOLD`). The manual `*_pool` fields are extras on top (see [content-design.md](content-design.md#card-sets)).
-- **Price overrides:** an owned item with `shop_price_override` (Needful: 0) sets the price of **everything** in the market: cards, items, trinkets, trinket upgrades and enhancements (the lowest override wins). The tile shows the normal price struck through. A trinket bought this way is worth what you actually paid when sold.
-- **Restocking:** an owned item with `restock_bought_cards` (Stockroom) refills a card slot with a new random card as soon as you buy from it (also for cards bought by effects).
+- **What the pools contain:** an encounter lists its `card_sets`; it sells every card, charm, trinket and enhancement of those sets **plus Utility and Coins** (`CardSets.ALWAYS_SOLD`). The manual `*_pool` fields are extras on top (see [content-design.md](content-design.md#card-sets)).
+- **Price overrides:** an owned charm with `shop_price_override` (Needful: 0) sets the price of **everything** in the market: cards, charms, trinkets, trinket upgrades and enhancements (the lowest override wins). The tile shows the normal price struck through. A trinket bought this way is worth what you actually paid when sold.
+- **Restocking:** an owned charm with `restock_bought_cards` (Stockroom) refills a card slot with a new random card as soon as you buy from it (also for cards bought by effects).
 - If you can't afford something, it's shown dimmed and you can't drag it.
 
 ## Buying and playing, in order
 
 **Buy a card:**
-1. Pay the cost. The `BEFORE_CARD_BUY` trigger fires, and items can change where the card goes.
+1. Pay the cost. The `BEFORE_CARD_BUY` trigger fires, and charms can change where the card goes.
 2. The card's **on-buy** effects resolve. A cost on an on-buy that can't be paid ("⤵ ➡ 🂠" with an empty hand) doesn't block the purchase: the rest of that on-buy is just skipped.
 3. The card goes to its destination. By default it goes to the **bottom of the draw pile**, never your hand, unless something like Express Delivery says otherwise. An on-buy "🂠 this" (Rush Order) **draws** it instead (it counts as a draw; if you can't draw, it goes to the bottom as usual). If its on-buy removed or destroyed it (Ember: "🗑 this"), it goes nowhere.
 4. `CARD_BOUGHT` fires for you and `OPPONENT_CARD_BOUGHT` fires for the enemy. Then the enemy may respond.
@@ -86,7 +86,7 @@ flowchart TD
 ## Trinkets: buy, upgrade, sell
 
 - You can own at most **3 trinkets** (`GameRules.MAX_TRINKETS`). The Trinkets panel always shows 3 frames; the free ones are empty.
-- The market has **1 trinket slot** and **1 item slot** (the default for every encounter). Trinket slots are **rerolled every round** from the whole pool, and trinkets you own (and can still upgrade) are **twice as likely**. A trinket you own at its top level never appears.
+- The market has **1 trinket slot** and **1 charm slot** (the default for every encounter). Trinket slots are **rerolled every round** from the whole pool, and trinkets you own (and can still upgrade) are **twice as likely**. A trinket you own at its top level never appears.
 - **Buying a trinket you already own upgrades it** (no second copy). It costs the **next level's `upgrade_cost`**, and the market tile shows that next level in purple. **An upgrade also refreshes the trinket** (a used one can be used again this turn). A **new** trinket costs its base cost and needs a free slot, so with 3 trinkets it's greyed out.
 - **Selling:** drag a trinket onto the market. You get **half of everything you paid for it** (purchase + upgrades), rounded down. It's a **free action** (`TRINKET_SELL_IS_ACTION = false`) and frees the slot.
 
@@ -118,7 +118,7 @@ Curses are cards with `curse = true`, usually **unplayable**, and shown in dark 
 
 - **Pass** on a card ends your turn right after that action. The enemy doesn't answer it.
 - An **extra turn** adds one more normal round to the encounter (restock, full hand, enemy actions refill).
-- **Replays, copies and cards played from the deck all count as playing a card** (cards-played count and "when you play a card" items).
+- **Replays, copies and cards played from the deck all count as playing a card** (cards-played count and "when you play a card" charms).
 
 ## Deck mechanics
 
@@ -136,7 +136,7 @@ Curses are cards with `curse = true`, usually **unplayable**, and shown in dark 
 | `DEFAULT_BUY_DESTINATION` | `DRAW_BOTTOM` | Where bought cards go |
 | `DISCARD_HAND_AT_ROUND_END` | true | Whether you keep unplayed cards between rounds |
 | `TRINKET_LIMIT` | `PER_TURN` | `PER_ACTION` would reset trinkets after every action |
-| `CARD/ITEM/TRINKET_BUY_IS_ACTION`, `ENHANCEMENT_BUY_IS_ACTION` | all true | Whether each purchase uses an action (and lets the enemy respond). Buying a trinket duplicate (an upgrade) counts as a trinket buy. |
+| `CARD/CHARM/TRINKET_BUY_IS_ACTION`, `ENHANCEMENT_BUY_IS_ACTION` | all true | Whether each purchase uses an action (and lets the enemy respond). Buying a trinket duplicate (an upgrade) counts as a trinket buy. |
 | `TRINKET_SELL_IS_ACTION` | false | Selling a trinket is free |
 | `MAX_TRINKETS` | 3 | Trinket slots you can own |
 | `ENEMY_STEP_DELAY` | 0.6 s | UI pause before the enemy's intent resolves |

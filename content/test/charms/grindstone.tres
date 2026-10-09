@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://caroohgn52rjs"]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://caroohgn52rjs"]
 
 [ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_jaqoh"]
 [ext_resource type="Script" uid="uid://dow1kbluxxx0s" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_iichq"]
-[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/item_data.gd" id="3_dsrbd"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/charm_data.gd" id="3_dsrbd"]
 
 [sub_resource type="Resource" id="Resource_70jlp"]
 script = ExtResource("2_iichq")

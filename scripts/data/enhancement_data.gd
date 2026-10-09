@@ -7,7 +7,7 @@ extends Resource
 @export var id: StringName
 @export var display_name: String = "New Enhancement"
 @export var cost: int = 2
-## Which set this belongs to (see CardSets). One set per card/item/trinket/enhancement.
+## Which set this belongs to (see CardSets). One set per card/charm/trinket/enhancement.
 @export var card_set: CardSets.Id = CardSets.Id.NONE
 @export var make_instant: bool = false
 @export var extra_on_play: Array[Effect] = []

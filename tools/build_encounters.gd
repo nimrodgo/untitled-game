@@ -4,7 +4,7 @@ extends SceneTree
 ## fill themselves from the existing content (ContentLibrary), so nothing here
 ## reads or touches your cards. Writes:
 ##   content/test/enemies/<enemy>.tres        5 enemies
-##   content/test/enemy_items/toll.tres       Barracuda's passive
+##   content/test/enemy_charms/toll.tres       Barracuda's passive
 ##   content/test/encounters/<encounter>.tres 5 encounters
 ## Run:  godot --headless --path . --script res://tools/build_encounters.gd
 ##
@@ -22,7 +22,7 @@ var _curse := {}
 
 
 func _init() -> void:
-	for sub in ["enemies", "enemy_items", "encounters"]:
+	for sub in ["enemies", "enemy_charms", "encounters"]:
 		DirAccess.make_dir_recursive_absolute(DIR + sub)
 	for id in ["dead_weight", "barnacle", "driftwood", "leaky_purse"]:
 		_curse[id] = load(DIR + "curses/%s.tres" % id)
@@ -46,19 +46,19 @@ func _init() -> void:
 	_encounter("Ink Cloud", "ink_cloud", squid, [S.DRAW, S.DISCARD])
 
 	# --- C. Market + Draw: the Barracuda snatches cards and taxes every buy ---
-	var toll := ItemData.new()
+	var toll := CharmData.new()
 	toll.id = &"toll"; toll.display_name = "Toll"; toll.cost = 0
 	toll.trigger = GameRules.Trigger.OPPONENT_CARD_BOUGHT
 	toll.effects.assign([_lose(1)])
 	toll.limit_per_round = 1
 	toll.description = "When you buy a card, you lose 1 🪙 (once per round)"
-	_save(toll, "enemy_items/toll.tres")
+	_save(toll, "enemy_charms/toll.tres")
 	var cuda := _enemy("Barracuda", Color("7f8c8d"), [
 		_intent("Snatch", Kind.SHOP, "Remove the cheapest market card", [_snatch(SnatchShopCardEffect.Mode.CHEAPEST)]),
 		_intent("Pinch", Kind.STEAL, "Steal 1 🪙", [_steal(1)]),
 		_intent("Grab", Kind.SHOP, "Remove the priciest market card", [_snatch(SnatchShopCardEffect.Mode.PRICIEST)]),
 	])
-	cuda.items.assign([toll])
+	cuda.charms.assign([toll])
 	_encounter("Toll Booth", "toll_booth", cuda, [S.MARKET, S.DRAW])
 
 	# --- D. Curse Synergy + Market: the Loan Shark lends curses and repossesses cards ---
@@ -93,11 +93,11 @@ func _encounter(title: String, file: String, enemy: EnemyData, sets: Array) -> v
 	enc.enemy = enemy
 	enc.card_sets.assign(sets)
 	enc.card_slots = 3
-	enc.item_slots = 1
+	enc.charm_slots = 1
 	enc.trinket_slots = 1
 	enc.enhancement_slots = 1
 	_save(enc, "encounters/%s.tres" % file)
-	print("%-10s cards %d, items %d, trinkets %d, enhancements %d" % [title, enc.get_card_pool().size(), enc.get_item_pool().size(), enc.get_trinket_pool().size(), enc.get_enhancement_pool().size()])
+	print("%-10s cards %d, charms %d, trinkets %d, enhancements %d" % [title, enc.get_card_pool().size(), enc.get_charm_pool().size(), enc.get_trinket_pool().size(), enc.get_enhancement_pool().size()])
 
 
 func _save(res: Resource, rel: String) -> void:

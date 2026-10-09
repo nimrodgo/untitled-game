@@ -17,7 +17,7 @@ const SELF := GameRules.Target.SELF
 
 
 func _init() -> void:
-	for sub in ["cards", "curses", "items", "trinkets", "enemies", "encounters", "loadouts"]:
+	for sub in ["cards", "curses", "charms", "trinkets", "enemies", "encounters", "loadouts"]:
 		DirAccess.make_dir_recursive_absolute(DIR + sub)
 
 	# --- Nimrod's original cards (text exactly as designed) ----------------
@@ -210,58 +210,58 @@ func _init() -> void:
 	ideas.append(_card("risky_draw", "Risky Draw", 0, false, [_draw(3), _add(leaky_purse)],
 		"3🂠. Add Leaky Purse into your deck"))
 
-	# Listed under items in ideas.md, but meant to be a card.
+	# Listed under charms in ideas.md, but meant to be a card.
 	var pawn := _trash(true, 1); pawn.piles = HAND; pawn.gain_cost_as_coins = true
 	ideas.append(_card("pawn", "Pawn", 1, false, [pawn],
 		"🔥 in hand. +🪙 equal to its cost"))
 
-	# --- Items -----------------------------------------------------------------
+	# --- Charms -----------------------------------------------------------------
 	var T := GameRules.Trigger
-	var original_items := [
-		_item("rebate", "Rebate", 3, T.CARD_BOUGHT, [_gain(1)], 0, 0, "+1🪙 when you buy a card"),
+	var original_charms := [
+		_charm("rebate", "Rebate", 3, T.CARD_BOUGHT, [_gain(1)], 0, 0, "+1🪙 when you buy a card"),
 	]
 	var dest := SetBuyDestinationEffect.new()
 	dest.destination = GameRules.Zone.HAND
-	original_items.append(_item("express_delivery", "Express Delivery", 2, T.BEFORE_CARD_BUY, [dest], 1, 0,
+	original_charms.append(_charm("express_delivery", "Express Delivery", 2, T.BEFORE_CARD_BUY, [dest], 1, 0,
 		"The first card you buy each encounter goes to your hand"))
 
 	var burn_played := _trash_self(true)
 	var retain_opt := RetainCardsEffect.new(); retain_opt.optional = true
 	var extra_play := ReplayEffect.new(); extra_play.mode = ReplayEffect.Mode.THIS_CARD
-	var idea_items := [
-		_item("furnace", "Furnace", 2, T.CARD_PLAYED, [burn_played], 0, 1,
+	var idea_charms := [
+		_charm("furnace", "Furnace", 2, T.CARD_PLAYED, [burn_played], 0, 1,
 			"The first card you play each turn is destroyed 🔥"),
-		_item("scrap_dealer", "Scrap Dealer", 4, T.CARD_REMOVED, [_gain(2)], 0, 0,
+		_charm("scrap_dealer", "Scrap Dealer", 4, T.CARD_REMOVED, [_gain(2)], 0, 0,
 			"When you 🗑 a card, +2🪙"),
-		_item("incinerator", "Incinerator", 5, T.CARD_DESTROYED, [_gain(3)], 0, 0,
+		_charm("incinerator", "Incinerator", 5, T.CARD_DESTROYED, [_gain(3)], 0, 0,
 			"When you 🔥 a card, +3🪙"),
-		_item("cursed_luck", "Cursed Luck", 3, T.CURSE_DRAWN, [_gain(2)], 0, 0,
+		_charm("cursed_luck", "Cursed Luck", 3, T.CURSE_DRAWN, [_gain(2)], 0, 0,
 			"When you draw a curse, +2🪙"),
-		_item("curse_ward", "Curse Ward", 3, T.CURSE_DRAWN, [_draw(1)], 0, 0,
+		_charm("curse_ward", "Curse Ward", 3, T.CURSE_DRAWN, [_draw(1)], 0, 0,
 			"When you draw a curse, 🂠"),
-		_item("recycler", "Recycler", 4, T.CARD_TRASHED_FROM_HAND, [_draw(1)], 0, 0,
+		_charm("recycler", "Recycler", 4, T.CARD_TRASHED_FROM_HAND, [_draw(1)], 0, 0,
 			"When you 🗑 or 🔥 a card in your hand, 🂠"),
-		_item("pocket", "Pocket", 4, T.ROUND_END, [retain_opt], 0, 0,
+		_charm("pocket", "Pocket", 4, T.ROUND_END, [retain_opt], 0, 0,
 			"You may 📌 each turn"),
-		_item("grindstone", "Grindstone", 5, T.CARD_DISCARDED, [_gain(2)], 0, 0,
+		_charm("grindstone", "Grindstone", 5, T.CARD_DISCARDED, [_gain(2)], 0, 0,
 			"When you ⤵, +2🪙"),
-		_item("second_look", "Second Look", 3, T.CARD_DRAWN, [OfferRedrawEffect.new()], 0, 1,
+		_charm("second_look", "Second Look", 3, T.CARD_DRAWN, [OfferRedrawEffect.new()], 0, 1,
 			"When you 🂠 during your turn, you may ⤵ it to draw another. Then this is disabled for the turn"),
-		_item("big_hands", "Big Hands", 5, T.HAND_DRAWN, [_draw(1)], 0, 0,
+		_charm("big_hands", "Big Hands", 5, T.HAND_DRAWN, [_draw(1)], 0, 0,
 			"Draw an additional 🂠 at the start of the turn"),
-		_item("echo_chamber", "Echo Chamber", 6, T.CARD_PLAYED, [extra_play], 0, 1,
+		_charm("echo_chamber", "Echo Chamber", 6, T.CARD_PLAYED, [extra_play], 0, 1,
 			"The first card you play each turn is played an extra time"),
 	]
-	idea_items.append(_item("shredder", "Shredder", 4, T.CARD_DISCARDED, [_trash_self(false)], 0, 0,
+	idea_charms.append(_charm("shredder", "Shredder", 4, T.CARD_DISCARDED, [_trash_self(false)], 0, 0,
 		"When you ⤵, 🗑 it"))
 	# "One never pays here - not with money": every market card is free, but each buy adds a random curse.
 	var random_curse := AddRandomCurseEffect.new()
 	random_curse.curses.assign([dead_weight, barnacle, driftwood, leaky_purse])
-	var bargain := _item("needful", "Needful", 5, T.SHOP_BUY, [random_curse], 0, 0,
+	var bargain := _charm("needful", "Needful", 5, T.SHOP_BUY, [random_curse], 0, 0,
 		"One never pays here - not with money")
 	bargain.shop_price_override = 0
-	_save(bargain, "items/needful.tres")
-	idea_items.append(bargain)
+	_save(bargain, "charms/needful.tres")
+	idea_charms.append(bargain)
 
 	# --- Trinkets ------------------------------------------------------------------
 	var coin_trinket := _trinket("coin_trinket", "Coin Trinket", 4, [
@@ -294,7 +294,7 @@ func _init() -> void:
 		[[_peek(3)], "⚡Look at the top 3 cards of your deck. ⤵ any of them", 3],
 		[[_peek(4)], "⚡Look at the top 4 cards of your deck. ⤵ any of them", 3]])
 
-	# --- Enemy (scripted intents; no cards/items) ---------------------------
+	# --- Enemy (scripted intents; no cards/charms) ---------------------------
 	var snatch := SnatchShopCardEffect.new()
 	snatch.mode = SnatchShopCardEffect.Mode.PRICIEST
 	var enemy := EnemyData.new()
@@ -316,8 +316,8 @@ func _init() -> void:
 	var pool: Array[CardData] = [example1, example2, drawful]
 	pool.append_array(ideas)
 	enc.card_pool.assign(pool)
-	var items: Array = original_items + idea_items
-	enc.item_pool.assign(items)
+	var charms: Array = original_charms + idea_charms
+	enc.charm_pool.assign(charms)
 	enc.trinket_pool.assign([coin_trinket, t_forge, t_idol, t_sieve, t_urn, t_pan, t_glass])
 	enc.card_slots = 3
 	enc.enhancement_slots = 0
@@ -328,7 +328,7 @@ func _init() -> void:
 	lo.starting_deck.assign([example2, example2, example2, example2, example2, example1, example1, example1])
 	_save(lo, "loadouts/test_loadout.tres")
 
-	print("Test content written to ", DIR, " (%d idea cards, %d items, 7 trinkets, 4 curses)" % [ideas.size(), items.size()])
+	print("Test content written to ", DIR, " (%d idea cards, %d charms, 7 trinkets, 4 curses)" % [ideas.size(), charms.size()])
 	quit()
 
 
@@ -352,13 +352,13 @@ func _curse(id: String, n: String, play: Array, text: String, permanent: bool) -
 	return c
 
 
-func _item(id: String, n: String, cost: int, trig: GameRules.Trigger, fx: Array, per_enc: int, per_round: int,
-		text: String) -> ItemData:
-	var it := ItemData.new()
+func _charm(id: String, n: String, cost: int, trig: GameRules.Trigger, fx: Array, per_enc: int, per_round: int,
+		text: String) -> CharmData:
+	var it := CharmData.new()
 	it.id = StringName(id); it.display_name = n; it.cost = cost; it.trigger = trig
 	it.effects.assign(fx); it.limit_per_encounter = per_enc; it.limit_per_round = per_round
 	it.description = text
-	_save(it, "items/%s.tres" % id)
+	_save(it, "charms/%s.tres" % id)
 	return it
 
 

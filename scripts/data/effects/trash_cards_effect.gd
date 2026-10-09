@@ -3,7 +3,7 @@ extends Effect
 ## Remove cards for this encounter (destroy = false) or destroy them
 ## permanently (destroy = true).
 ## what:
-## - SELF: this card (the one being played / bought, or ctx.card for items).
+## - SELF: this card (the one being played / bought, or ctx.card for charms).
 ## - CHOOSE: the owner picks exactly `amount` from `piles` (fewer if there
 ##   aren't enough). Curses only when `curses_only`.
 ## - ALL_OTHER_HAND: every other card in the owner's hand.

@@ -23,7 +23,7 @@ var candidates: Array = []
 var enabled: Array = []
 var min_count := 1
 var max_count := 1
-## Where the source effect came from (card / item / trinket name) for the UI.
+## Where the source effect came from (card / charm / trinket name) for the UI.
 var source_name := ""
 ## The card being played, if any (the UI shows it next to the picker).
 var source_card: CardInstance

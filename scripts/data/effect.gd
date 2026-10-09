@@ -1,6 +1,6 @@
 class_name Effect
 extends Resource
-## Base class for every effect primitive. Cards, items, trinkets and
+## Base class for every effect primitive. Cards, charms, trinkets and
 ## enhancements are just lists of these. Add a new primitive by extending
 ## this class and overriding apply / describe / ai_score.
 

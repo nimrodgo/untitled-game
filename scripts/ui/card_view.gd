@@ -1,6 +1,6 @@
 class_name CardView
 extends PanelContainer
-## Generic tile used for cards, items, trinkets, enhancements and intents.
+## Generic tile used for cards, charms, trinkets, enhancements and intents.
 ## Emits `tapped` on a short press-release (not after a drag/scroll).
 
 signal tapped

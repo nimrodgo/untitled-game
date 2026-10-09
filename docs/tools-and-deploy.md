@@ -7,10 +7,10 @@ All of them run with `godot --headless --path . --script res://tools/<name>.gd -
 | Tool | Args (defaults) | What it does |
 |---|---|---|
 | `simulate.gd` | `[encounter.tres] [loadout.tres] [runs]` (test encounter, test loadout, 200) | A greedy `SimBot` plays the player side N times. It prints the win %, average final coins and enemy actions per encounter. |
-| `build_test_content.gd` | — | Rewrites the cards, items, trinkets, curses, TEST enemy / encounter and loadout in `content/test/` from code, and applies the card-set map (`SETS`). **Careful:** several `.tres` texts were edited by hand afterwards (Rush Order, Cursed Luck, Furnace, Incinerator, Rebate, Scrap Dealer), and the script still has the old wording, so re-running it overwrites those edits and drops the `uid`s of the hand-made originals. Restore them from git afterwards, or sync the script first. |
+| `build_test_content.gd` | — | Rewrites the cards, charms, trinkets, curses, TEST enemy / encounter and loadout in `content/test/` from code, and applies the card-set map (`SETS`). **Careful:** several `.tres` texts were edited by hand afterwards (Rush Order, Cursed Luck, Furnace, Incinerator, Rebate, Scrap Dealer), and the script still has the old wording, so re-running it overwrites those edits and drops the `uid`s of the hand-made originals. Restore them from git afterwards, or sync the script first. |
 | `build_enhancements.gd` | — | Rewrites `content/test/enhancements/` (one enhancement per card set). Safe to re-run: it only touches that folder. |
 | `build_encounters.gd` | — | Rebuilds the 5 themed encounters + their enemies and the Toll passive. Each encounter lists its `card_sets` (and `enhancement_slots = 1`); the pools are not saved, they are resolved at runtime, so moving a piece to another set needs no re-run. Safe to re-run (it doesn't touch cards). |
-| `test_mechanics.gd` | — | Rules tests: plays every card, item and trinket level, then checks specific rules (costs, choices, retain, pass, extra turn, curses, items). Prints FAILs and a summary; exit code 1 on failure. |
+| `test_mechanics.gd` | — | Rules tests: plays every card, charm and trinket level, then checks specific rules (costs, choices, retain, pass, extra turn, curses, charms). Prints FAILs and a summary; exit code 1 on failure. |
 | `serve_web.gd` | `[port]` (8443) | A tiny HTTPS static server for `build/web`, using a self-signed certificate |
 
 Output format:
@@ -27,18 +27,31 @@ Each step, the bot does the following:
 2. Picks the best of: playing a card (`score_list(on_play)`), or buying a card (`on_buy + on_play × future × 1.5 − cost × 0.6`, where `future` is how many rounds are left).
 3. Passes if nothing beats `MIN_VALUE` (0.25). It buys at most 4 cards per round.
 
-It answers choices with `SimBot.choose` (gets rid of curses / weakest cards, keeps the best). It never buys trinkets or upgrades and rarely buys items, so **treat its win rate as a floor**. For reproducible runs, set `rng_seed` on the encounter.
+It answers choices with `SimBot.choose` (gets rid of curses / weakest cards, keeps the best). It never buys trinkets or upgrades and rarely buys charms, so **treat its win rate as a floor**. For reproducible runs, set `rng_seed` on the encounter.
 
 ## Content browser (editor plugin)
 
 `addons/content_browser/` adds the **Content** main-screen tab (enabled in `project.godot`; if it's missing, turn it on in **Project → Project Settings → Plugins**). See [content-design.md](content-design.md) for what it does. Notes:
 
-- It builds its edit panel from each resource's exported properties, so new fields, enums and effect types appear without changing the plugin. Arrays of resource classes listed in `REF_DIRS` (cards, items, trinkets, enhancements, enemies, encounters) are edited as references; any other resource array (effects, `EffectOption`, `TrinketLevel`, `EnemyIntent`) is edited inline, and **+ Add** offers every `class_name` that extends the element type.
+- It builds its edit panel from each resource's exported properties, so new fields, enums and effect types appear without changing the plugin. Arrays of resource classes listed in `REF_DIRS` (cards, charms, trinkets, enhancements, enemies, encounters) are edited as references; any other resource array (effects, `EffectOption`, `TrinketLevel`, `EnemyIntent`) is edited inline, and **+ Add** offers every `class_name` that extends the element type.
 - The content scripts aren't `@tool`, so in the editor their methods can't run. Tiles show your custom text as written; when a text field is empty, the tile shows an `auto:` summary of the effects instead of the game's generated wording.
 - Edits are written with `ResourceSaver`, so a file gets re-serialized in Godot's normal format the first time you edit it (expect some reordering in the git diff).
 - Files changed outside the editor (git, a text editor, the generator scripts) are reloaded when you switch back to the tab, or with **Reload from disk**.
 - The **Sets** tab edits `scripts/data/card_sets.gd` through `card_sets_file.gd`: it rewrites only the `enum Id`, `_INFO` and `ALWAYS_SOLD` blocks and leaves the rest of the file alone. After a save it recompiles `CardSets` and the data scripts that export `CardSets.Id`, so the Inspector's set menus pick up a new set without restarting the editor.
 - Excluded from the web export (`export_presets.cfg`).
+
+### Testing pieces
+
+From the Content tab, **▶ Test this** on a card, curse, charm, trinket or enhancement runs the main scene with it added on top of the starting loadout; on an encounter it plays that encounter, on an enemy it swaps that enemy into the encounter. **+ Test kit** adds the piece to the test bar instead (cards stack ×N, trinkets get a level), and **▶ Play test** runs the whole kit. The bar also picks the encounter (or random, as Main does) and has these options:
+
+| Option | Effect |
+|---|---|
+| Start with them | Cards go into the starting deck, charms and trinkets into your slots (off: only the market option applies) |
+| Cards in opening hand | The test cards are in your first hand. Enhancements go on the test cards, or on a random starting card if there are none |
+| In round 1 market | Round 1's market starts with the test pieces in its first slots (to test on-buy effects); later rounds restock normally |
+| + coins | Extra starting coins |
+
+Enemy charms in the kit go to the enemy. How it works: the tab writes `user://content_test.json` and presses Play; `encounter_screen.gd` reads it through `scripts/core/content_test.gd` (debug builds only), deletes the file, and keeps the test in memory so **Play again** repeats it. A normal F5 run has no file and plays as usual. The run shows a coral **TEST** strip at the top and a line in the log. The only engine hook is `Encounter.on_setup`, called in `start()` after the market is stocked and the deck shuffled, before the first draw.
 
 ## Playtesting on a phone
 

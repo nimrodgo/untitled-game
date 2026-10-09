@@ -8,7 +8,7 @@ extends VBoxContainer
 ##
 ## Editing is generic: the panel is built from each resource's exported properties, so new
 ## fields and new effect types show up here without touching this script. Arrays of effects
-## (and trinket levels, enemy intents...) are edited inline; arrays of cards / items / ...
+## (and trinket levels, enemy intents...) are edited inline; arrays of cards / charms / ...
 ## that live in their own files (decks, pools) are edited as reference lists with counts.
 ##
 ## The content scripts are not @tool, so in the editor their methods can't run (Godot gives
@@ -19,11 +19,11 @@ const ROOT := "res://content/test/"
 const CATS := [
 	{"name": "Cards", "one": "Card", "dir": "cards", "script": "res://scripts/data/card_data.gd"},
 	{"name": "Curses", "one": "Curse", "dir": "curses", "script": "res://scripts/data/card_data.gd"},
-	{"name": "Items", "one": "Item", "dir": "items", "script": "res://scripts/data/item_data.gd"},
+	{"name": "Charms", "one": "Charm", "dir": "charms", "script": "res://scripts/data/charm_data.gd"},
 	{"name": "Trinkets", "one": "Trinket", "dir": "trinkets", "script": "res://scripts/data/trinket_data.gd"},
 	{"name": "Enhancements", "one": "Enhancement", "dir": "enhancements", "script": "res://scripts/data/enhancement_data.gd"},
 	{"name": "Enemies", "one": "Enemy", "dir": "enemies", "script": "res://scripts/data/enemy_data.gd"},
-	{"name": "Enemy items", "one": "Enemy item", "dir": "enemy_items", "script": "res://scripts/data/item_data.gd"},
+	{"name": "Enemy charms", "one": "Enemy charm", "dir": "enemy_charms", "script": "res://scripts/data/charm_data.gd"},
 	{"name": "Encounters", "one": "Encounter", "dir": "encounters", "script": "res://scripts/data/encounter_data.gd"},
 	{"name": "Loadouts", "one": "Loadout", "dir": "loadouts", "script": "res://scripts/data/loadout_data.gd"},
 	# Not resources: the card sets themselves, stored in scripts/data/card_sets.gd.
@@ -31,7 +31,7 @@ const CATS := [
 ]
 ## Scripts that use CardSets.Id in their exports: recompiled after a set is added so the
 ## Inspector's set menus list it too.
-const SET_USERS := ["res://scripts/data/card_data.gd", "res://scripts/data/item_data.gd",
+const SET_USERS := ["res://scripts/data/card_data.gd", "res://scripts/data/charm_data.gd",
 	"res://scripts/data/trinket_data.gd", "res://scripts/data/enhancement_data.gd",
 	"res://scripts/data/encounter_data.gd"]
 const SetsFile := preload("res://addons/content_browser/card_sets_file.gd")
@@ -39,7 +39,7 @@ const SetsFile := preload("res://addons/content_browser/card_sets_file.gd")
 ## reference (picked from the library); anything else is an owned sub-resource edited inline.
 const REF_DIRS := {
 	"CardData": ["cards", "curses"],
-	"ItemData": ["items", "enemy_items"],
+	"CharmData": ["charms", "enemy_charms"],
 	"TrinketData": ["trinkets"],
 	"EnhancementData": ["enhancements"],
 	"EnemyData": ["enemies"],
@@ -76,6 +76,15 @@ var _sets_file = SetsFile.new()
 var _sets_dirty := false
 var _sets_mtime := 0
 var _sel_set := -1        # selected set id on the Sets tab (-1 = none)
+## Test kit (the bar under the toolbar): pieces to add on top of the starting loadout.
+var _kit: Array = []      # [{"res": Resource, "count": int, "level": int}]
+var _kit_encounter: Resource
+var _kit_enemy: Resource
+var _kit_start := true
+var _kit_opening := true
+var _kit_market := false
+var _kit_coins := 0
+var _kit_box: HFlowContainer
 
 var _tabs: TabBar
 var _search: LineEdit
@@ -179,6 +188,15 @@ func _build_ui() -> void:
 		bar.add_child(_inspector_sync)
 	_btn(bar, "New…", _ask_new)
 	_btn(bar, "Reload from disk", func(): _check_disk(true))
+
+	var kit_panel := PanelContainer.new()
+	kit_panel.add_theme_stylebox_override("panel", _box(Color(1, 1, 1, 0.04), Color(1, 1, 1, 0.08), 6, 1, int(6 * _s)))
+	_kit_box = HFlowContainer.new()
+	_kit_box.add_theme_constant_override("h_separation", int(8 * _s))
+	_kit_box.add_theme_constant_override("v_separation", int(4 * _s))
+	kit_panel.add_child(_kit_box)
+	add_child(kit_panel)
+	_refresh_kit_bar.call_deferred()
 
 	var split := HSplitContainer.new()
 	split.size_flags_horizontal = SIZE_EXPAND_FILL
@@ -642,7 +660,7 @@ func _parts(r: Resource) -> Dictionary:
 	var cls := String(s.get_global_name()) if s else ""
 	match cls:
 		"CardData": _card_parts(r, d)
-		"ItemData": _item_parts(r, d)
+		"CharmData": _charm_parts(r, d)
 		"TrinketData": _trinket_parts(r, d)
 		"EnhancementData": _enh_parts(r, d)
 		"EnemyData": _enemy_parts(r, d)
@@ -689,7 +707,7 @@ func _card_parts(r: Resource, d: Dictionary) -> void:
 	d["bg"] = Palette.CARD_CURSE if curse else _bg_for_set(r, Palette.CARD)
 
 
-func _item_parts(r: Resource, d: Dictionary) -> void:
+func _charm_parts(r: Resource, d: Dictionary) -> void:
 	d["cost"] = _cost(r)
 	var bits := [_enum_label(r, "trigger")]
 	var lpe := int(_g(r, "limit_per_encounter", 0))
@@ -711,7 +729,7 @@ func _item_parts(r: Resource, d: Dictionary) -> void:
 	if cb != 0:
 		flags.append("+%d 🪙 on every gain" % cb)
 	d["footer"] = _join(flags, " · ")
-	d["bg"] = _bg_for_set(r, Palette.CARD_ITEM)
+	d["bg"] = _bg_for_set(r, Palette.CARD_CHARM)
 
 
 func _trinket_parts(r: Resource, d: Dictionary) -> void:
@@ -784,9 +802,9 @@ func _enemy_parts(r: Resource, d: Dictionary) -> void:
 			lines.append("%s[b]%s[/b] [color=#9fc3cf]%s[/color]  %s" % [
 				"▶ " if i == start else "", it.get("display_name"), _enum_label(it, "kind"), desc])
 	d["body"] = _join(lines, "\n")
-	var items = _g(r, "items", [])
-	if items is Array and not items.is_empty():
-		d["footer"] = "Items: " + _names(items)
+	var charms = _g(r, "charms", [])
+	if charms is Array and not charms.is_empty():
+		d["footer"] = "Charms: " + _names(charms)
 	var c = _g(r, "color", Palette.CORAL)
 	d["bg"] = c.darkened(0.55) if c is Color else Palette.PANEL
 
@@ -804,9 +822,9 @@ func _encounter_parts(r: Resource, d: Dictionary) -> void:
 		lines.append("Sets: %s [color=#9fc3cf](+ Utility, Coins)[/color]" % _join(names, ", "))
 	else:
 		lines.append("Sets: none (pools only)")
-	lines.append("Market: %d cards · %d items · %d trinkets · %d upgrades" % [
-		int(_g(r, "card_slots", 0)), int(_g(r, "item_slots", 0)), int(_g(r, "trinket_slots", 0)), int(_g(r, "enhancement_slots", 0))])
-	for pool in ["card_pool", "item_pool", "trinket_pool", "enhancement_pool"]:
+	lines.append("Market: %d cards · %d charms · %d trinkets · %d upgrades" % [
+		int(_g(r, "card_slots", 0)), int(_g(r, "charm_slots", 0)), int(_g(r, "trinket_slots", 0)), int(_g(r, "enhancement_slots", 0))])
+	for pool in ["card_pool", "charm_pool", "trinket_pool", "enhancement_pool"]:
 		var arr = _g(r, pool, [])
 		if arr is Array and not arr.is_empty():
 			lines.append("%s: %s" % [pool.capitalize(), _names(arr)])
@@ -826,7 +844,7 @@ func _loadout_parts(r: Resource, d: Dictionary) -> void:
 	var lines := []
 	if deck is Array:
 		lines.append(_counted(deck))
-	for key in ["items", "trinkets"]:
+	for key in ["charms", "trinkets"]:
 		var arr = _g(r, key, [])
 		if arr is Array and not arr.is_empty():
 			lines.append("%s: %s" % [key.capitalize(), _names(arr)])
@@ -863,6 +881,11 @@ func _build_detail() -> void:
 		_btn(btns, "Show file", _show_file.bind(r))
 	_btn(btns, "Duplicate", _duplicate.bind(r))
 	_btn(btns, "Delete…", _ask_delete.bind(r))
+	if _testable(r):
+		var tb := _btn(btns, "▶ Test this", _test_only.bind(r))
+		tb.tooltip_text = "Run the game with just this on top of the starting loadout\n(uses the test bar's encounter and options)"
+		var kb := _btn(btns, _kit_add_label(r), _kit_add.bind(r))
+		kb.tooltip_text = "Add to the test kit (the bar under the toolbar) to test several pieces together"
 	_detail.add_child(btns)
 
 	_preview_holder = CenterContainer.new()
@@ -1481,7 +1504,7 @@ func _refresh_sets_grid() -> void:
 ## How many pieces of each kind are in set `id`, and which encounters sell it.
 func _set_usage(id: int) -> Dictionary:
 	var out := {}
-	for dir in ["cards", "curses", "items", "trinkets", "enhancements"]:
+	for dir in ["cards", "curses", "charms", "trinkets", "enhancements"]:
 		var n := 0
 		for r in _lib.get(dir, []):
 			if int(_g(r, "card_set", 0)) == id:
@@ -1503,7 +1526,7 @@ func _make_set_tile(st: Dictionary, w: float, big: bool) -> Control:
 	if String(st["note"]) != "":
 		lines.append(st["note"])
 	var counts := []
-	for pair in [["cards", "card"], ["curses", "curse"], ["items", "item"], ["trinkets", "trinket"], ["enhancements", "upgrade"]]:
+	for pair in [["cards", "card"], ["curses", "curse"], ["charms", "charm"], ["trinkets", "trinket"], ["enhancements", "upgrade"]]:
 		var c: int = u[pair[0]]
 		if c > 0:
 			counts.append("%d %s%s" % [c, pair[1], "" if c == 1 else "s"])
@@ -1543,7 +1566,7 @@ func _build_set_detail() -> void:
 	_detail.add_child(_muted("CardSets.Id.%s  ·  stored as %d in the content files" % [st["key"], id]))
 	var btns := HFlowContainer.new()
 	_btn(btns, "Show its cards", _show_set_pieces.bind(id, 0))
-	_btn(btns, "Items", _show_set_pieces.bind(id, 2))
+	_btn(btns, "Charms", _show_set_pieces.bind(id, 2))
 	_btn(btns, "Trinkets", _show_set_pieces.bind(id, 3))
 	_btn(btns, "Enhancements", _show_set_pieces.bind(id, 4))
 	_detail.add_child(btns)
@@ -1588,6 +1611,225 @@ func _build_set_detail() -> void:
 		_sets_changed())
 	_fields_box.add_child(al)
 	_fields_box.add_child(_muted("To put a piece in this set, pick it in that piece's Card Set field. To sell the set, tick it in an encounter's Card Sets."))
+
+
+# ------------------------------------------------------------------------------ test runs
+
+## Play-testing pieces: the game reads the test file at the start of an encounter
+## (scripts/core/content_test.gd) and adds the pieces on top of the normal loadout.
+const TEST_FILE := "user://content_test.json"
+
+
+func _cls(r: Object) -> String:
+	var sc = r.get_script() if r else null
+	return String(sc.get_global_name()) if sc else ""
+
+
+func _testable(r: Resource) -> bool:
+	return _cls(r) in ["CardData", "CharmData", "TrinketData", "EnhancementData", "EnemyData", "EncounterData"]
+
+
+func _is_enemy_charm(r: Resource) -> bool:
+	return r.resource_path.get_base_dir().get_file() == "enemy_charms"
+
+
+func _kit_add_label(r: Resource) -> String:
+	match _cls(r):
+		"EncounterData": return "Use in test"
+		"EnemyData": return "Fight in test"
+	return "+ Test kit"
+
+
+func _kit_add(r: Resource) -> void:
+	match _cls(r):
+		"EncounterData":
+			_kit_encounter = r
+		"EnemyData":
+			_kit_enemy = r
+		_:
+			var found := false
+			for e in _kit:
+				if e["res"] == r:
+					if _cls(r) == "CardData":
+						e["count"] += 1
+					found = true
+			if not found:
+				_kit.append({"res": r, "count": 1, "level": 1})
+	_refresh_kit_bar()
+	_set_status("Test kit: " + _kit_summary(_kit, _kit_encounter, _kit_enemy))
+
+
+func _refresh_kit_bar() -> void:
+	if _kit_box == null or not is_instance_valid(_kit_box):
+		return
+	_clear(_kit_box)
+	var head := Label.new()
+	head.text = "Test kit:"
+	head.add_theme_color_override("font_color", Palette.KELP)
+	_kit_box.add_child(head)
+	if _kit.is_empty():
+		var hint := _muted("starting loadout only (use “+ Test kit” on a piece)")
+		hint.autowrap_mode = TextServer.AUTOWRAP_OFF
+		_kit_box.add_child(hint)
+	for i in _kit.size():
+		_kit_box.add_child(_kit_chip(i))
+	if _kit_enemy:
+		var chip := _chip_panel(Palette.CORAL.darkened(0.55))
+		var hb: HBoxContainer = chip.get_child(0)
+		var l := Label.new()
+		l.text = "vs " + _name(_kit_enemy)
+		hb.add_child(l)
+		_small_btn(hb, "✕", func():
+			_kit_enemy = null
+			_refresh_kit_bar.call_deferred())
+		_kit_box.add_child(chip)
+
+	var encs: Array = _lib.get("encounters", [])
+	var opt := OptionButton.new()
+	opt.add_item("Encounter: random (Main)", 0)
+	for i in encs.size():
+		opt.add_item("Encounter: " + _name(encs[i]), i + 1)
+	opt.select(encs.find(_kit_encounter) + 1)
+	opt.item_selected.connect(func(i: int): _kit_encounter = encs[i - 1] if i > 0 else null)
+	_kit_box.add_child(opt)
+	_kit_box.add_child(_kit_check("Start with them", _kit_start, func(on: bool): _kit_start = on,
+		"Add the cards, charms and trinkets to the starting loadout"))
+	_kit_box.add_child(_kit_check("Cards in opening hand", _kit_opening, func(on: bool): _kit_opening = on,
+		"Test cards (and the card an enhancement goes on) are in your first hand"))
+	_kit_box.add_child(_kit_check("In round 1 market", _kit_market, func(on: bool): _kit_market = on,
+		"Round 1's market starts with the test pieces in it (to test buying them)"))
+	var cl := Label.new()
+	cl.text = "+ coins"
+	_kit_box.add_child(cl)
+	var sp := _spin(_kit_coins, 1)
+	sp.custom_minimum_size.x = 70 * _s
+	sp.value_changed.connect(func(x: float): _kit_coins = int(x))
+	_kit_box.add_child(sp)
+	var play := _btn(_kit_box, "▶ Play test", func(): _play_test(_kit, _kit_encounter, _kit_enemy))
+	play.disabled = ei == null
+	_btn(_kit_box, "Clear", func():
+		_kit.clear()
+		_kit_enemy = null
+		_kit_encounter = null
+		_refresh_kit_bar.call_deferred())
+
+
+func _kit_check(text: String, on: bool, cb: Callable, tip: String) -> CheckBox:
+	var c := CheckBox.new()
+	c.text = text
+	c.button_pressed = on
+	c.tooltip_text = tip
+	c.toggled.connect(cb)
+	return c
+
+
+func _chip_panel(bg: Color) -> PanelContainer:
+	var chip := PanelContainer.new()
+	chip.add_theme_stylebox_override("panel", _box(bg, bg.lightened(0.3), 6, 1, int(3 * _s)))
+	var hb := HBoxContainer.new()
+	hb.add_theme_constant_override("separation", int(4 * _s))
+	chip.add_child(hb)
+	return chip
+
+
+func _kit_chip(i: int) -> Control:
+	var e: Dictionary = _kit[i]
+	var r: Resource = e["res"]
+	var chip := _chip_panel(_bg_for_set(r, Palette.PANEL))
+	var hb: HBoxContainer = chip.get_child(0)
+	var link := LinkButton.new()
+	link.text = ("Enemy: " if _cls(r) == "CharmData" and _is_enemy_charm(r) else "") + _name(r)
+	link.underline = LinkButton.UNDERLINE_MODE_ON_HOVER
+	link.pressed.connect(_goto.bind(r))
+	hb.add_child(link)
+	match _cls(r):
+		"CardData":
+			_small_btn(hb, "−", func():
+				e["count"] = maxi(1, int(e["count"]) - 1)
+				_refresh_kit_bar.call_deferred())
+			var c := Label.new()
+			c.text = "×%d" % e["count"]
+			hb.add_child(c)
+			_small_btn(hb, "+", func():
+				e["count"] += 1
+				_refresh_kit_bar.call_deferred())
+		"TrinketData":
+			var lvls = r.get("levels")
+			var n: int = lvls.size() if lvls is Array else 1
+			if n > 1:
+				var lv := OptionButton.new()
+				for k in n:
+					lv.add_item("Lv%d" % (k + 1), k + 1)
+				lv.select(clampi(int(e["level"]), 1, n) - 1)
+				lv.item_selected.connect(func(k: int): e["level"] = k + 1)
+				hb.add_child(lv)
+	var x := _small_btn(hb, "✕", func():
+		_kit.erase(e)
+		_refresh_kit_bar.call_deferred())
+	x.tooltip_text = "Remove from the test kit"
+	return chip
+
+
+## Runs the main scene with `entries` added to the starting loadout.
+func _test_only(r: Resource) -> void:
+	match _cls(r):
+		"EncounterData": _play_test([], r, _kit_enemy)
+		"EnemyData": _play_test([], _kit_encounter, r)
+		_: _play_test([{"res": r, "count": 1, "level": 1}], _kit_encounter, _kit_enemy)
+
+
+func _play_test(entries: Array, enc_res: Resource, enemy_res: Resource) -> void:
+	flush()
+	var d := {"cards": [], "charms": [], "trinkets": [], "enhancements": [], "enemy_charms": [],
+		"encounter": enc_res.resource_path if enc_res else "",
+		"enemy": enemy_res.resource_path if enemy_res else "",
+		"start_with": _kit_start, "opening_hand": _kit_opening, "market": _kit_market,
+		"coins": _kit_coins, "summary": _kit_summary(entries, enc_res, enemy_res)}
+	for e in entries:
+		var r: Resource = e["res"]
+		match _cls(r):
+			"CardData": d["cards"].append({"path": r.resource_path, "count": int(e["count"])})
+			"CharmData": d["enemy_charms" if _is_enemy_charm(r) else "charms"].append(r.resource_path)
+			"TrinketData": d["trinkets"].append({"path": r.resource_path, "level": int(e["level"])})
+			"EnhancementData": d["enhancements"].append(r.resource_path)
+	var f := FileAccess.open(TEST_FILE, FileAccess.WRITE)
+	if f == null:
+		_set_status("Could not write the test file (%s)" % TEST_FILE)
+		return
+	f.store_string(JSON.stringify(d, "  "))
+	f.close()
+	if ei:
+		ei.play_main_scene()
+		_set_status("Playing test: " + d["summary"])
+	else:
+		_set_status("Test file written: " + d["summary"])
+
+
+func _kit_summary(entries: Array, enc_res: Resource, enemy_res: Resource) -> String:
+	var bits := []
+	for e in entries:
+		var r: Resource = e["res"]
+		var t := _name(r)
+		if _cls(r) == "CardData" and int(e["count"]) > 1:
+			t += " ×%d" % e["count"]
+		elif _cls(r) == "TrinketData" and int(e["level"]) > 1:
+			t += " Lv%d" % e["level"]
+		elif _cls(r) == "CharmData" and _is_enemy_charm(r):
+			t = "enemy " + t
+		bits.append(t)
+	var where := _name(enc_res) if enc_res else "random encounter"
+	if enemy_res:
+		where += " vs " + _name(enemy_res)
+	if bits.is_empty():
+		bits.append("starting loadout")
+	var extra := []
+	if not _kit_start:
+		extra.append("not in loadout")
+	if _kit_market:
+		extra.append("in market")
+	if _kit_coins != 0:
+		extra.append("%+d coins" % _kit_coins)
+	return _join(bits, ", ") + " · " + where + ("" if extra.is_empty() else " · " + _join(extra, ", "))
 
 
 func _show_set_pieces(id: int, tab: int) -> void:
