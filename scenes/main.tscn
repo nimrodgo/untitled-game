@@ -8,6 +8,8 @@
 [ext_resource type="Resource" path="res://content/test/encounters/ink_cloud.tres" id="enc_ink_cloud"]
 [ext_resource type="Resource" path="res://content/test/encounters/loan_shark.tres" id="enc_loan_shark"]
 [ext_resource type="Resource" path="res://content/test/encounters/toll_booth.tres" id="enc_toll_booth"]
+[ext_resource type="Resource" path="res://content/test/encounters/gullet.tres" id="enc_gullet"]
+[ext_resource type="Resource" path="res://content/test/encounters/slack_tide.tres" id="enc_slack_tide"]
 
 [node name="Main" type="Control" unique_id=628252777]
 layout_mode = 3
@@ -17,5 +19,5 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_screen")
-encounter_pool = Array[ExtResource("4_encdata")]([ExtResource("enc_hags_hex"), ExtResource("enc_ink_cloud"), ExtResource("enc_toll_booth"), ExtResource("enc_loan_shark"), ExtResource("enc_clutter")])
+encounter_pool = Array[ExtResource("4_encdata")]([ExtResource("enc_hags_hex"), ExtResource("enc_ink_cloud"), ExtResource("enc_toll_booth"), ExtResource("enc_loan_shark"), ExtResource("enc_clutter"), ExtResource("enc_gullet"), ExtResource("enc_slack_tide")])
 loadout = ExtResource("3_lo")

@@ -73,8 +73,9 @@ godot --headless --path . --script res://tools/simulate.gd -- res://content/test
 | Enemy choices | Enemies never get choices; effects that ask the player something are meant for the player's side. |
 | `StealCoinsEffect` | Ignores `target`. It always takes from the opponent. |
 | Test content | `tools/build_test_content.gd` is out of sync with the hand-edited `.tres` files, so regenerating overwrites those edits (see [tools-and-deploy.md](tools-and-deploy.md#headless-tools-tools)). Prefer editing the `.tres` files directly. |
+| Temporary | Burning at the end of the encounter only moves the card to `destroyed`; with no run layer it has no effect on later encounters yet. Encounter-level helpers: `Encounter.make_card(cd, temporary)`, `add_card(p, cd, zone, temporary)` (now returns the instance). |
 | Enhancements | Only a card **in your hand** can be enhanced; there is no picker for the deck or discard pile. Prices (3) and names are placeholders. Fleeting ("immediately 🔥") is implemented as destroy-after-play, which is still to be confirmed. |
-| Card sets | Retain has only 2 pieces. Market and Draw have no trinkets, Coins has no charm. Toll Booth only sells the Coin Trinket, so Borrowed Power (Utility) is dead there. |
+| Card sets | Market, Draw and Next Round have no trinkets, Coins has no charm. Temporary has no enhancement for sale (its own is never sold), so Toll Booth and Gullet offer 3 upgrades instead of 4. |
 | Balance | The greedy bot wins about 55% at target 10 on the TEST Encounter. On the themed encounters it wins roughly 16–24% (Hag's Hex, Loan Shark) to 64–86% (Ink Cloud, Toll Booth, Clutter). It undervalues curse synergy, so treat these as a floor; the targets are untuned. |
 | UI | Everything is built in code with placeholder colors and no art. Emoji rely on the `Icons` SVG set. |
 

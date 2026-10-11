@@ -4,12 +4,14 @@ extends Effect
 ## it does not inherit enhancements, so copy effects can't snowball.
 
 @export var zone: GameRules.Zone = GameRules.Zone.DRAW_BOTTOM
+## The copy is temporary (⏳).
+@export var temporary: bool = false
 
 
 func apply(ctx: EffectContext) -> void:
 	if ctx.card == null:
 		return
-	ctx.encounter.add_card(ctx.resolve(target), ctx.card.data, zone)
+	await ctx.encounter.add_card(ctx.resolve(target), ctx.card.data, zone, temporary, ctx.owner)
 
 
 func describe() -> String:
@@ -18,7 +20,7 @@ func describe() -> String:
 		GameRules.Zone.HAND: where = "hand"
 		GameRules.Zone.DISCARD: where = "discard"
 		GameRules.Zone.DRAW_TOP: where = "deck (top)"
-	return "%sAdd a copy to your %s" % [_who(), where]
+	return "%sAdd a %scopy to your %s" % [_who(), "⏳ " if temporary else "", where]
 
 
 func ai_score() -> float:

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnhancementData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="1_enh"]
+
+[resource]
+script = ExtResource("1_enh")
+id = &"temporary"
+display_name = "Temporary"
+cost = 0
+card_set = 10
+temporary = true
+generated_only = true
+icon = "⏳"
+description = "This card is 🔥 at the end of the encounter"

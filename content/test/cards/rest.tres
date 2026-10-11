@@ -20,4 +20,4 @@ cost = 0
 on_play = Array[ExtResource("1_ws4xy")]([SubResource("Resource_kyne1"), SubResource("Resource_pe1vx")])
 on_play_text = "Pass ➡ 🂠🂠🂠 at the start of your next turn"
 on_buy_text = "TBD"
-card_set = 3
+card_set = 6

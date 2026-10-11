@@ -2,14 +2,14 @@
 
 An aquatic roguelike deckbuilder where **every encounter is a shop**. You don't fight with damage: you race to hit a **coin target** while an enemy steals, taxes and snatches from the market.
 
-> **Status:** first playable prototype. A full rules engine, a placeholder landscape UI for phones, test content grouped into 8 **card sets**, and 5 themed encounters (one is picked at random on every launch). There's no run layer (map, gold, persistent deck) yet.
+> **Status:** first playable prototype. A full rules engine, a placeholder landscape UI for phones, test content grouped into 10 **card sets**, and 7 themed encounters (one is picked at random on every launch). There's no run layer (map, gold, persistent deck) yet.
 
 | | |
 |---|---|
 | Engine | Godot **4.6.3**, GDScript, GL Compatibility renderer |
 | Target | Landscape 1280×720 (stretch `canvas_items` / `expand`), mobile web first |
 | Repo | `github.com/nimrodgo/untitled-game` → Pages: `nimrodgo.github.io/untitled-game` |
-| Entry scene | `scenes/main.tscn` (one `Control` running `encounter_screen.gd`; its `encounter_pool` holds the 5 encounters) |
+| Entry scene | `scenes/main.tscn` (one `Control` running `encounter_screen.gd`; its `encounter_pool` holds the 7 encounters) |
 
 ## Terminology
 
@@ -31,7 +31,7 @@ An aquatic roguelike deckbuilder where **every encounter is a shop**. You don't 
 
 ## Quick start
 
-1. Open the folder in Godot 4.6.3 → press **F5**. One of the 5 themed encounters starts (random each launch and each "Play again").
+1. Open the folder in Godot 4.6.3 → press **F5**. One of the 7 themed encounters starts (random each launch and each "Play again").
 2. Drag a card out of your hand to **play** it. Drag a market card onto your **deck** to buy it.
 3. Hit the coin target (10) by the end of round 3.
 

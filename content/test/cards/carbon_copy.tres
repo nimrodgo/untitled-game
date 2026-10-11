@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_eff"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_cards_effect.gd" id="2_fx"]
+[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_card"]
+
+[sub_resource type="Resource" id="Resource_fx"]
+script = ExtResource("2_fx")
+temp_copy_drawn = true
+
+[resource]
+script = ExtResource("3_card")
+id = &"carbon_copy"
+display_name = "Carbon Copy"
+on_play = Array[ExtResource("1_eff")]([SubResource("Resource_fx")])
+on_play_text = "🂠 and get a ⏳ copy of it"
+on_buy_text = "TBD"
+card_set = 10

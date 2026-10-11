@@ -133,6 +133,16 @@ func take_trinket(slot: int) -> TrinketData:
 	return t
 
 
+## Every card the shop can stock (the encounter's sets + extras).
+func card_pool() -> Array[CardData]:
+	return _card_pool
+
+
+## A random card the shop could stock, using the encounter's rng.
+func random_pool_card() -> CardData:
+	return _random_card()
+
+
 func take_enhancement(slot: int) -> EnhancementData:
 	var e: EnhancementData = enhancements[slot]
 	enhancements[slot] = null

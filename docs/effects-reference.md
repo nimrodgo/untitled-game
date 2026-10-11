@@ -33,7 +33,7 @@ Each effect implements these methods:
 
 | Class | Fields | Does |
 |---|---|---|
-| `DrawCardsEffect` | `amount`=1, `source`=TOP | Draw. `source`: `TOP`, `BOTTOM` (bottom of the deck), `DISCARD_CHOOSE` (you pick from the discard pile) |
+| `DrawCardsEffect` | `amount`=1, `source`=TOP | Draw. `source`: `TOP`, `BOTTOM` (bottom of the deck), `DISCARD_CHOOSE` (you pick from the discard pile). `retain_drawn`: 📌 the cards this effect drew (not cards drawn by triggers meanwhile; Stash). `temp_copy_drawn`: also a ⏳ copy of each card it drew to your hand (not a draw; Carbon Copy) |
 | `DiscardCardsEffect` | `amount`=1, `all_hand`, `as_cost`, `draw_that_many` | You pick cards in your hand to discard, or the whole hand. `as_cost`: "Discard 1 ⤵ ➡ …" is unplayable without enough **other** cards; where nothing checks that first (an on-buy, Cycle), not discarding enough sets `ctx.cost_unpaid` and the rest of the list is skipped. `draw_that_many`: "Discard your hand. Draw that many". |
 | `DiscardRandomEffect` | `amount`=1 | Discards random cards from the target's hand (enemy intents: set `target = OPPONENT`) |
 | `DiscardFromDeckEffect` | `look`=1 | Look at the top N cards of your deck; discard any of them (in order, optional) |
@@ -46,12 +46,14 @@ Each effect implements these methods:
 
 | Class | Fields | Does |
 |---|---|---|
-| `TrashCardsEffect` | `destroy`=true, `what`=CHOOSE, `amount`=1, `piles`=all, `curses_only`, `coins_per_card`, `gain_cost_as_coins`, `as_cost` | **Remove** 🗑 (for this encounter, `destroy=false`) or **destroy** 🔥 (permanently). `what`: `SELF` (this card / the played card for charms), `CHOOSE` (exactly `amount` from `piles`, fewer only if there aren't enough), `ALL_OTHER_HAND`, `DRAW_PILE` ("your deck"). |
+| `TrashCardsEffect` | `destroy`=true, `what`=CHOOSE, `amount`=1, `piles`=all, `curses_only`, `coins_per_card`, `gain_cost_as_coins`, `as_cost` | **Remove** 🗑 (for this encounter, `destroy=false`) or **destroy** 🔥 (permanently). `what`: `SELF` (this card / the played card for charms), `CHOOSE` (exactly `amount` from `piles`, fewer only if there aren't enough), `ALL_OTHER_HAND`, `DRAW_PILE` ("your deck"), `ALL_TEMPORARY` (every ⏳ card in hand, deck and discard; Refund). |
 | `MoveCardsEffect` | `from_piles`, `to_zone`, `curses_only`, `amount`=0 | Move cards between piles (no triggers). `amount=0` = all matching cards; otherwise you choose. |
 | `TransformCardsEffect` | `into` | Choose any number of cards in your hand; each becomes `into` (upgrades are lost) |
 | `AddCardEffect` | `card`, `amount`=1, `zone`=DRAW_BOTTOM | Creates new copies of a card (curses: "Add C3 to the bottom of your deck", "Gain C2") |
 | `AddRandomCurseEffect` | `curses`, `amount`=1, `zone`=DRAW_BOTTOM | Adds `amount` curses picked at random from `curses` (with the encounter's rng). Used by Needful. |
-| `AddCopyOfThisCardEffect` | `zone`=DRAW_BOTTOM | Adds a copy of the card this effect belongs to. The copy is the plain card (no enhancements), so copies can't snowball. Used by the Franchise enhancement. |
+| `AddCopyOfThisCardEffect` | `zone`=DRAW_BOTTOM, `temporary` | Adds a copy of the card this effect belongs to. The copy is the plain card (no enhancements), so copies can't snowball. `temporary`: the copy is ⏳. Used by the Franchise enhancement and Free Trial (on CARD_BOUGHT, `ctx.card` = the bought card). |
+| `CopyCardEffect` | `amount`=1, `zone`=HAND, `temporary`=true, `discard_original`, `bonus_coins` | Pick up to `amount` different cards in your hand; make `amount` copies (round-robin over the picks, so one pick gets every copy). Copies are plain + ⏳. `discard_original`: discard the picks first (Trade-In). `bonus_coins` once if anything was copied. Copier trinket. |
+| `GainRandomCardsEffect` | `amount`=1, `zone`=DRAW_BOTTOM, `temporary`=true, `as_draw` | Random cards from the shop's card pool (`ShopState.random_pool_card()`: the encounter's sets + extras). `as_draw` with zone HAND: they are drawn (count as draws, blocked by draw locks, fire CARD_DRAWN; unused for now). Trial Pack (zone HAND, not a draw). |
 
 `piles` / `from_piles` are flags: Hand, Deck (draw pile), Discard. "Remove / destroy" default to all three, "discard" is from the hand unless stated otherwise.
 
@@ -62,7 +64,7 @@ Each effect implements these methods:
 | `PlayTopCardsEffect` | `amount`=2 | Play the top N cards of your deck. Unplayable ones go to the discard pile. |
 | `ReplayEffect` | `mode`=NEXT_CARD, `times`=1 | `NEXT_CARD`: the next card you play this turn is played an additional time. `THIS_CARD` (charms on `CARD_PLAYED`): play the card that was just played again. |
 | `PlayRandomFromHandEffect` | — | Plays a random card from your hand that you could play right now (curses and unpayable costs skipped); nothing if none (Mimic's on-buy) |
-| `PlayCopyEffect` | `source`=LAST_PLAYED | Resolve another card's on-play: `LAST_PLAYED` this turn, or a card you choose from those `DESTROYED` this encounter |
+| `PlayCopyEffect` | `source`=LAST_PLAYED | Resolve another card's on-play: `LAST_PLAYED` this turn, or a card you choose from those `DESTROYED` this encounter. Skips cards that play copies themselves (Mimic, Necromancy), so two Mimics can't loop |
 
 All of these **count as playing a card** (cards-played count, `CARD_PLAYED` charms).
 
@@ -73,7 +75,8 @@ All of these **count as playing a card** (cards-played count, `CARD_PLAYED` char
 | `BuyCardEffect` | `source`=MARKET, `free`, `zone`=-1, `play_then_destroy` | Buy a card you choose (and can afford) as part of this effect. `source`: `MARKET`, `REMOVED` or `DESTROYED` this encounter. It's a real buy: on-buy, `BEFORE_CARD_BUY` / `CARD_BOUGHT` charms. `zone` overrides the destination (`DRAW_TOP` for "place it on top"). `play_then_destroy`: play it right away, then destroy it. |
 | `NextBuyToHandEffect` | `amount`=1 | The next card you buy is drawn immediately |
 | `SetBuyDestinationEffect` | `destination`=HAND, `optional`, `draw` | Sets `ctx.buy_destination` (buy triggers / on-buy only). `optional`: asks the player each time ("you may…", Top Shelf). `draw`: "🂠 this", the bought card is drawn (counts as a draw; can't-draw sends it to its normal place; a pending Rush Order stays pending) (Rush Order's on-buy) |
-| `RandomEnhanceEffect` | — | Attaches a random enhancement (any except destroy-only ones like Fleeting) to this card, if it can take one (Blank Slate's on-buy) |
+| `RemoveRandomEffect` | `amount`=1, `destroy` | 🗑 (or 🔥) random cards from the target's hand; for enemies (Gulper Eel's Gulp) |
+| `RandomEnhanceEffect` | — | Attaches a random enhancement (any except destroy-only ones like Fleeting and `generated_only` ones like Temporary) to this card, if it can take one (Blank Slate's on-buy) |
 | `SnatchShopCardEffect` | `mode`, `amount`=1 | Removes market card(s): `CHEAPEST`, `PRICIEST`, `RANDOM`, `LEFTMOST` |
 | `DestroyShopCardEffect` | `restock`=true | You pick a market card to destroy; its slot gets a new random card |
 | `RefreshTrinketsEffect` | `amount`=1, `all` | Used trinkets become usable again (you pick which if there's a choice) |
@@ -136,6 +139,8 @@ These are the charm `trigger` values in `GameRules.Trigger`. The engine fires ea
 | `SHOP_BUY` | After **any** purchase: a card (after `CARD_BOUGHT`), a charm (before the new charm is added, so it doesn't react to itself), a trinket or trinket upgrade, an enhancement. Used by Needful | player |
 | `TRINKET_USED` | After a trinket resolves | player |
 | `ROUND_END` | When you pass, before cleanup | both |
+| `CARD_RETAINED` | End of your turn, after cleanup: each card that stayed in your hand (`ctx.card`). Unused for now | player |
+| `CARD_CREATED` | You created a card in your own cards (`ctx.card`): `Encounter.add_card(..., creator)` with creator = the receiver, i.e. AddCard, AddRandomCurse, AddCopyOfThisCard, CopyCard, GainRandomCards, DrawCards `temp_copy_drawn`. Not buys, transforms, the starting deck, or a card the opponent gives you. Workshop | player |
 | `ENEMY_ACTED` | After each intent | both |
 
 Only **charms** listen to triggers. A charm fires if `can_trigger()` passes (its per-round and per-encounter limits). "The first card you play each turn…" = `CARD_PLAYED` with `limit_per_round = 1`.

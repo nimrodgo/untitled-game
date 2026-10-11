@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharmData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="1_eff"]
+[ext_resource type="Script" path="res://scripts/data/effects/add_copy_of_this_card_effect.gd" id="2_fx"]
+[ext_resource type="Script" path="res://scripts/data/charm_data.gd" id="3_charm"]
+
+[sub_resource type="Resource" id="Resource_fx"]
+script = ExtResource("2_fx")
+zone = 0
+temporary = true
+
+[resource]
+script = ExtResource("3_charm")
+id = &"free_trial"
+display_name = "Free Trial"
+cost = 3
+trigger = 4
+effects = Array[ExtResource("1_eff")]([SubResource("Resource_fx")])
+limit_per_round = 1
+description = "Add a ⏳ copy of the first card you buy each turn to your hand"
+card_set = 10

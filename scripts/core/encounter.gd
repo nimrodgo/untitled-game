@@ -480,7 +480,8 @@ func _log_coins(p: PlayerState, real: int, source: String) -> void:
 ## Draw from the top (or `from_bottom`) of the draw pile. The discard pile is
 ## never reshuffled mid-turn: if the deck runs out you just draw what's there
 ## (the discard pile goes under the deck at the end of every turn).
-func draw_cards(p: PlayerState, n: int, from_bottom := false, opening := false) -> int:
+## `out` (optional) collects the cards this call drew, not cards drawn by triggers.
+func draw_cards(p: PlayerState, n: int, from_bottom := false, opening := false, out: Array = []) -> int:
 	var drawn := 0
 	for i in n:
 		if is_over or (p.draw_locked and not opening):
@@ -489,6 +490,7 @@ func draw_cards(p: PlayerState, n: int, from_bottom := false, opening := false) 
 			break
 		var c: CardInstance = p.draw_pile.pop_front() if from_bottom else p.draw_pile.pop_back()
 		p.hand.append(c)
+		out.append(c)
 		drawn += 1
 		p.cards_drawn_this_turn += 1
 		await _after_draw(p, c, opening)
@@ -566,10 +568,32 @@ func trash_card(p: PlayerState, c: CardInstance, destroy: bool) -> void:
 		await _fire(GameRules.Trigger.CARD_TRASHED_FROM_HAND, p, ctx)
 
 
-func add_card(p: PlayerState, cd: CardData, zone: GameRules.Zone) -> void:
-	var c := CardInstance.new(cd)
+## `temporary`: the new card gets the Temporary (⏳) enhancement.
+## `creator`: who made it (usually ctx.owner). When it's `p` itself, CARD_CREATED
+## fires ("whenever you create a card"); a curse the opponent gives you doesn't count.
+func add_card(p: PlayerState, cd: CardData, zone: GameRules.Zone, temporary := false,
+		creator: PlayerState = null) -> CardInstance:
+	var c := make_card(cd, temporary)
 	_place_card(p, c, zone)
-	log_line("  %s gain %s." % [p.display_name, _card_name(c)])
+	log_line("  %s gain %s%s." % [p.display_name, "temporary " if temporary else "", _card_name(c)])
+	await card_created(p, c, creator)
+	return c
+
+
+## Fire CARD_CREATED for `p` if `p` created card `c` itself.
+func card_created(p: PlayerState, c: CardInstance, creator: PlayerState) -> void:
+	if creator == p:
+		await _fire(GameRules.Trigger.CARD_CREATED, p, _ctx(p, c))
+
+
+## A new card instance in no pile; `temporary` gives it the Temporary (⏳) enhancement.
+func make_card(cd: CardData, temporary := false) -> CardInstance:
+	var c := CardInstance.new(cd)
+	if temporary:
+		var t := ContentLibrary.temporary_enhancement()
+		if t:
+			c.add_enhancement(t)
+	return c
 
 
 ## Move a card you own to `zone` (no triggers).
@@ -881,6 +905,8 @@ func _end_round() -> void:
 			else:
 				player.discard.append(c)
 		player.hand = keep
+		for c in keep:
+			await _fire(GameRules.Trigger.CARD_RETAINED, player, _ctx(player, c))
 	for c in player.hand:
 		c.retain = false
 	_cycle_discard_under_deck(player)
@@ -909,8 +935,24 @@ func _finish_encounter() -> void:
 	active = null
 	won = player.coins >= coin_target()
 	log_line("\n[b]%s[/b] You have %d / %d coins." % ["VICTORY!" if won else "DEFEAT.", player.coins, coin_target()])
+	_burn_temporary(player)
+	_burn_temporary(enemy)
 	changed.emit()
 	ended.emit(won)
+
+
+## End of the encounter: temporary (⏳) cards are destroyed wherever they are.
+## After the result, and without triggers (nothing can change the outcome).
+func _burn_temporary(p: PlayerState) -> void:
+	var n := 0
+	for pile in [p.hand, p.draw_pile, p.discard, p.removed]:
+		for c in pile.duplicate():
+			if c.is_temporary():
+				pile.erase(c)
+				p.destroyed.append(c)
+				n += 1
+	if n > 0 and not p.is_enemy:
+		log_line("  %d temporary card%s burn." % [n, "" if n == 1 else "s"])
 
 
 func _await_player_action() -> void:

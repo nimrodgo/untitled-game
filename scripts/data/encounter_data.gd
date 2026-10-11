@@ -62,8 +62,11 @@ func get_trinket_pool() -> Array[TrinketData]:
 func get_enhancement_pool() -> Array[EnhancementData]:
 	var out: Array[EnhancementData] = []
 	for c in _from_sets(ContentLibrary.enhancements()):
-		out.append(c)
-	out.append_array(enhancement_pool)
+		if not c.generated_only:
+			out.append(c)
+	for c in enhancement_pool:
+		if not c.generated_only:
+			out.append(c)
 	return out
 
 

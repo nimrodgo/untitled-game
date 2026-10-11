@@ -107,6 +107,7 @@ Some effects make you decide something while they resolve: pick cards to discard
 | **Discard** ⤵ | From the hand to the discard pile, unless the text says otherwise. Fires `on_discard` and `CARD_DISCARDED`. The end-of-round cleanup is **not** a discard. |
 | **Retain** | The card stays in your hand at the end of the turn. You then draw a **full** new hand of 5 on top of it. |
 | **Refresh** ↺ | A used trinket can be used again this turn |
+| **Temporary** ⏳ | The card has the Temporary enhancement: at the end of the encounter it is destroyed wherever it is (after the result, no triggers). Only effects make temporary cards; the enhancement is never sold and Blank Slate never rolls it. It takes the card's one enhancement slot, and copies are the plain card + Temporary. |
 
 Remove and destroy pick from the deck, hand or discard pile unless stated otherwise.
 
