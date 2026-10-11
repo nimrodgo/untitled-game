@@ -15,5 +15,5 @@ display_name = "Scrap Dealer"
 cost = 4
 trigger = 16
 effects = Array[ExtResource("1_utcus")]([SubResource("Resource_fa46h")])
-description = "When you 🗑 a card, 🪙🪙"
+description = "When you 🗑, 🪙🪙"
 card_set = 5

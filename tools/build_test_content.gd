@@ -52,9 +52,9 @@ func _init() -> void:
 	ideas.append(_card("curse_recall", "Curse Recall", 1, false, [mv],
 		"Return all curses from the discard pile to your hand"))
 
-	var impulse := BuyCardEffect.new(); impulse.play_then_destroy = true
+	var impulse := BuyCardEffect.new(); impulse.free = true; impulse.play_then_destroy = true
 	ideas.append(_card("impulse_buy", "Impulse Buy", 2, false, [impulse],
-		"Buy a card and play it immediately. Then 🔥 it"))
+		"Buy a card for free and play it immediately. Then 🔥 it"))
 
 	ideas.append(_card("sift", "Sift", 1, false, [_draw(2), _discard(2)],
 		"2🂠. 2⤵"))

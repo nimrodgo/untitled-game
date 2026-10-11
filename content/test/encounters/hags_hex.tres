@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="EncounterData" format=3]
+[gd_resource type="Resource" script_class="EncounterData" format=3 uid="uid://dr5um6xf70ik4"]
 
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="1_4t1t3"]
-[ext_resource type="Resource" path="res://content/test/enemies/sea_hag.tres" id="2_vultb"]
-[ext_resource type="Script" path="res://scripts/data/enhancement_data.gd" id="3_s7a11"]
-[ext_resource type="Script" path="res://scripts/data/charm_data.gd" id="4_a6pga"]
-[ext_resource type="Script" path="res://scripts/data/encounter_data.gd" id="5_psudv"]
-[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="6_jldfl"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="1_4t1t3"]
+[ext_resource type="Resource" uid="uid://b7i212wyxcsax" path="res://content/test/enemies/sea_hag.tres" id="2_vultb"]
+[ext_resource type="Script" uid="uid://c7wqsr8q832fh" path="res://scripts/data/enhancement_data.gd" id="3_s7a11"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/charm_data.gd" id="4_a6pga"]
+[ext_resource type="Script" uid="uid://dc1kglt8y5lk" path="res://scripts/data/encounter_data.gd" id="5_psudv"]
+[ext_resource type="Script" uid="uid://bldvg83fphc0b" path="res://scripts/data/trinket_data.gd" id="6_jldfl"]
 
 [resource]
 script = ExtResource("5_psudv")
@@ -14,4 +14,3 @@ coin_target = 10
 enemy = ExtResource("2_vultb")
 card_sets = Array[int]([5, 9])
 card_slots = 3
-enhancement_slots = 1

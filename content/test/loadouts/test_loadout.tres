@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="LoadoutData" format=3]
+[gd_resource type="Resource" script_class="LoadoutData" format=3 uid="uid://21hk3i1anw5h"]
 
-[ext_resource type="Script" path="res://scripts/data/charm_data.gd" id="1_ntv7m"]
-[ext_resource type="Script" path="res://scripts/data/loadout_data.gd" id="2_5e4hs"]
-[ext_resource type="Script" path="res://scripts/data/card_data.gd" id="3_4k74b"]
-[ext_resource type="Resource" path="res://content/test/cards/example2.tres" id="4_535rg"]
-[ext_resource type="Resource" path="res://content/test/cards/example1.tres" id="5_vkrpx"]
-[ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="6_4d0x8"]
+[ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/charm_data.gd" id="1_ntv7m"]
+[ext_resource type="Script" uid="uid://bxovpkrjoimcy" path="res://scripts/data/loadout_data.gd" id="2_5e4hs"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="3_4k74b"]
+[ext_resource type="Resource" uid="uid://b7da6lj1mawuj" path="res://content/test/cards/example2.tres" id="4_535rg"]
+[ext_resource type="Resource" uid="uid://dlon3ufw2nb1a" path="res://content/test/cards/example1.tres" id="5_vkrpx"]
+[ext_resource type="Script" uid="uid://bldvg83fphc0b" path="res://scripts/data/trinket_data.gd" id="6_4d0x8"]
 
 [resource]
 script = ExtResource("2_5e4hs")

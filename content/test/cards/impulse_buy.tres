@@ -6,6 +6,7 @@
 
 [sub_resource type="Resource" id="Resource_vmg64"]
 script = ExtResource("2_jl065")
+free = true
 play_then_destroy = true
 
 [resource]
@@ -14,6 +15,6 @@ id = &"impulse_buy"
 display_name = "Impulse Buy"
 cost = 2
 on_play = Array[ExtResource("1_2mht2")]([SubResource("Resource_vmg64")])
-on_play_text = "Buy a card and play it immediately. Then 🔥 it"
+on_play_text = "Buy a card for free and play it immediately. Then 🔥 it"
 on_buy_text = "TBD"
 card_set = 8

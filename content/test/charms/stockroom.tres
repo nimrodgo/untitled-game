@@ -1,12 +1,13 @@
-[gd_resource type="Resource" script_class="CharmData" format=3]
+[gd_resource type="Resource" script_class="CharmData" format=3 uid="uid://480w4300vsky"]
 
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_8dr04"]
 [ext_resource type="Script" uid="uid://c80wicq0ftfii" path="res://scripts/data/charm_data.gd" id="1_charm"]
 
 [resource]
 script = ExtResource("1_charm")
 id = &"stockroom"
-card_set = 8
 display_name = "Stockroom"
 cost = 4
-description = "When you buy a market card, its slot restocks right away"
+description = "When you buy a market card, its slot restocks immediately"
 restock_bought_cards = true
+card_set = 8

@@ -1015,6 +1015,23 @@ func _shop_content_rules() -> void:
 	e.buy_card(0)
 	_check(e.shop.cards[0] != null, "Stockroom: the bought slot restocks")
 
+	# Impulse Buy: buys for free, you pick any market card (even unaffordable ones).
+	e = _enc(["example1", "example1", "example1", "example1", "example1"], false)
+	e.shop.cards[0] = _card("example1")
+	e.shop.cards[1] = _card("all_in")   # costs 3, more than the 2 coins left
+	e.player.coins = 2
+	var ib := _give(e, "impulse_buy")
+	_check(e.play_card(ib), "Impulse Buy: playable")
+	_check(e.pending_choice != null and e.pending_choice.kind == ChoiceRequest.Kind.SHOP_CARD, "Impulse Buy: asks which card")
+	var filled := 0
+	for c in e.shop.cards:
+		if c != null:
+			filled += 1
+	_check(e.pending_choice != null and e.pending_choice.candidates.size() == filled, "Impulse Buy: free, so every market card can be picked")
+	if e.pending_choice:
+		e.submit_choice([0])
+	_check(e.player.coins == 2, "Impulse Buy: the bought card costs nothing (coins %d)" % e.player.coins)
+
 	# Hunker Down: pass, keep the whole hand.
 	e = _enc(["example1", "example2", "example1", "example2", "example1", "example2", "example2", "example2"])
 	var hd := _give(e, "hunker_down")
