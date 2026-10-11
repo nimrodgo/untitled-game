@@ -1,11 +1,16 @@
 extends SceneTree
-## Builds the 5 themed encounters (docs: "Encounters v1" in the project). Each
+## Builds the 7 themed encounters (docs: "Encounters" in the project). Each
 ## encounter just names its card sets (EncounterData.card_sets); the shop pools
 ## fill themselves from the existing content (ContentLibrary), so nothing here
 ## reads or touches your cards. Writes:
-##   content/test/enemies/<enemy>.tres        5 enemies
+##   content/test/enemies/<enemy>.tres        7 enemies
 ##   content/test/enemy_charms/toll.tres       Barracuda's passive
-##   content/test/encounters/<encounter>.tres 5 encounters
+##   content/test/encounters/<encounter>.tres 7 encounters
+## Ring (every set in exactly two encounters, neighbours share one):
+##   Trim+Curse -> Curse+Market -> Market+Temporary -> Temporary+Draw
+##   -> Draw+Next Round -> Next Round+Discard -> Discard+Trim -> back
+## Careful: re-running gives the saved files new uids and drops edits made in
+## the editor (see the project notes).
 ## Run:  godot --headless --path . --script res://tools/build_encounters.gd
 ##
 ## Each encounter sells two themed sets + Utility + Coins (Utility and Coins are
@@ -37,15 +42,17 @@ func _init() -> void:
 	])
 	_encounter("Hag's Hex", "hags_hex", hag, [S.TRIM, S.CURSE_SYNERGY])
 
-	# --- B. Draw + Discard: the Cuttlefish makes you discard and shuts off draws ---
+	# --- B. Discard + Next Round: the Cuttlefish makes you discard and shuts off draws ---
+	# (was Draw + Discard; Next Round's next-turn draws dodge Murk)
 	var squid := _enemy("Cuttlefish", Color("6fa8dc"), [
 		_intent("Ink Spray", Kind.ATTACK, "You ⤵ a card at random", [_discard_random(1)]),
 		_intent("Pinch", Kind.STEAL, "Steal 1 🪙", [_steal(1)]),
 		_intent("Murk", Kind.OTHER, "You can't draw additional cards this turn", [_draw_lock()]),
 	])
-	_encounter("Ink Cloud", "ink_cloud", squid, [S.DRAW, S.DISCARD])
+	_encounter("Ink Cloud", "ink_cloud", squid, [S.DISCARD, S.NEXT_ROUND])
 
-	# --- C. Market + Draw: the Barracuda snatches cards and taxes every buy ---
+	# --- C. Market + Temporary: the Barracuda snatches cards and taxes every buy ---
+	# (was Market + Draw; Temporary gets you cards without buying)
 	var toll := CharmData.new()
 	toll.id = &"toll"; toll.display_name = "Toll"; toll.cost = 0
 	toll.trigger = GameRules.Trigger.OPPONENT_CARD_BOUGHT
@@ -59,7 +66,7 @@ func _init() -> void:
 		_intent("Grab", Kind.SHOP, "Remove the priciest market card", [_snatch(SnatchShopCardEffect.Mode.PRICIEST)]),
 	])
 	cuda.charms.assign([toll])
-	_encounter("Toll Booth", "toll_booth", cuda, [S.MARKET, S.DRAW])
+	_encounter("Toll Booth", "toll_booth", cuda, [S.MARKET, S.TEMPORARY])
 
 	# --- D. Curse Synergy + Market: the Loan Shark lends curses and repossesses cards ---
 	var shark := _enemy("Loan Shark", Color("c0504d"), [
@@ -78,6 +85,22 @@ func _init() -> void:
 		_intent("Pinch", Kind.STEAL, "Steal 1 🪙", [_steal(1)]),
 	])
 	_encounter("Clutter", "clutter", hagfish, [S.DISCARD, S.TRIM])
+
+	# --- F. Temporary + Draw: the Gulper Eel eats cards from your hand and clamps draws ---
+	var eel := _enemy("Gulper Eel", Color("4b3f72"), [
+		_intent("Gulp", Kind.ATTACK, "You 🗑 a card in your hand at random", [_remove_random(1)]),
+		_intent("Pinch", Kind.STEAL, "Steal 1 🪙", [_steal(1)]),
+		_intent("Clamp", Kind.OTHER, "You can't draw additional cards this turn", [_draw_lock()]),
+	])
+	_encounter("Gullet", "gullet", eel, [S.TEMPORARY, S.DRAW])
+
+	# --- G. Draw + Next Round: the Sunfish punishes every action, so pass early and build the next turn ---
+	var sunfish := _enemy("Sunfish", Color("d9a441"), [
+		_intent("Sting", Kind.ATTACK, "You lose 2 🪙", [_lose(2)]),
+		_intent("Pinch", Kind.STEAL, "Steal 1 🪙", [_steal(1)]),
+		_intent("Riptide", Kind.ATTACK, "You ⤵ a card at random", [_discard_random(1)]),
+	])
+	_encounter("Slack Tide", "slack_tide", sunfish, [S.DRAW, S.NEXT_ROUND])
 
 	print("Encounters written to ", DIR, "encounters/")
 	quit()
@@ -149,6 +172,10 @@ func _random_curse(ids: Array) -> Effect:
 
 func _discard_random(n: int) -> Effect:
 	var e := DiscardRandomEffect.new(); e.amount = n; e.target = OPP; return e
+
+
+func _remove_random(n: int) -> Effect:
+	var e := RemoveRandomEffect.new(); e.amount = n; e.target = OPP; return e
 
 
 func _draw_lock() -> Effect:

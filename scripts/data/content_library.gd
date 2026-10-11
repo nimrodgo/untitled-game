@@ -25,6 +25,14 @@ static func enhancements() -> Array:
 	return _load("enhancements")
 
 
+## The enhancement that makes a card temporary (⏳), or null.
+static func temporary_enhancement() -> EnhancementData:
+	for e in enhancements():
+		if e.temporary:
+			return e
+	return null
+
+
 ## The pieces of `all` whose `card_set` is in `sets` (library order).
 static func in_sets(all: Array, sets: Array) -> Array:
 	var out := []

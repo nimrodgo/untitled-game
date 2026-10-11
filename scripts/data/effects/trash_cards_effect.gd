@@ -8,9 +8,10 @@ extends Effect
 ##   aren't enough). Curses only when `curses_only`.
 ## - ALL_OTHER_HAND: every other card in the owner's hand.
 ## - DRAW_PILE: the owner's whole draw pile ("your deck").
+## - ALL_TEMPORARY: every temporary (⏳) card in the owner's hand, deck and discard pile.
 ## Bonuses: `coins_per_card` for each card, and/or coins equal to each card's cost.
 
-enum What { SELF, CHOOSE, ALL_OTHER_HAND, DRAW_PILE }
+enum What { SELF, CHOOSE, ALL_OTHER_HAND, DRAW_PILE, ALL_TEMPORARY }
 
 @export var destroy: bool = true
 @export var what: What = What.CHOOSE
@@ -38,6 +39,8 @@ func apply(ctx: EffectContext) -> void:
 					cards.append(c)
 		What.DRAW_PILE:
 			cards = p.draw_pile.duplicate()
+		What.ALL_TEMPORARY:
+			cards = _temporary_cards(p, ctx.card)
 		_:
 			var f := Callable()
 			if curses_only:
@@ -59,8 +62,18 @@ func preview_coins(_enc: Encounter, owner: PlayerState, _cd: CardData, card: Car
 		What.SELF: n = 1
 		What.ALL_OTHER_HAND: n = owner.hand.size() - (1 if card and owner.hand.has(card) else 0)
 		What.DRAW_PILE: n = owner.draw_pile.size()
+		What.ALL_TEMPORARY: n = _temporary_cards(owner, card).size()
 		_: n = amount
 	return n * coins_per_card
+
+
+func _temporary_cards(p: PlayerState, except: CardInstance) -> Array:
+	var out: Array = []
+	for pile in [p.hand, p.draw_pile, p.discard]:
+		for c in pile:
+			if c != except and c.is_temporary():
+				out.append(c)
+	return out
 
 
 func is_cost() -> bool:
@@ -75,6 +88,7 @@ func describe() -> String:
 		What.SELF: t = "%s this" % icon
 		What.ALL_OTHER_HAND: t = "%s all other cards %s in hand" % [verb, icon]
 		What.DRAW_PILE: t = "%s your deck %s" % [verb, icon]
+		What.ALL_TEMPORARY: t = "%s all ⏳ cards in your hand, deck and discard pile" % icon
 		_:
 			t = "%s%s" % [Icons.n(amount, icon), " curse" if curses_only else ""]
 			if piles == GameRules.PILE_HAND:

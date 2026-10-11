@@ -21,6 +21,8 @@ func _init() -> void:
 	_shop_content_rules()
 	_more_ideas_rules()
 	_on_buy_rules()
+	_next_round_rules()
+	_temporary_rules()
 	print("\n%d checks, %d failed" % [checks, fails])
 	quit(1 if fails > 0 else 0)
 
@@ -460,13 +462,15 @@ func _count_id(arr: Array, id: String) -> int:
 	return n
 
 
-# ------------------------------------------------------- the 5 encounters
+# ------------------------------------------------------- the 7 encounters
 
 const ENC_DIR := "res://content/test/encounters/%s.tres"
 const THEMES := {
 	"hags_hex": [CardSets.Id.TRIM, CardSets.Id.CURSE_SYNERGY],
-	"ink_cloud": [CardSets.Id.DRAW, CardSets.Id.DISCARD],
-	"toll_booth": [CardSets.Id.MARKET, CardSets.Id.DRAW],
+	"ink_cloud": [CardSets.Id.DISCARD, CardSets.Id.NEXT_ROUND],
+	"toll_booth": [CardSets.Id.MARKET, CardSets.Id.TEMPORARY],
+	"gullet": [CardSets.Id.TEMPORARY, CardSets.Id.DRAW],
+	"slack_tide": [CardSets.Id.DRAW, CardSets.Id.NEXT_ROUND],
 	"loan_shark": [CardSets.Id.CURSE_SYNERGY, CardSets.Id.MARKET],
 	"clutter": [CardSets.Id.DISCARD, CardSets.Id.TRIM],
 }
@@ -615,6 +619,51 @@ func _encounter_rules() -> void:
 	_enemy_does(e, "Repo")
 	_check(_filled_cards(e) == filled - 1, "Loan Shark: Repo removes a market card")
 
+	# F. Gulper Eel
+	e = _enc(DECK5, true, true, ENC_DIR % "gullet")
+	hand_n = e.player.hand.size()
+	_enemy_does(e, "Gulp")
+	_check(e.player.hand.size() == hand_n - 1 and e.player.removed.size() == 1, "Gulper Eel: Gulp removes a random card from your hand")
+	e.active = e.enemy
+	_enemy_does(e, "Clamp")
+	_check(e.player.draw_locked and not e.enemy.draw_locked, "Gulper Eel: Clamp locks YOUR draws")
+	e = _enc(DECK5, true, true, ENC_DIR % "gullet")
+	var tp := _give(e, "trial_pack")
+	e.player.draw_locked = true
+	e.play_card(tp)
+	_check(_temps_in(e.player.hand) == 2, "Gullet: Trial Pack still works under Clamp")
+
+	# G. Sunfish
+	e = _enc(DECK5, true, true, ENC_DIR % "slack_tide")
+	coins = e.player.coins
+	_enemy_does(e, "Sting")
+	_check(e.player.coins == coins - 2, "Sunfish: Sting, you lose 2")
+	e.active = e.enemy
+	hand_n = e.player.hand.size()
+	_enemy_does(e, "Riptide")
+	_check(e.player.hand.size() == hand_n - 1, "Sunfish: Riptide discards 1 at random")
+
+	# The ring: the game's pool has all 7, and every themed set is in exactly 2 of them.
+	var main_scene: PackedScene = load("res://scenes/main.tscn")
+	var main_node := main_scene.instantiate()
+	var pool_files: Array = []
+	for d in main_node.encounter_pool:
+		pool_files.append(d.resource_path.get_file().get_basename())
+	main_node.free()
+	pool_files.sort()
+	var want_files: Array = THEMES.keys()
+	want_files.sort()
+	_check(pool_files == want_files, "main.tscn encounter_pool has the 7 themed encounters %s" % str(pool_files))
+	var count := {}
+	for file in THEMES:
+		for st in THEMES[file]:
+			count[st] = count.get(st, 0) + 1
+	var ring_ok := true
+	for st in [CardSets.Id.DRAW, CardSets.Id.DISCARD, CardSets.Id.TRIM, CardSets.Id.NEXT_ROUND,
+			CardSets.Id.MARKET, CardSets.Id.CURSE_SYNERGY, CardSets.Id.TEMPORARY]:
+		ring_ok = ring_ok and count.get(st, 0) == 2
+	_check(ring_ok, "every themed set is sold in exactly 2 encounters %s" % str(count))
+
 	# E. Hagfish
 	e = _enc(DECK5, true, true, ENC_DIR % "clutter")
 	hand_n = e.player.hand.size()
@@ -668,7 +717,7 @@ func _enhancement_rules() -> void:
 	for en in ContentLibrary.enhancements():
 		sets[en.card_set] = en.display_name
 	for s in [CardSets.Id.COINS, CardSets.Id.DRAW, CardSets.Id.DISCARD, CardSets.Id.TRIM,
-			CardSets.Id.RETAIN, CardSets.Id.UTILITY, CardSets.Id.MARKET, CardSets.Id.CURSE_SYNERGY]:
+			CardSets.Id.NEXT_ROUND, CardSets.Id.UTILITY, CardSets.Id.MARKET, CardSets.Id.CURSE_SYNERGY]:
 		_check(sets.has(s), "enhancement for set %s exists" % CardSets.display_name(s))
 
 	# Coins: +2 coins on play.
@@ -784,10 +833,12 @@ func _enhancement_rules() -> void:
 		allowed.append(CardSets.Id.UTILITY)
 		allowed.append(CardSets.Id.COINS)
 		var pool := data.get_enhancement_pool()
-		var ok := pool.size() == 4
+		# Temporary's enhancement is never sold, so those encounters offer 3.
+		var want_n := 3 if allowed.has(CardSets.Id.TEMPORARY) else 4
+		var ok := pool.size() == want_n
 		for en in pool:
-			ok = ok and allowed.has(en.card_set)
-		_check(ok, "%s: sells the enhancements of its 4 sets" % file)
+			ok = ok and allowed.has(en.card_set) and not en.generated_only
+		_check(ok, "%s: sells the enhancements of its sets (%d)" % [file, pool.size()])
 		_check(data.enhancement_slots == 1, "%s: 1 enhancement slot" % file)
 		e = _enc(DECK5, true, false, ENC_DIR % file)
 		_check(e.shop.enhancements.size() == 1 and e.shop.enhancements[0] != null, "%s: enhancement slot is filled" % file)
@@ -795,7 +846,7 @@ func _enhancement_rules() -> void:
 		for i in 40:
 			e.shop.restock()
 			seen[e.shop.enhancements[0].id] = true
-		_check(seen.size() == 4, "%s: the slot rerolls through all 4 enhancements (saw %d)" % [file, seen.size()])
+		_check(seen.size() == pool.size(), "%s: the slot rerolls through all its enhancements (saw %d of %d)" % [file, seen.size(), pool.size()])
 
 	# Buying: pay, pick a card in hand, it is attached.
 	e = _enc(DECK5, true, false, ENC_DIR % "toll_booth")
@@ -1291,3 +1342,235 @@ func _on_buy_rules() -> void:
 			if cd.on_buy_text != "" and cd.on_buy_text != "TBD" and cd.on_buy.is_empty():
 				missing.append(cd.id)
 	_check(missing.is_empty(), "every written on-buy has effects %s" % str(missing))
+
+
+func _next_round_rules() -> void:
+	_check(_card("rest").card_set == CardSets.Id.NEXT_ROUND, "Rest is in the Next Round set")
+	_smoke_ids(["stash", "head_start"])
+
+	# Stash: draws 2 and retains exactly those two.
+	var e := _enc(DECK5 + DECK5 + DECK5 + DECK5, false)
+	var old_hand := e.player.hand.duplicate()
+	var c := _give(e, "stash")
+	e.play_card(c)
+	var drawn: Array = []
+	for k in e.player.hand:
+		if not old_hand.has(k):
+			drawn.append(k)
+	_check(drawn.size() == 2, "Stash: draws 2 (%d)" % drawn.size())
+	var all_retained := true
+	for k in drawn:
+		all_retained = all_retained and k.is_retained()
+	_check(all_retained, "Stash: the drawn cards are retained")
+	var others_retained := false
+	for k in old_hand:
+		others_retained = others_retained or k.is_retained()
+	_check(not others_retained, "Stash: the rest of the hand is not retained")
+	e.pass_turn()
+	var kept := true
+	for k in drawn:
+		kept = kept and e.player.hand.has(k)
+	_check(kept and e.player.hand.size() == 7, "Stash: both stay for the next turn, on top of a full 5 (%d)" % e.player.hand.size())
+	_consistent(e, "Stash")
+
+	# Stash with Curse Ward: the card Curse Ward draws is not retained.
+	e = _enc(["dead_weight", "dead_weight", "dead_weight"] + DECK5 + DECK5, false)
+	e.player.charms.append(CharmInstance.new(_charm("curse_ward")))
+	e.player.draw_pile.push_back(CardInstance.new(_card("example1")))
+	e.player.draw_pile.push_back(CardInstance.new(_card("dead_weight")))
+	old_hand = e.player.hand.duplicate()
+	c = _give(e, "stash")
+	e.play_card(c)
+	var retained_new := 0
+	var new_cards := 0
+	for k in e.player.hand:
+		if not old_hand.has(k):
+			new_cards += 1
+			if k.is_retained():
+				retained_new += 1
+	_check(new_cards == 3 and retained_new == 2, "Stash + Curse Ward: 3 drawn, only Stash's 2 retained (%d/%d)" % [retained_new, new_cards])
+
+	# Head Start: 2 coins now, 1 extra card next turn.
+	e = _enc(DECK5 + DECK5 + DECK5, false)
+	var coins := e.player.coins
+	c = _give(e, "head_start")
+	e.play_card(c)
+	_check(e.player.coins == coins + 2, "Head Start: +2 coins")
+	_check(e.player.bonus_draw_next_turn == 1, "Head Start: 1 bonus draw queued")
+	e.pass_turn()
+	_check(e.player.hand.size() == 6, "Head Start: next turn starts with 6 cards (%d)" % e.player.hand.size())
+	_consistent(e, "Head Start")
+
+
+func _temp(e: Encounter, id: String) -> CardInstance:
+	return e.make_card(_card(id), true)
+
+
+func _temps_in(arr: Array) -> int:
+	var n := 0
+	for c in arr:
+		if c.is_temporary():
+			n += 1
+	return n
+
+
+func _temporary_rules() -> void:
+	var temp := ContentLibrary.temporary_enhancement()
+	_check(temp != null and temp.generated_only and temp.card_set == CardSets.Id.TEMPORARY, "Temporary: enhancement exists, generated only, Temporary set")
+	# Never sold.
+	for path in ["clutter", "hags_hex", "ink_cloud", "loan_shark", "toll_booth", "test_encounter"]:
+		var d: EncounterData = load("res://content/test/encounters/%s.tres" % path)
+		_check(not d.get_enhancement_pool().has(temp), "Temporary: not sold in %s" % path)
+	# Never picked by random enhancement (Blank Slate).
+	var e := _enc(DECK5 + DECK5)
+	var bs := _give(e, "blank_slate")
+	var rnd := RandomEnhanceEffect.new()
+	for i in 60:
+		rnd.apply(e._ctx(e.player, bs))
+	_check(bs.enhancements.size() == 60 and not bs.is_temporary(), "Temporary: Blank Slate's random enhance never picks it")
+	_smoke_ids(["trial_pack", "refund", "trade_in", "carbon_copy"])
+
+	# Burned at the end of the encounter, wherever it is, after the result.
+	e = _enc(DECK5 + DECK5, false)
+	var where := [e.player.hand, e.player.draw_pile, e.player.discard, e.player.removed]
+	var made: Array = []
+	for pile in where:
+		var c := _temp(e, "example1")
+		pile.append(c)
+		made.append(c)
+	e.player.coins = 99
+	e._finish_encounter()
+	var burned := true
+	for c in made:
+		burned = burned and e.player.destroyed.has(c)
+	_check(burned and e.won, "Temporary: all burned at the end of the encounter (hand, deck, discard, removed); result unaffected")
+	_consistent(e, "Temporary burn")
+
+	# Trial Pack: 2 random temporary shop-pool cards to the hand (not draws).
+	e = _enc(DECK5 + DECK5, false)
+	var c := _give(e, "trial_pack")
+	var drawn_before := e.player.cards_drawn_this_turn
+	e.play_card(c)
+	var pool := e.shop.card_pool()
+	var got: Array = e.player.hand.filter(func(k: CardInstance): return k.is_temporary())
+	_check(got.size() == 2 and pool.has(got[0].data) and pool.has(got[1].data), "Trial Pack: 2 temporary shop-pool cards in hand")
+	_check(e.player.cards_drawn_this_turn == drawn_before, "Trial Pack: they are not draws")
+	e = _enc(DECK5 + DECK5, false)
+	e.player.draw_locked = true
+	c = _give(e, "trial_pack")
+	e.play_card(c)
+	_check(_temps_in(e.player.hand) == 2, "Trial Pack: works while draws are locked")
+
+	# Refund: removes every temporary card in hand, deck and discard; 1 coin each.
+	e = _enc(DECK5 + DECK5, false)
+	var t1 := _temp(e, "example1"); e.player.hand.append(t1)
+	var t2 := _temp(e, "example1"); e.player.draw_pile.append(t2)
+	var t3 := _temp(e, "example1"); e.player.discard.append(t3)
+	var plain := e.player.hand[0]
+	c = _give(e, "refund")
+	var coins := e.player.coins
+	e.play_card(c)
+	_check(e.player.removed.has(t1) and e.player.removed.has(t2) and e.player.removed.has(t3), "Refund: all 3 temporary cards removed")
+	_check(not e.player.removed.has(plain), "Refund: plain cards stay")
+	_check(e.player.coins == coins + 3, "Refund: +1 coin each (%d)" % (e.player.coins - coins))
+
+	# Trade-In: discard a card, get a temporary copy of it in hand, +2 coins.
+	e = _enc(DECK5 + DECK5, false)
+	for k in e.player.hand.duplicate():
+		e.player.hand.erase(k)
+		e.player.draw_pile.append(k)
+	var orig := _give_enh(e, "example2", "gilded")
+	c = _give(e, "trade_in")
+	coins = e.player.coins
+	e.play_card(c)
+	var copy: CardInstance = _in_hand(e, "example2")
+	_check(e.player.discard.has(orig), "Trade-In: the card is discarded")
+	_check(copy != null and copy != orig and copy.is_temporary() and copy.enhancements.size() == 1, "Trade-In: a plain temporary copy in hand")
+	_check(e.player.coins == coins + 2, "Trade-In: +2 coins")
+	_consistent(e, "Trade-In")
+
+	# Copier: level 1 copies + Dead Weight, level 2 copies, level 3 copies 2 + Dead Weight.
+	for lvl in 3:
+		e = _enc(DECK5 + DECK5)
+		var tr := TrinketInstance.new(_trinket("copier"))
+		tr.level = lvl
+		e.player.trinkets.append(tr)
+		var dw := _count_id(e.player.all_cards(), "dead_weight")
+		var temps := _temps_in(e.player.hand)
+		_check(e.use_trinket(0), "Copier L%d: usable" % (lvl + 1))
+		var want := 2 if lvl == 2 else 1
+		_check(_temps_in(e.player.hand) == temps + want, "Copier L%d: %d temporary cop%s in hand" % [lvl + 1, want, "y" if want == 1 else "ies"])
+		_check(_count_id(e.player.all_cards(), "dead_weight") == dw + (0 if lvl == 1 else 1), "Copier L%d: Dead Weight %s" % [lvl + 1, "not added" if lvl == 1 else "added"])
+	# Level 3 with a single card in hand: 2 copies of it.
+	e = _enc(DECK5 + DECK5, false)
+	for k in e.player.hand.duplicate():
+		e.player.hand.erase(k)
+		e.player.draw_pile.append(k)
+	_give(e, "example2")
+	var tr3 := TrinketInstance.new(_trinket("copier"))
+	tr3.level = 2
+	e.player.trinkets.append(tr3)
+	e.use_trinket(0)
+	_check(_count_id(e.player.hand, "example2") == 3, "Copier L3: one card in hand -> 2 copies of it")
+
+	# Free Trial: a temporary copy of the first card bought each turn goes to the hand.
+	e = _enc(DECK5 + DECK5, false)
+	e.player.charms.append(CharmInstance.new(_charm("free_trial")))
+	var hand_temps := _temps_in(e.player.hand)
+	_buy(e, "example2")
+	var ft: CardInstance = _in_hand(e, "example2")
+	_check(_temps_in(e.player.hand) == hand_temps + 1 and ft != null and ft.is_temporary(), "Free Trial: temporary copy of the first buy in hand")
+	_buy(e, "example1")
+	_check(_temps_in(e.player.hand) == hand_temps + 1, "Free Trial: only the first buy each turn")
+
+	# Workshop: +2 coins whenever you create a card (temporary copies, curses...).
+	e = _enc(DECK5 + DECK5, false)
+	e.player.charms.append(CharmInstance.new(_charm("workshop")))
+	coins = e.player.coins
+	c = _give(e, "risky_draw")
+	e.play_card(c)
+	_check(e.player.coins == coins + 2, "Workshop: curse added by your own card -> +2 (%d)" % (e.player.coins - coins))
+	coins = e.player.coins
+	c = _give(e, "trial_pack")
+	e.play_card(c)
+	_check(e.player.coins == coins + 4, "Workshop: 2 temporary cards -> +4 (%d)" % (e.player.coins - coins))
+	coins = e.player.coins
+	c = _give(e, "carbon_copy")
+	e.play_card(c)
+	_check(e.player.coins == coins + 2, "Workshop: Carbon Copy's copy -> +2, the draw itself doesn't count (%d)" % (e.player.coins - coins))
+	coins = e.player.coins
+	var give := AddCardEffect.new()
+	give.card = _card("dead_weight")
+	give.target = GameRules.Target.OPPONENT
+	give.apply(e._ctx(e.enemy))
+	_check(e.player.coins == coins and _count_id(e.player.all_cards(), "dead_weight") >= 1, "Workshop: a curse the enemy gives you doesn't count")
+	coins = e.player.coins
+	_buy(e, "hold")
+	_check(e.player.coins == 30 - e.card_price(e.player, _card("hold").cost), "Workshop: buying a card doesn't count")
+
+	# Carbon Copy: draw a card and get a temporary copy of it in hand.
+	e = _enc(DECK5 + ["example2"], false)
+	var top: CardInstance = e.player.draw_pile.back()
+	var cc := _give(e, "carbon_copy")
+	var drawn0 := e.player.cards_drawn_this_turn
+	e.play_card(cc)
+	var copies: Array = e.player.hand.filter(func(k: CardInstance): return k.is_temporary())
+	_check(e.player.hand.has(top) and not top.is_temporary(), "Carbon Copy: draws the top card")
+	_check(copies.size() == 1 and copies[0].data == top.data and copies[0] != top, "Carbon Copy: a temporary copy of the drawn card in hand")
+	_check(e.player.cards_drawn_this_turn == drawn0 + 1, "Carbon Copy: only the real card counts as a draw")
+	e = _enc(DECK5 + DECK5, false)
+	e.player.draw_locked = true
+	cc = _give(e, "carbon_copy")
+	e.play_card(cc)
+	_check(_temps_in(e.player.hand) == 0, "Carbon Copy: no draw, no copy")
+
+	# Mimic never copies another Mimic (they would copy each other forever).
+	e = _enc(DECK5 + DECK5, true)
+	coins = e.player.coins
+	var ex := _give(e, "example2")
+	e.play_card(ex)
+	var m1 := _give(e, "mimic")
+	e.play_card(m1)
+	var m2 := _give(e, "mimic")
+	e.play_card(m2)
+	_check(not e.is_busy() and e.player.coins == coins + 3, "Mimic after Mimic: copies the last non-Mimic card, no loop (%d)" % (e.player.coins - coins))

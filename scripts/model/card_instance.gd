@@ -39,6 +39,11 @@ func is_curse() -> bool:
 	return data.curse or enhancements.any(func(e: EnhancementData): return e.counts_as_curse)
 
 
+## Temporary (⏳): burned at the end of the encounter.
+func is_temporary() -> bool:
+	return enhancements.any(func(e: EnhancementData): return e.temporary)
+
+
 ## Kept in hand at the end of the turn (picked by an effect, or by an enhancement).
 func is_retained() -> bool:
 	return retain or enhancements.any(func(e: EnhancementData): return e.retain)

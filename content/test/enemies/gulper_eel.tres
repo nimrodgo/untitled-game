@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_intent.gd" id="1_int"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_eff"]
+[ext_resource type="Script" path="res://scripts/data/effects/remove_random_effect.gd" id="3_rem"]
+[ext_resource type="Script" path="res://scripts/data/effects/steal_coins_effect.gd" id="4_steal"]
+[ext_resource type="Script" path="res://scripts/data/effects/draw_lock_effect.gd" id="5_lock"]
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="6_enemy"]
+
+[sub_resource type="Resource" id="Resource_gulp_fx"]
+script = ExtResource("3_rem")
+target = 1
+
+[sub_resource type="Resource" id="Resource_gulp"]
+script = ExtResource("1_int")
+display_name = "Gulp"
+effects = Array[ExtResource("2_eff")]([SubResource("Resource_gulp_fx")])
+description = "You 🗑 a card in your hand at random"
+
+[sub_resource type="Resource" id="Resource_pinch_fx"]
+script = ExtResource("4_steal")
+
+[sub_resource type="Resource" id="Resource_pinch"]
+script = ExtResource("1_int")
+display_name = "Pinch"
+kind = 1
+effects = Array[ExtResource("2_eff")]([SubResource("Resource_pinch_fx")])
+description = "Steal 1 🪙"
+
+[sub_resource type="Resource" id="Resource_clamp_fx"]
+script = ExtResource("5_lock")
+target = 1
+
+[sub_resource type="Resource" id="Resource_clamp"]
+script = ExtResource("1_int")
+display_name = "Clamp"
+kind = 5
+effects = Array[ExtResource("2_eff")]([SubResource("Resource_clamp_fx")])
+description = "You can't draw additional cards this turn"
+
+[resource]
+script = ExtResource("6_enemy")
+display_name = "Gulper Eel"
+intents = Array[ExtResource("1_int")]([SubResource("Resource_gulp"), SubResource("Resource_pinch"), SubResource("Resource_clamp")])
+color = Color(0.29411766, 0.24705882, 0.44705883, 1)

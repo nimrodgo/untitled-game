@@ -12,6 +12,6 @@ script = ExtResource("5_f0g6p")
 display_name = "Ink Cloud"
 coin_target = 10
 enemy = ExtResource("2_r467u")
-card_sets = Array[int]([3, 4])
+card_sets = Array[int]([4, 6])
 card_slots = 3
 enhancement_slots = 1

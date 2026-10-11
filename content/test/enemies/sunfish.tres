@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_intent.gd" id="1_int"]
+[ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_eff"]
+[ext_resource type="Script" path="res://scripts/data/effects/lose_coins_effect.gd" id="3_lose"]
+[ext_resource type="Script" path="res://scripts/data/effects/steal_coins_effect.gd" id="4_steal"]
+[ext_resource type="Script" path="res://scripts/data/effects/discard_random_effect.gd" id="5_disc"]
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="6_enemy"]
+
+[sub_resource type="Resource" id="Resource_sting_fx"]
+script = ExtResource("3_lose")
+amount = 2
+target = 1
+
+[sub_resource type="Resource" id="Resource_sting"]
+script = ExtResource("1_int")
+display_name = "Sting"
+effects = Array[ExtResource("2_eff")]([SubResource("Resource_sting_fx")])
+description = "You lose 2 🪙"
+
+[sub_resource type="Resource" id="Resource_pinch_fx"]
+script = ExtResource("4_steal")
+
+[sub_resource type="Resource" id="Resource_pinch"]
+script = ExtResource("1_int")
+display_name = "Pinch"
+kind = 1
+effects = Array[ExtResource("2_eff")]([SubResource("Resource_pinch_fx")])
+description = "Steal 1 🪙"
+
+[sub_resource type="Resource" id="Resource_rip_fx"]
+script = ExtResource("5_disc")
+target = 1
+
+[sub_resource type="Resource" id="Resource_rip"]
+script = ExtResource("1_int")
+display_name = "Riptide"
+effects = Array[ExtResource("2_eff")]([SubResource("Resource_rip_fx")])
+description = "You ⤵ a card at random"
+
+[resource]
+script = ExtResource("6_enemy")
+display_name = "Sunfish"
+intents = Array[ExtResource("1_int")]([SubResource("Resource_sting"), SubResource("Resource_pinch"), SubResource("Resource_rip")])
+color = Color(0.8509804, 0.6431373, 0.25490198, 1)

@@ -4,7 +4,7 @@ Aquatic roguelike deckbuilder where **every encounter is a shop**. You don't fig
 reach a coin target while an enemy steals, taxes and snatches from the market.
 
 Current slice: a full rules engine, a landscape (phone-friendly) placeholder UI, TEST content grouped into
-8 card sets, and 5 themed encounters (one is picked at random on every launch). No run layer yet.
+10 card sets, and 7 themed encounters (one is picked at random on every launch). No run layer yet.
 Godot **4.6.3**, GDScript, GL Compatibility.
 
 **Playtest:** https://nimrodgo.github.io/untitled-game/ (rebuilt on every push to `main`).

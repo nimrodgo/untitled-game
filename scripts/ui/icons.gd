@@ -15,6 +15,7 @@ const DESTROY := "🔥"
 const REMOVE := "🗑"
 const REFRESH := "↺"
 const RETAIN := "📌"   ## keep a card in hand at the end of the turn
+const TEMPORARY := "⏳"  ## burned at the end of the encounter
 ## Alternative spellings that draw the same icon.
 const ALIASES := {"🗲": "⚡"}
 
@@ -62,6 +63,11 @@ const SVG := {
 	"⧉": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
 		<rect x="3" y="3" width="17" height="17" rx="3.5" fill="#9fc3cf" stroke="#243c48" stroke-width="2.2"/>
 		<rect x="12" y="12" width="17" height="17" rx="3.5" fill="#e8f4f5" stroke="#243c48" stroke-width="2.2"/></svg>""",
+	"⏳": """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+		<path d="M8 3 H24 M8 29 H24" stroke="#d9c58a" stroke-width="2.6" stroke-linecap="round"/>
+		<path d="M9.5 4.5 H22.5 C22.5 10 19.5 13 16 16 C19.5 19 22.5 22 22.5 27.5 H9.5 C9.5 22 12.5 19 16 16 C12.5 13 9.5 10 9.5 4.5 Z"
+		fill="#f4ecd2" stroke="#6b5a24" stroke-width="2" stroke-linejoin="round"/>
+		<path d="M12.5 8 H19.5 C19 10.5 17.5 12.5 16 13.8 C14.5 12.5 13 10.5 12.5 8 Z M11.8 26 C12.5 22.5 14.5 20.5 16 19.6 C17.5 20.5 19.5 22.5 20.2 26 Z" fill="#e0a43a"/></svg>""",
 }
 
 ## What each icon means (shown as a hover pop-up).
@@ -69,7 +75,7 @@ const TIPS := {
 	"🪙": "Coins", "🂠": "Card — draw", "⚡": "Instant — free action, doesn't end your turn",
 	"🛍": "On buy — happens when you buy it", "⤵": "Discard", "➡": "Pay what's on the left to get what's on the right",
 	"🔥": "Destroy — gone for good", "🗑": "Remove — gone for this encounter", "↺": "Refresh", "📌": "Retain — keep the card in your hand at the end of the turn",
-	"☠": "Curse", "⧉": "Copy",
+	"☠": "Curse", "⧉": "Copy", "⏳": "Temporary — burned at the end of the encounter",
 }
 
 static var _cache := {}

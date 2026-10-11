@@ -13,10 +13,11 @@ enum Id {
 	DRAW,          ## Drawing, fetching from the deck, draw synergy.
 	DISCARD,       ## Discarding and discard payoffs.
 	TRIM,          ## Remove and destroy.
-	RETAIN,        ## Keeping cards in hand between turns.
+	NEXT_ROUND,    ## Effects that help your next round: retain, set up next turn's draw, delayed payoffs.
 	UTILITY,       ## Unique effects (replays, trinket refresh, extra turns...).
 	MARKET,        ## Market manipulation: buying, restocking, recovering cards.
 	CURSE_SYNERGY, ## Gaining, moving and cashing in curses.
+	TEMPORARY,     ## Temporary (⏳) cards: made by effects, burned at the end of the encounter.
 }
 
 const _INFO := {
@@ -26,10 +27,11 @@ const _INFO := {
 	Id.DRAW: ["Draw", Color("11587a")],
 	Id.DISCARD: ["Discard", Color("8a4a2a")],
 	Id.TRIM: ["Trim", Color("8a2f3a")],
-	Id.RETAIN: ["Retain", Color("3a7a2a")],
+	Id.NEXT_ROUND: ["Next Round", Color("3a7a2a")],
 	Id.UTILITY: ["Utility", Color("4a5568")],
 	Id.MARKET: ["Market", Color("0f6b6b")],
 	Id.CURSE_SYNERGY: ["Curse Synergy", Color("7a2f6a")],
+	Id.TEMPORARY: ["Temporary", Color("5f6f2a")],
 }
 
 

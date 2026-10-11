@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_eff"]
+[ext_resource type="Script" uid="uid://dow1kbluxxx0s" path="res://scripts/data/effects/gain_coins_effect.gd" id="2_gain"]
+[ext_resource type="Script" uid="uid://712xags3i4ts" path="res://scripts/data/effects/next_turn_draw_effect.gd" id="3_next"]
+[ext_resource type="Script" uid="uid://blua7f30frb6p" path="res://scripts/data/card_data.gd" id="4_card"]
+
+[sub_resource type="Resource" id="Resource_gain"]
+script = ExtResource("2_gain")
+amount = 2
+
+[sub_resource type="Resource" id="Resource_next"]
+script = ExtResource("3_next")
+amount = 1
+
+[resource]
+script = ExtResource("4_card")
+id = &"head_start"
+display_name = "Head Start"
+on_play = Array[ExtResource("1_eff")]([SubResource("Resource_gain"), SubResource("Resource_next")])
+on_play_text = "🪙🪙. 🂠 at the start of your next turn"
+on_buy_text = "TBD"
+card_set = 6

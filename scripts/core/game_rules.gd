@@ -38,6 +38,8 @@ enum Trigger {
 	CARD_DESTROYED,        ## A card was destroyed permanently.
 	CARD_TRASHED_FROM_HAND, ## A card in your hand was removed or destroyed.
 	SHOP_BUY,              ## Any purchase: a card, a charm (not the charm just bought), a trinket or upgrade, an enhancement.
+	CARD_RETAINED,         ## End of your turn: each card that stays in your hand (ctx.card).
+	CARD_CREATED,          ## You created a card in your own cards (curse, copy, random card...; ctx.card). Not buys, transforms or the starting deck.
 }
 
 ## Terminology: a TURN is your whole round (draw a hand, act until you pass).

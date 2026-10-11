@@ -62,6 +62,8 @@ If you write custom text, the auto "INSTANT" tag is hidden. Put ⚡ in the text 
 | `retain` | The card stays in hand at the end of every turn |
 | `destroy_on_apply` | Buying it destroys the chosen card (permanently) on the spot; nothing is attached |
 | `counts_as_curse` | The card counts as a curse (curse triggers, curse filters) |
+| `temporary` | ⏳ The card is destroyed at the end of the encounter (`CardInstance.is_temporary()`) |
+| `generated_only` | Only effects attach it: never sold in the shop, never rolled by `RandomEnhanceEffect` |
 | `icon` | Icon token (see `Icons`) drawn as a round badge on the enhanced card's corner and on the shop tile. The card text is never changed |
 | `description` | Shown on the shop tile and in the hover legend of an enhanced card. Auto-generated if empty |
 
@@ -110,13 +112,14 @@ Every card, charm, trinket, enhancement and curse has exactly one `card_set` (en
 |---|---|---|
 | Curses | 4 | The curses themselves (never sold) |
 | Coins | 5 | Simple coin cards (sold everywhere) |
-| Draw | 9 | Drawing, fetching from the deck, draw synergy |
+| Draw | 8 | Drawing, fetching from the deck, draw synergy |
 | Discard | 11 | Discarding and discard payoffs |
 | Trim | 14 | Remove and destroy |
-| Retain | 3 | Keeping cards in hand (thin, needs more cards) |
+| Next Round | 6 | Effects that help your next round: retain, setting up next turn's draw, delayed payoffs (was "Retain"): Hold, Hunker Down, Rest, Stash, Head Start, Pocket |
 | Utility | 10 | Unique effects: replays, trinket refresh, extra turns (sold everywhere) |
 | Market | 8 | Buying, restocking, recovering cards, market manipulation |
 | Curse Synergy | 12 | Gaining, moving and cashing in curses |
+| Temporary | 7 | Temporary ⏳ cards (made by effects, burned at the end of the encounter): Trial Pack, Carbon Copy, Refund, Trade-In, Copier (trinket), Free Trial, Workshop (charms) + the Temporary enhancement |
 
 `ContentLibrary` (`scripts/data/content_library.gd`) scans `res://content/test/{cards,charms,trinkets,enhancements}` at runtime, so moving a piece to another set or adding a new `.tres` needs no script re-run. Curses are not scanned. Gotcha: a static func called `set_name` on a `class_name` script collides with `Resource.set_name`; use `display_name`.
 
@@ -169,15 +172,18 @@ Cards, charms, trinkets and curses come from `tools/build_test_content.gd` (see 
 | Idea cards (44) | Every card idea from `design/ideas.md`, plus Pawn (listed under charms, meant as a card). P1 is **Snowball** (dummy name). All in the market pool. |
 | Curses (`content/test/curses/`) | C1 **Dead Weight** (does nothing), C2 **Barnacle** (permanent), C3 **Driftwood** (play: remove this), C4 **Leaky Purse** (end of turn in hand: lose 2 🪙). Dummy names; the ids match (`dead_weight`, `barnacle`, `driftwood`, `leaky_purse`). Not in the market. |
 | Charms (17, + Tip Jar below) | Rebate, Express Delivery, the 11 charm ideas, Shredder ("when you discard, remove it"), Needful (the whole shop costs 0, every purchase adds a random curse to your deck), **Top Shelf** (Market: when you buy a card you may put it on top of your deck) and **Stockroom** (Market: bought card slots restock) |
-| Hunker Down | Retain card, cost 2: "Pass. 📌 your hand this turn" |
+| Hunker Down | Next Round card, cost 2: "Pass. 📌 your hand this turn" |
+| Stash | Next Round card, cost 1 (placeholder): "🂠🂠 and 📌 them" (`DrawCardsEffect retain_drawn`) |
+| Head Start | Next Round card, cost 1 (placeholder): "🪙🪙. 🂠 at the start of your next turn" |
+| Temporary set (2026-10-11) | Placeholder names, costs (cards 1, charms 3, trinket 3) and "TBD" on-buys. Cards: **Trial Pack** (2 random ⏳ cards from the shop's pool to your hand; not draws), **Carbon Copy** (🂠 and get a ⏳ copy of it), **Refund** (🗑 all ⏳ cards in hand, deck and discard, 🪙 each), **Trade-In** (⤵ a card ➡ a ⏳ copy of it in hand and 🪙🪙). Trinket **Copier**: L1 ⏳ copy of a hand card + Dead Weight, L2 copy, L3 copies of 2 hand cards (2 copies of one if you only have one) + Dead Weight. Charms **Free Trial** (⏳ copy of the first card you buy each turn to your hand) and **Workshop** (when you create a card, 🪙🪙: temporary cards, copies, curses from your own cards; not buys, transforms or curses the enemy gives you). |
 | More ideas (2026-10-08) | Placeholder names and costs, "TBD" on-buys, only in the .tres (not in `build_test_content.gd`): **Stonewall** (Utility, 3, ⚡ cancel the enemy's next action this turn), **Overclock** (Utility, 3, use the level 3 effect of a trinket you own), **Hindsight** (Coins, 3, 🪙 per card in your discard pile), **Both Ends** (Draw, 2, draw the top and the bottom card), **Moving Goalposts** (Utility, 4, target −3), **Blank Slate** (Utility, 2, does nothing; any number of enhancements) and the charm **Tip Jar** (Coins, 4, +1 🪙 on every other gain). Not in the TEST Encounter pools; the themed encounters sell them through their sets. |
 | On-buy placeholders | Every card without a real on-buy shows a "TBD" buy strip (`on_buy_text = "TBD"`) |
 | Nimrod's on-buys (2026-10-08) | Blank Slate (randomly enhance this), Cycle (⤵ ➡ 🂠), Ember (🗑 this; Ember now draws 🂠🂠 when **removed**, not destroyed), Free Sample (🂠), Mimic (play a random card from your hand), Rush Order (🂠 this), Sift (🂠⤵), Snowball (+1 to all Snowballs; Snowball now starts at 🪙), Spark and Tinker (↺ a trinket). The tests check that every on-buy text other than "TBD" has effects. |
 | Trinkets (7) | Coin Trinket + the 6 trinket ideas, 3 levels each |
 | Enemy | TEST Moray: Pinch (steal 1) → Toll (you lose 1) → Snatch (priciest market card). 3 actions per round. |
 | Encounter | TEST Encounter: 3 rounds, target 10, 3 card slots, 1 charm slot, 1 trinket slot, 0 upgrade slots. Uses explicit pools, no `card_sets`. It is not in `encounter_pool`, but the tests and the simulator use it. |
-| Enhancements (8) | One per set except Curses (`content/test/enhancements/`, built by `tools/build_enhancements.gd`): Gilded (Coins), Insight (Draw), Boomerang (Discard), Fleeting (Trim), Anchored (Retain), Hasty (Utility), Franchise (Market), Tainted (Curse Synergy). Placeholder names, price 3 each. |
+| Enhancements (9) | **Temporary** ⏳ (Temporary set, `generated_only`: never sold, never rolled by Blank Slate). Plus one per set except Curses (`content/test/enhancements/`, built by `tools/build_enhancements.gd`): Gilded (Coins), Insight (Draw), Boomerang (Discard), Fleeting (Trim), Anchored (Next Round), Hasty (Utility), Franchise (Market), Tainted (Curse Synergy). Placeholder names, price 3 each. |
 | Loadout | 5× example2 + 3× example1, 3 coins |
-| 5 themed encounters | Built by `tools/build_encounters.gd`; each just lists its two `card_sets` and the shop pools fill themselves by `card_set`. Each sells two sets + Utility + Coins, 3 rounds, target 10, 3 card / 1 charm / 1 trinket slot. **Hag's Hex** (Trim + Curse Synergy, Sea Hag), **Ink Cloud** (Draw + Discard, Cuttlefish), **Toll Booth** (Market + Draw, Barracuda + the Toll charm), **Loan Shark** (Curse Synergy + Market), **Clutter** (Discard + Trim, Hagfish). Enemies in `content/test/enemies/`, the Toll passive in `content/test/enemy_charms/`. Names are placeholders. |
+| 7 themed encounters | Built by `tools/build_encounters.gd`; each just lists its two `card_sets` and the shop pools fill themselves by `card_set`. Each sells two sets + Utility + Coins, 3 rounds, target 10, 3 card / 1 charm / 1 trinket slot. **Hag's Hex** (Trim + Curse Synergy, Sea Hag), **Ink Cloud** (Discard + Next Round, Cuttlefish), **Toll Booth** (Market + Temporary, Barracuda + the Toll charm), **Loan Shark** (Curse Synergy + Market), **Clutter** (Discard + Trim, Hagfish), **Gullet** (Temporary + Draw, Gulper Eel: Gulp 🗑 a random hand card / Pinch / Clamp draw lock), **Slack Tide** (Draw + Next Round, Sunfish: Sting lose 2 / Pinch / Riptide random ⤵). Ring: every themed set is in exactly two encounters (Trim+Curse → Curse+Market → Market+Temporary → Temporary+Draw → Draw+Next Round → Next Round+Discard → Discard+Trim). Enemies in `content/test/enemies/`, the Toll passive in `content/test/enemy_charms/`. Names are placeholders. |
 
 With the idea cards in the pool the greedy bot wins about 55% at target 10 (it plays the new cards badly, so treat it as a floor).

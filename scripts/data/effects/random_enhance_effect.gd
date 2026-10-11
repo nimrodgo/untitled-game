@@ -1,14 +1,15 @@
 class_name RandomEnhanceEffect
 extends Effect
 ## Attach a random enhancement to this card (the one bought / played): any
-## enhancement in the game except ones that only destroy the card (Fleeting).
+## enhancement in the game except ones that only destroy the card (Fleeting)
+## and generated-only ones (Temporary).
 ## Respects the card's enhancement limit (Blank Slate has none).
 
 func apply(ctx: EffectContext) -> void:
 	var c := ctx.card
 	if c == null or not (c.enhancements.is_empty() or c.data.unlimited_enhancements):
 		return
-	var pool: Array = ContentLibrary.enhancements().filter(func(e: EnhancementData): return not e.destroy_on_apply)
+	var pool: Array = ContentLibrary.enhancements().filter(func(e: EnhancementData): return not e.destroy_on_apply and not e.generated_only)
 	if pool.is_empty():
 		return
 	var e: EnhancementData = pool[ctx.encounter.rng.randi_range(0, pool.size() - 1)]

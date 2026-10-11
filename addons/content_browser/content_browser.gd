@@ -771,6 +771,10 @@ func _enh_parts(r: Resource, d: Dictionary) -> void:
 		tags.append("🔥 Destroys the card")
 	if _g(r, "counts_as_curse", false):
 		tags.append("☠ Counts as curse")
+	if _g(r, "temporary", false):
+		tags.append("⏳ Temporary")
+	if _g(r, "generated_only", false):
+		tags.append("Not sold")
 	d["tag"] = _join(tags, " · ")
 	var desc := str(_g(r, "description", ""))
 	if desc == "":

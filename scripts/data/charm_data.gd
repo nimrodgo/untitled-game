@@ -51,6 +51,8 @@ func get_description() -> String:
 		GameRules.Trigger.CARD_DESTROYED: when = "When you destroy a card"
 		GameRules.Trigger.CARD_TRASHED_FROM_HAND: when = "When you remove or destroy a card in your hand"
 		GameRules.Trigger.SHOP_BUY: when = "When you buy anything"
+		GameRules.Trigger.CARD_RETAINED: when = "When you retain a card"
+		GameRules.Trigger.CARD_CREATED: when = "When you create a card"
 	var limit := ""
 	if limit_per_encounter == 1:
 		limit = " (first time each encounter)"

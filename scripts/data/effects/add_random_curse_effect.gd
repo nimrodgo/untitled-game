@@ -12,7 +12,7 @@ func apply(ctx: EffectContext) -> void:
 		return
 	var who := ctx.resolve(target)
 	for i in amount:
-		ctx.encounter.add_card(who, curses[ctx.encounter.rng.randi_range(0, curses.size() - 1)], zone)
+		await ctx.encounter.add_card(who, curses[ctx.encounter.rng.randi_range(0, curses.size() - 1)], zone, false, ctx.owner)
 
 
 func describe() -> String:

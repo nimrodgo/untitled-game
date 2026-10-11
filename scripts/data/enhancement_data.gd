@@ -20,6 +20,11 @@ extends Resource
 @export var destroy_on_apply: bool = false
 ## The card counts as a curse for everything that looks at curses.
 @export var counts_as_curse: bool = false
+## Temporary (⏳): the card is burned (destroyed, no triggers) at the end of the encounter.
+@export var temporary: bool = false
+## Only effects attach it: never sold in the shop, never picked by random
+## enhancement (Blank Slate).
+@export var generated_only: bool = false
 ## Icon token (see Icons) shown in the corner of an enhanced card and on the
 ## shop tile. The card's own text is never changed by an enhancement.
 @export var icon: String = ""
@@ -43,4 +48,6 @@ func get_description() -> String:
 		parts.append("Destroys the card immediately")
 	if counts_as_curse:
 		parts.append("Counts as a curse")
+	if temporary:
+		parts.append("Burned at the end of the encounter")
 	return ". ".join(parts)

@@ -40,8 +40,8 @@ func _init() -> void:
 	e.description = "This card is immediately 🔥"
 	_save(e)
 
-	# Retain: This card is 📌 while in your hand
-	e = _make("anchored", "Anchored", CardSets.Id.RETAIN)
+	# Next Round: This card is 📌 while in your hand
+	e = _make("anchored", "Anchored", CardSets.Id.NEXT_ROUND)
 	e.icon = "📌"
 	e.retain = true
 	e.description = "This card is 📌 while in your hand"

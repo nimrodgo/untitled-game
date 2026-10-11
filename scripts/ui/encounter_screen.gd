@@ -598,7 +598,7 @@ func _show_deck_viewer() -> void:
 # ================================================================ choices
 
 ## Verb shown while picking, with its icon where the game has one.
-const VERB_ICONS := {"Discard": "⤵", "Destroy": "🔥", "Remove": "🗑", "Refresh": "↺", "Retain": "📌", "Draw": "🂠", "Buy": "🛍"}
+const VERB_ICONS := {"Discard": "⤵", "Destroy": "🔥", "Remove": "🗑", "Refresh": "↺", "Retain": "📌", "Draw": "🂠", "Buy": "🛍", "Copy": "⧉"}
 
 
 func _verb(req: ChoiceRequest) -> String:
