@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="EnhancementData" format=3 uid="uid://dgr7jtrsddj12"]
 
 [ext_resource type="Script" uid="uid://tnk8v5vh272q" path="res://scripts/data/effect.gd" id="1_pmek0"]
-[ext_resource type="Script" uid="uid://d3xj3r0g0hv8u" path="res://scripts/data/effects/draw_this_card_effect.gd" id="2_l507f"]
+[ext_resource type="Script" uid="uid://l5ere0y371di" path="res://scripts/data/effects/play_this_card_effect.gd" id="2_l507f"]
 [ext_resource type="Script" uid="uid://c7wqsr8q832fh" path="res://scripts/data/enhancement_data.gd" id="3_0j7qy"]
 
 [sub_resource type="Resource" id="Resource_3es4n"]
@@ -15,4 +15,4 @@ cost = 3
 card_set = 4
 on_discard = Array[ExtResource("1_pmek0")]([SubResource("Resource_3es4n")])
 icon = "⤵"
-description = "When this is ⤵, 🂠 it"
+description = "When this is ⤵, play it"

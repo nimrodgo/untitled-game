@@ -747,22 +747,32 @@ func _enhancement_rules() -> void:
 	_check(pile - e.player.draw_pile.size() == plain_drawn + 1, "Insight: draws 1 extra card on play")
 
 	# Discard: when discarded, it comes back to your hand.
+	# "This is another card" (instant) gives 1 coin when played.
 	e = _enc(DECK5 + DECK5)
-	c = _give_enh(e, "example1", "boomerang")
+	c = _give_enh(e, "example2", "boomerang")
+	var coins_b := e.player.coins
+	var played_b := e.player.cards_played_this_turn
 	e.discard_cards(e.player, [c])
-	_check(e.player.hand.has(c) and not e.player.discard.has(c), "Boomerang: a discarded card returns to hand")
+	_check(e.player.coins == coins_b + 1, "Boomerang: a discarded card is played (+1 coin, got %d)" % (e.player.coins - coins_b))
+	_check(e.player.cards_played_this_turn == played_b + 1 and e.player.played_log.has(c), "Boomerang: it counts as a play")
+	_check(e.player.discard.has(c) and not e.player.hand.has(c), "Boomerang: the card stays in the discard pile (not drawn)")
 	_consistent(e, "Boomerang")
-	var plain_c := _give(e, "example1")
+	var plain_c := _give(e, "example2")
+	coins_b = e.player.coins
 	e.discard_cards(e.player, [plain_c])
-	_check(e.player.discard.has(plain_c), "Boomerang: only the enhanced card returns")
+	_check(e.player.discard.has(plain_c) and e.player.coins == coins_b, "Boomerang: only the enhanced card is played")
+	# Not affected by draw locks any more (it plays, it doesn't draw).
+	c = _give_enh(e, "example2", "boomerang")
 	e.player.draw_locked = true
+	coins_b = e.player.coins
 	e.discard_cards(e.player, [c])
-	_check(e.player.discard.has(c), "Boomerang: stays discarded while draws are locked")
+	_check(e.player.coins == coins_b + 1, "Boomerang: still plays while draws are locked")
 	# End-of-round cleanup is not a discard.
 	e = _enc(DECK5 + DECK5, false)
-	c = _give_enh(e, "example1", "boomerang")
+	c = _give_enh(e, "example2", "boomerang")
+	coins_b = e.player.coins
 	e.pass_turn()
-	_check(e.player.discard.has(c) or e.player.hand.has(c) == false, "Boomerang: end-of-round cleanup still discards it")
+	_check(e.player.coins == coins_b and not e.player.played_log.has(c), "Boomerang: end-of-round cleanup is not a discard, so it is not played")
 
 	# Trim: buying it destroys the chosen card immediately (not when played).
 	e = _enc(DECK5 + DECK5, true, false, ENC_DIR % "clutter")

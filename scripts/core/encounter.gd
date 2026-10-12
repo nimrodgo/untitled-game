@@ -617,6 +617,13 @@ func play_copy(p: PlayerState, c: CardInstance) -> void:
 	await _resolve_play(p, c, false)
 
 
+## Play a card where it is, for free (no action, no cost): resolve its on-play
+## effects as a play. It is not moved anywhere (Boomerang plays it from the discard pile).
+func play_in_place(p: PlayerState, c: CardInstance) -> void:
+	log_line("  %s play %s." % [p.display_name, _card_name(c)])
+	await _resolve_play(p, c, false)
+
+
 ## Buy a card instance from anywhere (market, removed, destroyed pile...).
 ## Pays `cost`, resolves on-buy + buy triggers. If `place` is false the card
 ## is left out of every pile (the caller decides where it goes).
