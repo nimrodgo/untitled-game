@@ -26,11 +26,11 @@ func _init() -> void:
 	e.extra_on_play.assign([draw])
 	_save(e)
 
-	# Discard: When this is ⤵, 🂠 it
+	# Discard: When this is ⤵, play it (Nimrod 2026-10-12: play, not draw)
 	e = _make("boomerang", "Boomerang", CardSets.Id.DISCARD)
 	e.icon = "⤵"
-	e.on_discard.assign([DrawThisCardEffect.new()])
-	e.description = "When this is ⤵, 🂠 it"
+	e.on_discard.assign([PlayThisCardEffect.new()])
+	e.description = "When this is ⤵, play it"
 	_save(e)
 
 	# Trim: This card is immediately 🔥 (the moment you buy it, not when played)

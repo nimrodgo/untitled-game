@@ -40,7 +40,7 @@ Each effect implements these methods:
 | `OfferRedrawEffect` | — | For a `CARD_DRAWN` charm: you may discard the card just drawn to draw another. Declining, or the start-of-turn draw, doesn't use up the charm. |
 | `DrawLockEffect` | — | The **target** can't draw additional cards this turn (an enemy intent with `target = OPPONENT` locks *your* draws) |
 | `NextTurnDrawEffect` | `amount`=1 | Draw N extra at the start of your next turn |
-| `DrawThisCardEffect` | — | Draws the card this effect belongs to into your hand from wherever it is (e.g. the discard pile). Nothing while draws are locked. Used by the Boomerang enhancement. Text "🂠 this card". |
+| `PlayThisCardEffect` | — | Plays the card this effect belongs to, in place and for free (e.g. from the discard pile): its on-play effects resolve and it counts as a play; the card does not move. Used by the Boomerang enhancement. Text "Play this card". |
 
 ### Remove, destroy, move
 
