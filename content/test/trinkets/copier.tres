@@ -2,44 +2,46 @@
 
 [ext_resource type="Script" path="res://scripts/data/trinket_level.gd" id="1_lvl"]
 [ext_resource type="Script" path="res://scripts/data/effect.gd" id="2_eff"]
-[ext_resource type="Resource" path="res://content/test/curses/dead_weight.tres" id="3_dw"]
-[ext_resource type="Script" path="res://scripts/data/effects/add_card_effect.gd" id="4_add"]
+[ext_resource type="Script" path="res://scripts/data/effects/pay_coins_effect.gd" id="3_pay"]
 [ext_resource type="Script" path="res://scripts/data/effects/copy_card_effect.gd" id="5_copy"]
 [ext_resource type="Script" path="res://scripts/data/trinket_data.gd" id="6_trk"]
+
+[sub_resource type="Resource" id="Resource_pay1"]
+script = ExtResource("3_pay")
 
 [sub_resource type="Resource" id="Resource_copy1"]
 script = ExtResource("5_copy")
 
-[sub_resource type="Resource" id="Resource_dw1"]
-script = ExtResource("4_add")
-card = ExtResource("3_dw")
-
 [sub_resource type="Resource" id="Resource_l1"]
 script = ExtResource("1_lvl")
 upgrade_cost = 0
-effects = Array[ExtResource("2_eff")]([SubResource("Resource_copy1"), SubResource("Resource_dw1")])
-text = "⚡Make a ⏳ copy of a card in your hand. Gain 1 Dead Weight"
+effects = Array[ExtResource("2_eff")]([SubResource("Resource_pay1"), SubResource("Resource_copy1")])
+text = "⚡Pay 🪙 ➡ a ⏳ copy of a card in your hand"
+
+[sub_resource type="Resource" id="Resource_pay2"]
+script = ExtResource("3_pay")
+amount = 2
 
 [sub_resource type="Resource" id="Resource_copy2"]
 script = ExtResource("5_copy")
+amount = 2
 
 [sub_resource type="Resource" id="Resource_l2"]
 script = ExtResource("1_lvl")
-effects = Array[ExtResource("2_eff")]([SubResource("Resource_copy2")])
-text = "⚡Make a ⏳ copy of a card in your hand"
+effects = Array[ExtResource("2_eff")]([SubResource("Resource_pay2"), SubResource("Resource_copy2")])
+text = "⚡Pay 🪙🪙 ➡ ⏳ copies of 2 cards in your hand"
+
+[sub_resource type="Resource" id="Resource_pay3"]
+script = ExtResource("3_pay")
 
 [sub_resource type="Resource" id="Resource_copy3"]
 script = ExtResource("5_copy")
 amount = 2
 
-[sub_resource type="Resource" id="Resource_dw3"]
-script = ExtResource("4_add")
-card = ExtResource("3_dw")
-
 [sub_resource type="Resource" id="Resource_l3"]
 script = ExtResource("1_lvl")
-effects = Array[ExtResource("2_eff")]([SubResource("Resource_copy3"), SubResource("Resource_dw3")])
-text = "⚡Make ⏳ copies of 2 cards in your hand. Gain 1 Dead Weight"
+effects = Array[ExtResource("2_eff")]([SubResource("Resource_pay3"), SubResource("Resource_copy3")])
+text = "⚡Pay 🪙 ➡ ⏳ copies of 2 cards in your hand"
 
 [resource]
 script = ExtResource("6_trk")

@@ -1506,7 +1506,7 @@ func _temporary_rules() -> void:
 	_check(e.player.coins == coins + 2, "Trade-In: +2 coins")
 	_consistent(e, "Trade-In")
 
-	# Copier: level 1 copies + Dead Weight, level 2 copies, level 3 copies 2 + Dead Weight.
+	# Copier: L1 pay 1 -> 1 copy, L2 pay 2 -> 2 copies, L3 pay 1 -> 2 copies. No Dead Weight.
 	for lvl in 3:
 		e = _enc(DECK5 + DECK5)
 		var tr := TrinketInstance.new(_trinket("copier"))
@@ -1514,10 +1514,20 @@ func _temporary_rules() -> void:
 		e.player.trinkets.append(tr)
 		var dw := _count_id(e.player.all_cards(), "dead_weight")
 		var temps := _temps_in(e.player.hand)
+		var pay := 2 if lvl == 1 else 1
+		var want := 1 if lvl == 0 else 2
+		coins = e.player.coins
 		_check(e.use_trinket(0), "Copier L%d: usable" % (lvl + 1))
-		var want := 2 if lvl == 2 else 1
+		_check(e.player.coins == coins - pay, "Copier L%d: pays %d" % [lvl + 1, pay])
 		_check(_temps_in(e.player.hand) == temps + want, "Copier L%d: %d temporary cop%s in hand" % [lvl + 1, want, "y" if want == 1 else "ies"])
-		_check(_count_id(e.player.all_cards(), "dead_weight") == dw + (0 if lvl == 1 else 1), "Copier L%d: Dead Weight %s" % [lvl + 1, "not added" if lvl == 1 else "added"])
+		_check(_count_id(e.player.all_cards(), "dead_weight") == dw, "Copier L%d: no Dead Weight" % (lvl + 1))
+		# Can't use it without the coins.
+		e = _enc(DECK5 + DECK5)
+		tr = TrinketInstance.new(_trinket("copier"))
+		tr.level = lvl
+		e.player.trinkets.append(tr)
+		e.player.coins = pay - 1
+		_check(not e.can_use_trinket(0), "Copier L%d: not usable with %d coins" % [lvl + 1, pay - 1])
 	# Level 3 with a single card in hand: 2 copies of it.
 	e = _enc(DECK5 + DECK5, false)
 	for k in e.player.hand.duplicate():
