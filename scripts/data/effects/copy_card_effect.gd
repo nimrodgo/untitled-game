@@ -1,13 +1,13 @@
 class_name CopyCardEffect
 extends Effect
-## Make `amount` copies of cards you choose in your hand, temporary (⏳) by
-## default. You pick up to `amount` different cards; if you have fewer, the
-## extra copies go round the ones you picked. Copies are the plain card (no
-## enhancements other than Temporary).
+## Pick `amount` different cards in your hand (fewer if you have fewer) and
+## make `copies` copies of each, temporary (⏳) by default. Copies are the
+## plain card (no enhancements other than Temporary).
 ## `discard_original`: discard each picked card first ("⤵ a card ➡ a copy").
 ## `bonus_coins`: gained once if anything was copied.
 
 @export var amount: int = 1
+@export var copies: int = 1
 @export var zone: GameRules.Zone = GameRules.Zone.HAND
 @export var temporary: bool = true
 @export var discard_original: bool = false
@@ -26,8 +26,9 @@ func apply(ctx: EffectContext) -> void:
 		datas.append(c.data)
 	if discard_original:
 		await enc.discard_cards(p, picks)
-	for i in amount:
-		await enc.add_card(p, datas[i % datas.size()], zone, temporary, p)
+	for cd in datas:
+		for i in copies:
+			await enc.add_card(p, cd, zone, temporary, p)
 	if bonus_coins > 0:
 		enc.change_coins(p, bonus_coins, ctx.source_name)
 
@@ -35,10 +36,11 @@ func apply(ctx: EffectContext) -> void:
 func describe() -> String:
 	var t := "⏳ " if temporary else ""
 	var s := ""
-	if amount == 1:
-		s = "a %scopy of a card in your hand" % t
+	var what := "a card" if amount == 1 else "%d cards" % amount
+	if copies == 1:
+		s = "a %scopy of %s in your hand" % [t, what]
 	else:
-		s = "%d %scopies of cards in your hand" % [amount, t]
+		s = "%d %scopies of %s in your hand" % [copies, t, what]
 	if discard_original:
 		s = "⤵ a card ➡ " + s.replace("of a card in your hand", "of it")
 	else:
@@ -49,4 +51,4 @@ func describe() -> String:
 
 
 func ai_score() -> float:
-	return 0.8 * amount + bonus_coins - (0.3 if discard_original else 0.0)
+	return 0.8 * amount * copies + bonus_coins - (0.3 if discard_original else 0.0)

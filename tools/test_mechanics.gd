@@ -1506,12 +1506,13 @@ func _temporary_rules() -> void:
 	_check(e.player.coins == coins + 2, "Trade-In: +2 coins")
 	_consistent(e, "Trade-In")
 
-	# Copier: L1 pay 1 -> 1 copy, L2 pay 2 -> 2 copies, L3 pay 1 -> 2 copies. No Dead Weight.
+	# Copier: L1 pay 1 -> 1 copy, L2 pay 2 -> 2 copies of one card, L3 pay 1 -> 2 copies of one card.
 	for lvl in 3:
 		e = _enc(DECK5 + DECK5)
 		var tr := TrinketInstance.new(_trinket("copier"))
 		tr.level = lvl
 		e.player.trinkets.append(tr)
+		_give(e, "example2")  # a mixed hand, so "same card" means something
 		var dw := _count_id(e.player.all_cards(), "dead_weight")
 		var temps := _temps_in(e.player.hand)
 		var pay := 2 if lvl == 1 else 1
@@ -1520,6 +1521,11 @@ func _temporary_rules() -> void:
 		_check(e.use_trinket(0), "Copier L%d: usable" % (lvl + 1))
 		_check(e.player.coins == coins - pay, "Copier L%d: pays %d" % [lvl + 1, pay])
 		_check(_temps_in(e.player.hand) == temps + want, "Copier L%d: %d temporary cop%s in hand" % [lvl + 1, want, "y" if want == 1 else "ies"])
+		var copied := {}
+		for k in e.player.hand:
+			if k.is_temporary():
+				copied[k.data] = true
+		_check(copied.size() == 1, "Copier L%d: all copies are of the same card" % (lvl + 1))
 		_check(_count_id(e.player.all_cards(), "dead_weight") == dw, "Copier L%d: no Dead Weight" % (lvl + 1))
 		# Can't use it without the coins.
 		e = _enc(DECK5 + DECK5)
@@ -1528,17 +1534,6 @@ func _temporary_rules() -> void:
 		e.player.trinkets.append(tr)
 		e.player.coins = pay - 1
 		_check(not e.can_use_trinket(0), "Copier L%d: not usable with %d coins" % [lvl + 1, pay - 1])
-	# Level 3 with a single card in hand: 2 copies of it.
-	e = _enc(DECK5 + DECK5, false)
-	for k in e.player.hand.duplicate():
-		e.player.hand.erase(k)
-		e.player.draw_pile.append(k)
-	_give(e, "example2")
-	var tr3 := TrinketInstance.new(_trinket("copier"))
-	tr3.level = 2
-	e.player.trinkets.append(tr3)
-	e.use_trinket(0)
-	_check(_count_id(e.player.hand, "example2") == 3, "Copier L3: one card in hand -> 2 copies of it")
 
 	# Free Trial: a temporary copy of the first card bought each turn goes to the hand.
 	e = _enc(DECK5 + DECK5, false)

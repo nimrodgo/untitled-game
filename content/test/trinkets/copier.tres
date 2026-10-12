@@ -24,24 +24,24 @@ amount = 2
 
 [sub_resource type="Resource" id="Resource_copy2"]
 script = ExtResource("5_copy")
-amount = 2
+copies = 2
 
 [sub_resource type="Resource" id="Resource_l2"]
 script = ExtResource("1_lvl")
 effects = Array[ExtResource("2_eff")]([SubResource("Resource_pay2"), SubResource("Resource_copy2")])
-text = "⚡Pay 🪙🪙 ➡ ⏳ copies of 2 cards in your hand"
+text = "⚡Pay 🪙🪙 ➡ 2 ⏳ copies of a card in your hand"
 
 [sub_resource type="Resource" id="Resource_pay3"]
 script = ExtResource("3_pay")
 
 [sub_resource type="Resource" id="Resource_copy3"]
 script = ExtResource("5_copy")
-amount = 2
+copies = 2
 
 [sub_resource type="Resource" id="Resource_l3"]
 script = ExtResource("1_lvl")
 effects = Array[ExtResource("2_eff")]([SubResource("Resource_pay3"), SubResource("Resource_copy3")])
-text = "⚡Pay 🪙 ➡ ⏳ copies of 2 cards in your hand"
+text = "⚡Pay 🪙 ➡ 2 ⏳ copies of a card in your hand"
 
 [resource]
 script = ExtResource("6_trk")
